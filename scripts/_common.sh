@@ -5,7 +5,8 @@
 #=================================================
 
 # dependencies used by the app
-pkg_dependencies="postgresql python3"
+# HACK zlib1g-dev libjpeg-dev (libwebp-dev optional but necessary for stickers) are necessary to compile / install pillow
+pkg_dependencies="postgresql python3 zlib1g-dev libjpeg-dev libwebp-dev"
 
 #=================================================
 # PERSONAL HELPERS
