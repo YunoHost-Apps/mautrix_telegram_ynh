@@ -95,14 +95,6 @@ then
 fi
 
 #=================================================
-# NGINX CONFIGURATION
-#=================================================
-ynh_script_progression --message="Upgrading NGINX web server configuration..." --time --weight=1
-
-# Create a dedicated NGINX config
-ynh_add_nginx_config
-
-#=================================================
 # UPGRADE DEPENDENCIES
 #=================================================
 ynh_script_progression --message="Upgrading dependencies..." --time --weight=1
@@ -131,6 +123,12 @@ ynh_add_fpm_config
 # ...
 #=================================================
 
+if [ "$upgrade_type" == "UPGRADE_APP" ]
+then
+$final_path/bin/pip3 install --upgrade setuptools wheel # HACK fixes "error: invalid command 'bdist_wheel'"
+$final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[postgres,speedups,webp_convert,qr_login]
+fi
+#
 #=================================================
 # SETUP SYSTEMD
 #=================================================
@@ -145,12 +143,71 @@ ynh_add_systemd_config
 
 ### Verify the checksum of a file, stored by `ynh_store_file_checksum` in the install script.
 ### And create a backup of this file if the checksum is different. So the file will be backed up if the admin had modified it.
-ynh_backup_if_checksum_is_different --file="$final_path/CONFIG_FILE"
 
-ynh_replace_string --match_string="match_string" --replace_string="replace_string" --target_file="$final_path/CONFIG_FILE"
+server_name=$(ynh_app_setting_get --app=$app --key=server_name)
+port=$(ynh_app_setting_get --app=$app --key=port)
+mautrix_bridge_user=$(ynh_app_setting_get --app=$app --key=mautrix_bridge_user)
+mautrix_bridge_db_pwd=$(ynh_app_setting_get --app=$app --key=mautrix_bridge_db_pwd)
+mautrix_bridge_db_name=$(ynh_app_setting_get --app=$app --key=mautrix_bridge_db_name)
+botname=$(ynh_app_setting_get --app=$app --key=botname)
+botusers=$(ynh_app_setting_get --app=$app --key=botusers)
+botadmin=$(ynh_app_setting_get --app=$app --key=botadmin)
+apiid=$(ynh_app_setting_get --app=$app --key=apiid)
+apihash=$(ynh_app_setting_get --app=$app --key=apihash)
+bottoken=$(ynh_app_setting_get --app=$app --key=bottoken)
+
+# mautrix_config_path="$final_path/config.yaml"
+# cp ../conf/config.yaml "$mautrix_config_path"
+# ynh_replace_string --match_string=__DOMAIN__ --replace_string="https://$domain" --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__SERVER_NAME__ --replace_string=$server_name --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__VERIFY_SERVER_SSL_CERTIFICATES__ --replace_string=true --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__MATRIX_SERVER_SUPPORTS_ASMUX__ --replace_string=false --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__PORT__ --replace_string=$port --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__MAUTRIX_BRIDGE_USER__ --replace_string=$mautrix_bridge_user --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__MAUTRIX_BRIDGE_DB_PWD__ --replace_string=$mautrix_bridge_db_pwd --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__MAUTRIX_BRIDGE_DB_NAME__ --replace_string=$mautrix_bridge_db_name --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__BOTNAME__ --replace_string=$botname --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__ENCRYPTION__ --replace_string=$encryption --target_file="$mautrix_config_path"
+# if [ "$botusers" = "local" ]
+# then
+# ynh_replace_string --match_string=__BOTUSERS__ --replace_string=$server_name --target_file="$mautrix_config_path"
+# else
+# ynh_replace_string --match_string=__BOTUSERS__ --replace_string=$botusers --target_file="$mautrix_config_path"
+# fi
+# ynh_replace_string --match_string=__BOTADMIN__ --replace_string=$botadmin --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__APP__ --replace_string=$app --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__LOG_FILENAME__ --replace_string="/var/log/$app/$app.log" --target_file="$mautrix_config_path"
+#     # Options: debug, info, warn, error, fatal
+# ynh_replace_string --match_string=__LOG_LEVEL__ --replace_string="error" --target_file="$mautrix_config_path"
+
+# ynh_replace_string --match_string=__TELEGRAM_API_ID__ --replace_string=$apiid --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__TELEGRAM_API_HASH__ --replace_string=$apihash --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__TELEGRAM_BOT_TOKEN__ --replace_string=$bottoken --target_file="$mautrix_config_path"
+
+# ynh_backup_if_checksum_is_different --file="$mautrix_config_path"
+
+# ynh_replace_string --match_string="script_location = alembic" \
+#   --replace_string="script_location = $final_path/alembic" \
+#   --target_file="$final_path/alembic.ini"
+# ynh_backup_if_checksum_is_different --file="$final_path/alembic.ini"
+
+# upgrade the python stuff
+$final_path/bin/python3 -m mautrix_telegram -g -c "$mautrix_config_path" -r "$app_service_registration_path/$app.yaml"
+
+# update the registration file
+synapse_instance=$(ynh_app_setting_get --app=$app --key=synapse_instance)
+app_service_registration_path="/etc/matrix-$synapse_instance/app-service"
+$final_path/bin/alembic  -c "$final_path/alembic.ini" -x config="$mautrix_config_path" upgrade head
+
+# upgrade the database
+ynh_backup_if_checksum_is_different --file="$app_service_registration_path/$app.yaml"
+
 
 # Recalculate and store the checksum of the file for the next upgrade.
-ynh_store_file_checksum --file="$final_path/CONFIG_FILE"
+ynh_store_file_checksum --file="$mautrix_config_path"
+ynh_store_file_checksum --file="$final_path/alembic.ini"
+
+
 
 #=================================================
 # GENERIC FINALIZATION
@@ -184,31 +241,12 @@ ynh_script_progression --message="Starting a systemd service..." --time --weight
 ynh_systemd_action --service_name=$app --action="start" --log_path="/var/log/$app/$app.log"
 
 #=================================================
-# UPGRADE FAIL2BAN
+# RELOAD synapse
 #=================================================
-ynh_script_progression --message="Reconfiguring Fail2Ban..." --time --weight=1
+ynh_script_progression --message="Reloading synapse server..." --time --weight=1
 
-# Create a dedicated Fail2Ban config
-ynh_add_fail2ban_config --logpath="/var/log/nginx/${domain}-error.log" --failregex="Regex to match into the log for a failed login"
-
-#=================================================
-# SETUP SSOWAT
-#=================================================
-ynh_script_progression --message="Upgrading SSOwat configuration..." --time --weight=1
-
-# Make app public if necessary
-if [ $is_public -eq 1 ]
-then
-	# unprotected_uris allows SSO credentials to be passed anyway
-	ynh_app_setting_set --app=$app --key=unprotected_uris --value="/"
-fi
-
-#=================================================
-# RELOAD NGINX
-#=================================================
-ynh_script_progression --message="Reloading NGINX web server..." --time --weight=1
-
-ynh_systemd_action --service_name=nginx --action=reload
+/opt/yunohost/matrix-$synapse_instance/update_synapse_for_appservice.sh \
+    || ynh_die "Synapse can't restart with the appservice configuration"
 
 #=================================================
 # END OF SCRIPT

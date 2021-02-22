@@ -25,13 +25,37 @@ appservice:
     # Usually 1 is enough, but on high-traffic bridges you might need to increase this to avoid 413s
     max_body_size: 1
 
-    # The full URI to the database. Only Postgres is currently supported.
+    # The full URI to the database. SQLite and Postgres are fully supported.
+    # Other DBMSes supported by SQLAlchemy may or may not work.
+    # Format examples:
+    #   SQLite:   sqlite:///filename.db
+    #   Postgres: postgres://username:password@hostname/dbname
     database: postgres://__MAUTRIX_BRIDGE_USER__:__MAUTRIX_BRIDGE_DB_PWD__@localhost:5432/__MAUTRIX_BRIDGE_DB_NAME__
-    # Additional arguments for asyncpg.create_pool()
-    # https://magicstack.github.io/asyncpg/current/api/index.html#asyncpg.pool.create_pool
-    database_opts:
-        min_size: 5
-        max_size: 10
+    # Optional extra arguments for SQLAlchemy's create_engine
+    database_opts: {}
+
+    # Public part of web server for out-of-Matrix interaction with the bridge.
+    # Used for things like login if the user wants to make sure the 2FA password isn't stored in
+    # the HS database.
+    public:
+        # Whether or not the public-facing endpoints should be enabled.
+        enabled: false
+        # The prefix to use in the public-facing endpoints.
+        prefix: /public
+        # The base URL where the public-facing endpoints are available. The prefix is not added
+        # implicitly.
+        external: https://example.com/public
+
+    # Provisioning API part of the web server for automated portal creation and fetching information.
+    # Used by things like mautrix-manager (https://github.com/tulir/mautrix-manager).
+    provisioning:
+        # Whether or not the provisioning API should be enabled.
+        enabled: false
+        # The prefix to use in the provisioning API endpoints.
+        prefix: /_matrix/provision/v1
+        # The shared secret to authorize users of the API.
+        # Set to "generate" to generate and save a new token.
+        shared_secret: generate
 
     # The unique ID of this appservice.
     id: __BOTNAME__
@@ -39,14 +63,14 @@ appservice:
     bot_username: __BOTNAME__
     # Display name and avatar for bot. Set to "remove" to remove display name/avatar, leave empty
     # to leave display name/avatar as-is.
-    bot_displayname: Signal bridge bot
-    bot_avatar: mxc://maunium.net/wPJgTQbZOtpBFmDNkiNEMDUp
+    bot_displayname: Telegram bridge bot
+    bot_avatar: mxc://maunium.net/tJCRmUyJDsgRNgqhOgoiHWbX
 
     # Community ID for bridged users (changes registration file) and rooms.
     # Must be created manually.
     #
-    # Example: "+signal:example.com". Set to false to disable.
-    community_id: +sg:__SERVER_NAME__
+    # Example: "+telegram:example.com". Set to false to disable.
+    community_id: +telegram:__SERVER_NAME__
 
     # Whether or not to receive ephemeral events via appservice transactions.
     # Requires MSC2409 support (i.e. Synapse 1.22+).
@@ -62,58 +86,104 @@ metrics:
     enabled: false
     listen_port: 8000
 
-signal:
-    # Path to signald unix socket
-    socket_path: /var/run/signald/signald.sock
-    # Directory for temp files when sending files to Signal. This should be an
-    # absolute path that signald can read. For attachments in the other direction,
-    # make sure signald is configured to use an absolute path as the data directory.
-    outgoing_attachment_dir: /tmp
-    # Directory where signald stores avatars for groups.
-    avatar_dir: ~/.config/signald/avatars
-    # Directory where signald stores auth data. Used to delete data when logging out.
-    data_dir: ~/.config/signald/data
-    # Whether or not message attachments should be removed from disk after they're bridged.
-    remove_file_after_handling: true
+# Manhole config.
+manhole:
+    # Whether or not opening the manhole is allowed.
+    enabled: false
+    # The path for the unix socket.
+    path: /var/tmp/mautrix-telegram.manhole
+    # The list of UIDs who can be added to the whitelist.
+    # If empty, any UIDs can be specified in the open-manhole command.
+    whitelist:
+    - 0
 
 # Bridge config
 bridge:
-    # Localpart template of MXIDs for Signal users.
-    # {userid} is replaced with an identifier for the Signal user.
-    username_template: "sg_{userid}"
-    # Displayname template for Signal users.
-    # {displayname} is replaced with the displayname of the Signal user, which is the first
-    # available variable in displayname_preference. The variables in displayname_preference
-    # can also be used here directly.
-    displayname_template: "{displayname} (SG)"
-    # Whether or not contact list displaynames should be used.
-    # Possible values: disallow, allow, prefer
-    #
-    # Multi-user instances are recommended to disallow contact list names, as otherwise there can
-    # be conflicts between names from different users' contact lists.
-    contact_list_names: disallow
-    # Available variables: full_name, first_name, last_name, phone, uuid
-    displayname_preference:
-    - full_name
-    - phone
+    # Localpart template of MXIDs for Telegram users.
+    # {userid} is replaced with the user ID of the Telegram user.
+    username_template: "telegram_{userid}"
+    # Localpart template of room aliases for Telegram portal rooms.
+    # {groupname} is replaced with the name part of the public channel/group invite link ( https://t.me/{} )
+    alias_template: "telegram_{groupname}"
+    # Displayname template for Telegram users.
+    # {displayname} is replaced with the display name of the Telegram user.
+    displayname_template: "{displayname} (Telegram)"
 
-    # Whether or not to create portals for all groups on login/connect.
-    autocreate_group_portal: true
-    # Whether or not to create portals for all contacts on login/connect.
-    autocreate_contact_portal: false
-    # Whether or not to use /sync to get read receipts and typing notifications
+    # Set the preferred order of user identifiers which to use in the Matrix puppet display name.
+    # In the (hopefully unlikely) scenario that none of the given keys are found, the numeric user
+    # ID is used.
+    #
+    # If the bridge is working properly, a phone number or an username should always be known, but
+    # the other one can very well be empty.
+    #
+    # Valid keys:
+    #   "full name"          (First and/or last name)
+    #   "full name reversed" (Last and/or first name)
+    #   "first name"
+    #   "last name"
+    #   "username"
+    #   "phone number"
+    displayname_preference:
+    - full name
+    - username
+    - phone number
+    # Maximum length of displayname
+    displayname_max_length: 100
+    # Remove avatars from Telegram ghost users when removed on Telegram. This is disabled by default
+    # as there's no way to determine whether an avatar is removed or just hidden from some users. If
+    # you're on a single-user instance, this should be safe to enable.
+    allow_avatar_remove: false
+
+    # Maximum number of members to sync per portal when starting up. Other members will be
+    # synced when they send messages. The maximum is 10000, after which the Telegram server
+    # will not send any more members.
+    # -1 means no limit (which means it's limited to 10000 by the server)
+    max_initial_member_sync: 100
+    # Whether or not to sync the member list in channels.
+    # If no channel admins have logged into the bridge, the bridge won't be able to sync the member
+    # list regardless of this setting.
+    sync_channel_members: true
+    # Whether or not to skip deleted members when syncing members.
+    skip_deleted_members: true
+    # Whether or not to automatically synchronize contacts and chats of Matrix users logged into
+    # their Telegram account at startup.
+    startup_sync: true
+    # Number of most recently active dialogs to check when syncing chats.
+    # Set to 0 to remove limit.
+    sync_update_limit: 0
+    # Number of most recently active dialogs to create portals for when syncing chats.
+    # Set to 0 to remove limit.
+    sync_create_limit: 30
+    # Whether or not to sync and create portals for direct chats at startup.
+    sync_direct_chats: false
+    # The maximum number of simultaneous Telegram deletions to handle.
+    # A large number of simultaneous redactions could put strain on your homeserver.
+    max_telegram_delete: 10
+    # Whether or not to automatically sync the Matrix room state (mostly unpuppeted displaynames)
+    # at startup and when creating a bridge.
+    sync_matrix_state: true
+    # Allow logging in within Matrix. If false, users can only log in using login-qr or the
+    # out-of-Matrix login website (see appservice.public config section)
+    allow_matrix_login: true
+    # Whether or not to bridge plaintext highlights.
+    # Only enable this if your displayname_template has some static part that the bridge can use to
+    # reliably identify what is a plaintext highlight.
+    plaintext_highlights: false
+    # Whether or not to make portals of publicly joinable channels/supergroups publicly joinable on Matrix.
+    public_portals: true
+    # Whether or not to use /sync to get presence, read receipts and typing notifications
     # when double puppeting is enabled
     sync_with_custom_puppets: true
     # Whether or not to update the m.direct account data event when double puppeting is enabled.
     # Note that updating the m.direct event is not atomic (except with mautrix-asmux)
     # and is therefore prone to race conditions.
     sync_direct_chat_list: false
-    # Allow using double puppeting from any server with a valid client .well-known file.
-    double_puppet_allow_discovery: false
-    # Servers to allow double puppeting from, even if double_puppet_allow_discovery is false.
+    # Servers to always allow double puppeting from
     double_puppet_server_map:
         example.com: https://example.com
-    # Shared secret for https://github.com/devture/matrix-synapse-shared-secret-auth
+    # Allow using double puppeting from any server with a valid client .well-known file.
+    double_puppet_allow_discovery: false
+    # Shared secrets for https://github.com/devture/matrix-synapse-shared-secret-auth
     #
     # If set, custom puppets will be enabled automatically for local users
     # instead of users having to find an access token and run `login-matrix`
@@ -121,18 +191,61 @@ bridge:
     # If using this for other servers than the bridge's server,
     # you must also set the URL in the double_puppet_server_map.
     login_shared_secret_map:
-        example.com: foo
+        example.com: foobar
+    # Set to false to disable link previews in messages sent to Telegram.
+    telegram_link_preview: true
+    # Whether or not the !tg join command should do a HTTP request
+    # to resolve redirects in invite links.
+    invite_link_resolve: false
+    # Use inline images instead of a separate message for the caption.
+    # N.B. Inline images are not supported on all clients (e.g. Element iOS/Android).
+    inline_images: false
+    # Maximum size of image in megabytes before sending to Telegram as a document.
+    image_as_file_size: 10
+    # Maximum size of Telegram documents in megabytes to bridge.
+    max_document_size: 100
+    # Enable experimental parallel file transfer, which makes uploads/downloads much faster by
+    # streaming from/to Matrix and using many connections for Telegram.
+    # Note that generating HQ thumbnails for videos is not possible with streamed transfers.
+    parallel_file_transfer: false
     # Whether or not created rooms should have federation enabled.
     # If false, created portal rooms will never be federated.
     federate_rooms: true
-    # End-to-bridge encryption support options. You must install the e2be optional dependency for
-    # this to work. See https://github.com/tulir/mautrix-telegram/wiki/End‐to‐bridge-encryption
+    # Settings for converting animated stickers.
+    animated_sticker:
+        # Format to which animated stickers should be converted.
+        # disable - No conversion, send as-is (gzipped lottie)
+        # png - converts to non-animated png (fastest),
+        # gif - converts to animated gif, but loses transparency
+        # webm - converts to webm video, requires ffmpeg executable with vp9 codec and webm container support
+        target: gif
+        # Arguments for converter. All converters take width and height.
+        # GIF converter takes background as a hex color.
+        args:
+            width: 256
+            height: 256
+            background: "020202"  # only for gif
+            fps: 30               # only for webm
+    # End-to-bridge encryption support options. These require matrix-nio to be installed with pip
+    # and login_shared_secret to be configured in order to get a device for the bridge bot.
+    #
+    # Additionally, https://github.com/matrix-org/synapse/pull/5758 is required if using a normal
+    # application service.
     encryption:
         # Allow encryption, work in group chat rooms with e2ee enabled
-        allow: __ENCRYPTION__
+        allow: false
         # Default to encryption, force-enable encryption in all portals the bridge creates
         # This will cause the bridge bot to be in private chats for the encryption to work properly.
         default: false
+        # Database for the encryption data. Currently only supports Postgres and an in-memory
+        # store that's persisted as a pickle.
+        # If set to `default`, will use the appservice postgres database
+        # or a pickle file if the appservice database is sqlite.
+        #
+        # Format examples:
+        #   Pickle:   pickle:///filename.pickle
+        #   Postgres: postgres://username:password@hostname/dbname
+        database: default
         # Options for automatic key sharing.
         key_sharing:
             # Enable key sharing? If enabled, key requests for rooms where users are in will be fulfilled.
@@ -149,43 +262,231 @@ bridge:
     # chat portal rooms. This will be implicitly enabled if encryption.default is true.
     private_chat_portal_meta: false
     # Whether or not the bridge should send a read receipt from the bridge bot when a message has
-    # been sent to Signal. This let's you check manually whether the bridge is receiving your
-    # messages.
-    # Note that this is not related to Signal delivery receipts.
+    # been sent to Telegram.
     delivery_receipts: false
-    # Whether or not delivery errors should be reported as messages in the Matrix room. (not yet implemented)
+    # Whether or not delivery errors should be reported as messages in the Matrix room.
     delivery_error_reports: false
     # Set this to true to tell the bridge to re-send m.bridge events to all rooms on the next run.
     # This field will automatically be changed back to false after it,
     # except if the config file is not writable.
     resend_bridge_info: false
+    # Settings for backfilling messages from Telegram.
+    backfill:
+        # Whether or not the Telegram ghosts of logged in Matrix users should be
+        # invited to private chats when backfilling history from Telegram. This is
+        # usually needed to prevent rate limits and to allow timestamp massaging.
+        invite_own_puppet: true
+        # Maximum number of messages to backfill without using a takeout.
+        # The first time a takeout is used, the user has to manually approve it from a different
+        # device. If initial_limit or missed_limit are higher than this value, the bridge will ask
+        # the user to accept the takeout after logging in before syncing any chats.
+        takeout_limit: 100
+        # Maximum number of messages to backfill initially.
+        # Set to 0 to disable backfilling when creating portal, or -1 to disable the limit.
+        #
+        # N.B. Initial backfill will only start after member sync. Make sure your
+        #      max_initial_member_sync is set to a low enough value so it doesn't take forever.
+        initial_limit: 0
+        # Maximum number of messages to backfill if messages were missed while the bridge was
+        # disconnected. Note that this only works for logged in users and only if the chat isn't
+        # older than sync_update_limit
+        # Set to 0 to disable backfilling missed messages.
+        missed_limit: 50
+        # If using double puppeting, should notifications be disabled
+        # while the initial backfill is in progress?
+        disable_notifications: false
+        # Whether or not to enable backfilling in normal groups.
+        # Normal groups have numerous technical problems in Telegram, and backfilling normal groups
+        # will likely cause problems if there are multiple Matrix users in the group.
+        normal_groups: false
 
-    # Provisioning API part of the web server for automated portal creation and fetching information.
-    # Used by things like mautrix-manager (https://github.com/tulir/mautrix-manager).
-    provisioning:
-        # Whether or not the provisioning API should be enabled.
-        enabled: false
-        # The prefix to use in the provisioning API endpoints.
-        prefix: /_matrix/provision/v1
-        # The shared secret to authorize users of the API.
-        # Set to "generate" to generate and save a new token.
-        shared_secret: generate
+    # Overrides for base power levels.
+    initial_power_level_overrides:
+        user: {}
+        group: {}
+
+    # Whether to bridge Telegram bot messages as m.notices or m.texts.
+    bot_messages_as_notices: true
+    bridge_notices:
+        # Whether or not Matrix bot messages (type m.notice) should be bridged.
+        default: false
+        # List of user IDs for whom the previous flag is flipped.
+        # e.g. if bridge_notices.default is false, notices from other users will not be bridged, but
+        #      notices from users listed here will be bridged.
+        exceptions:
+        - "@importantbot:example.com"
+
+    # Some config options related to Telegram message deduplication.
+    # The default values are usually fine, but some debug messages/warnings might recommend you
+    # change these.
+    deduplication:
+        # Whether or not to check the database if the message about to be sent is a duplicate.
+        pre_db_check: false
+        # The number of latest events to keep when checking for duplicates.
+        # You might need to increase this on high-traffic bridge instances.
+        cache_queue_length: 20
+
+    # The formats to use when sending messages to Telegram via the relay bot.
+    # Text msgtypes (m.text, m.notice and m.emote) support HTML, media msgtypes don't.
+    #
+    # Available variables:
+    #   $sender_displayname - The display name of the sender (e.g. Example User)
+    #   $sender_username    - The username (Matrix ID localpart) of the sender (e.g. exampleuser)
+    #   $sender_mxid        - The Matrix ID of the sender (e.g. @exampleuser:example.com)
+    #   $message            - The message content
+    message_formats:
+        m.text: "<b>$sender_displayname</b>: $message"
+        m.notice: "<b>$sender_displayname</b>: $message"
+        m.emote: "* <b>$sender_displayname</b> $message"
+        m.file: "<b>$sender_displayname</b> sent a file: $message"
+        m.image: "<b>$sender_displayname</b> sent an image: $message"
+        m.audio: "<b>$sender_displayname</b> sent an audio file: $message"
+        m.video: "<b>$sender_displayname</b> sent a video: $message"
+        m.location: "<b>$sender_displayname</b> sent a location: $message"
+    # Telegram doesn't have built-in emotes, this field specifies how m.emote's from authenticated
+    # users are sent to telegram. All fields in message_formats are supported. Additionally, the
+    # Telegram user info is available in the following variables:
+    #    $displayname - Telegram displayname
+    #    $username    - Telegram username (may not exist)
+    #    $mention     - Telegram @username or displayname mention (depending on which exists)
+    emote_format: "* $mention $formatted_body"
+
+    # The formats to use when sending state events to Telegram via the relay bot.
+    #
+    # Variables from `message_formats` that have the `sender_` prefix are available without the prefix.
+    # In name_change events, `$prev_displayname` is the previous displayname.
+    #
+    # Set format to an empty string to disable the messages for that event.
+    state_event_formats:
+        join: "<b>$displayname</b> joined the room."
+        leave: "<b>$displayname</b> left the room."
+        name_change: "<b>$prev_displayname</b> changed their name to <b>$displayname</b>"
+
+    # Filter rooms that can/can't be bridged. Can also be managed using the `filter` and
+    # `filter-mode` management commands.
+    #
+    # Filters do not affect direct chats.
+    # An empty blacklist will essentially disable the filter.
+    filter:
+        # Filter mode to use. Either "blacklist" or "whitelist".
+        # If the mode is "blacklist", the listed chats will never be bridged.
+        # If the mode is "whitelist", only the listed chats can be bridged.
+        mode: blacklist
+        # The list of group/channel IDs to filter.
+        list: []
 
     # The prefix for commands. Only required in non-management rooms.
-    command_prefix: "!sg"
+    command_prefix: "!tg"
 
     # Permissions for using the bridge.
     # Permitted values:
-    #       user - Use the bridge with puppeting.
-    #      admin - Use and administrate the bridge.
+    #   relaybot - Only use the bridge via the relaybot, no access to commands.
+    #       user - Relaybot level + access to commands to create bridges.
+    #  puppeting - User level + logging in with a Telegram account.
+    #       full - Full access to use the bridge, i.e. previous levels + Matrix login.
+    #      admin - Full access to use the bridge and some extra administration commands.
     # Permitted keys:
     #        * - All Matrix users
     #   domain - All users on that homeserver
     #     mxid - Specific user
     permissions:
-        "__BOTUSERS__": "user"
+        "*": "relaybot"
+        "__BOTUSERS__": "puppeting"
         "__BOTADMIN__": "admin"
 
+    # Options related to the message relay Telegram bot.
+    relaybot:
+        private_chat:
+            # List of users to invite to the portal when someone starts a private chat with the bot.
+            # If empty, private chats with the bot won't create a portal.
+            invite: []
+            # Whether or not to bridge state change messages in relaybot private chats.
+            state_changes: true
+            # When private_chat_invite is empty, this message is sent to users /starting the
+            # relaybot. Telegram's "markdown" is supported.
+            message: This is a Matrix bridge relaybot and does not support direct chats
+        # List of users to invite to all group chat portals created by the bridge.
+        group_chat_invite: []
+        # Whether or not the relaybot should not bridge events in unbridged group chats.
+        # If false, portals will be created when the relaybot receives messages, just like normal
+        # users. This behavior is usually not desirable, as it interferes with manually bridging
+        # the chat to another room.
+        ignore_unbridged_group_chat: true
+        # Whether or not to allow creating portals from Telegram.
+        authless_portals: true
+        # Whether or not to allow Telegram group admins to use the bot commands.
+        whitelist_group_admins: true
+        # Whether or not to ignore incoming events sent by the relay bot.
+        ignore_own_incoming_events: true
+        # List of usernames/user IDs who are also allowed to use the bot commands.
+        whitelist: []
+
+# Telegram config
+telegram:
+    # Get your own API keys at https://my.telegram.org/apps
+    api_id: __TELEGRAM_API_ID__
+    api_hash: __TELEGRAM_API_HASH__
+    # (Optional) Create your own bot at https://t.me/BotFather
+    bot_token: __TELEGRAM_BOT_TOKEN__
+
+    # Telethon connection options.
+    connection:
+        # The timeout in seconds to be used when connecting.
+        timeout: 120
+        # How many times the reconnection should retry, either on the initial connection or when
+        # Telegram disconnects us. May be set to a negative or null value for infinite retries, but
+        # this is not recommended, since the program can get stuck in an infinite loop.
+        retries: 5
+        # The delay in seconds to sleep between automatic reconnections.
+        retry_delay: 1
+        # The threshold below which the library should automatically sleep on flood wait errors
+        # (inclusive). For instance, if a FloodWaitError for 17s occurs and flood_sleep_threshold
+        # is 20s, the library will sleep automatically. If the error was for 21s, it would raise
+        # the error instead. Values larger than a day (86400) will be changed to a day.
+        flood_sleep_threshold: 60
+        # How many times a request should be retried. Request are retried when Telegram is having
+        # internal issues, when there is a FloodWaitError less than flood_sleep_threshold, or when
+        # there's a migrate error. May take a negative or null value for infinite retries, but this
+        # is not recommended, since some requests can always trigger a call fail (such as searching
+        # for messages).
+        request_retries: 5
+
+    # Device info sent to Telegram.
+    device_info:
+        # "auto" = OS name+version.
+        device_model: auto
+        # "auto" = Telethon version.
+        system_version: auto
+        # "auto" = mautrix-telegram version.
+        app_version: auto
+        lang_code: en
+        system_lang_code: en
+
+    # Custom server to connect to.
+    server:
+        # Set to true to use these server settings. If false, will automatically
+        # use production server assigned by Telegram. Set to false in production.
+        enabled: false
+        # The DC ID to connect to.
+        dc: 2
+        # The IP to connect to.
+        ip: 149.154.167.40
+        # The port to connect to. 443 may not work, 80 is better and both are equally secure.
+        port: 80
+
+    # Telethon proxy configuration.
+    # You must install PySocks from pip for proxies to work.
+    proxy:
+        # Allowed types: disabled, socks4, socks5, http, mtproxy
+        type: disabled
+        # Proxy IP address and port.
+        address: 127.0.0.1
+        port: 1080
+        # Whether or not to perform DNS resolving remotely. Only for socks/http proxies.
+        rdns: true
+        # Proxy authentication (optional). Put MTProxy secret in password field.
+        username: ""
+        password: ""
 
 # Python logging configuration.
 #
@@ -195,7 +496,7 @@ logging:
     version: 1
     formatters:
         colored:
-            (): mautrix_signal.util.ColorFormatter
+            (): mautrix_telegram.util.ColorFormatter
             format: "[%(asctime)s] [%(levelname)s@%(name)s] %(message)s"
         normal:
             format: "[%(asctime)s] [%(levelname)s@%(name)s] %(message)s"
@@ -212,6 +513,8 @@ logging:
     loggers:
         mau:
             level: DEBUG
+        telethon:
+            level: INFO
         aiohttp:
             level: INFO
     root:

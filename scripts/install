@@ -30,10 +30,15 @@ encryption=$YNH_APP_ARG_ENCRYPTION
 botadmin=$YNH_APP_ARG_BOTADMIN
 botusers=$YNH_APP_ARG_BOTUSERS
 
+# TODO new settings specific to telegram
+apiid=$YNH_APP_ARG_APIID
+apihash=$YNH_APP_ARG_APIHASH
+bottoken=$YNH_APP_ARG_BOTTOKEN
+
 app=$YNH_APP_INSTANCE_NAME
 final_path=/opt/yunohost/$app
 
-# ToDo check (in manifest?) if the selected synapse instance is not already connected to a mautrix_bridge bridge
+# TODO check (in manifest?) if the selected synapse instance is not already connected to a mautrix_bridge bridge
 if [ $synapsenumber -eq "1" ]
 then
 synapse_instance="synapse"
@@ -74,7 +79,7 @@ test ! -e "$final_path" || ynh_die --message="This path already contains a folde
 ynh_script_progression --message="Configuring firewall..." --weight=1
 
 # Find a free port for communication between your local synapse instance (home server) and its app service mautrix_bridge.
-port=$(ynh_find_port --port=8449)
+port=$(ynh_find_port --port=29317)
 
 #=================================================
 # STORE SETTINGS FROM MANIFEST
@@ -88,9 +93,13 @@ ynh_app_setting_set --app=$app --key=botname --value=$botname
 ynh_app_setting_set --app=$app --key=synapse_instance --value=$synapse_instance
 ynh_app_setting_set --app=$app --key=app_service_registration_path --value=$app_service_registration_path
 ynh_app_setting_set --app=$app --key=encryption --value=$encryption
-ynh_app_setting_set --app=$app --key=mautrix_bridge_db_name --value=$mautrix_bridge_db_name
-ynh_app_setting_set --app=$app --key=botadmin --value=$botadmin
+ynh_app_setting_set --app=$app --key=mautrix_bridge_db_name --value=$mautrix_bridge_db_name ynh_app_setting_set --app=$app --key=botadmin --value=$botadmin
 ynh_app_setting_set --app=$app --key=botusers --value=$botusers
+
+ynh_app_setting_set --app=$app --key=apiid --value=$apiid
+ynh_app_setting_set --app=$app --key=apihash --value=$apihash
+ynh_app_setting_set --app=$app --key=bottoken --value=$bottoken
+
 ynh_app_setting_set --app=$app --key=mautrix_version --value=$upstream_version
 ynh_app_setting_set --app=$app --key=final_path --value=$final_path
 
@@ -108,8 +117,6 @@ ynh_script_progression --message="Installing dependencies..." --weight=97
 ###		- And the section "UPGRADE DEPENDENCIES" in the upgrade script
 
 ynh_install_app_dependencies $pkg_dependencies
-
-ynh_install_extra_app_dependencies --repo="https://updates.signald.org unstable main" --package="libunixsocket-java signaldctl signald" --key="https://updates.signald.org/apt-signing-key.asc"
 
 #=================================================
 # CREATE A POSTGRESQL DATABASE
@@ -204,6 +211,10 @@ ynh_replace_string --match_string=__LOG_FILENAME__ --replace_string="/var/log/$a
     # Options: debug, info, warn, error, fatal
 ynh_replace_string --match_string=__LOG_LEVEL__ --replace_string="error" --target_file="$mautrix_config_path"
 
+ynh_replace_string --match_string=__TELEGRAM_API_ID__ --replace_string=$apiid --target_file="$mautrix_config_path"
+ynh_replace_string --match_string=__TELEGRAM_API_HASH__ --replace_string=$apihash --target_file="$mautrix_config_path"
+ynh_replace_string --match_string=__TELEGRAM_BOT_TOKEN__ --replace_string=$bottoken --target_file="$mautrix_config_path"
+
 
 #=================================================
 # INSTALL MAUTRIX-BRIDGE PYTHON MODULE
@@ -212,10 +223,17 @@ ynh_replace_string --match_string=__LOG_LEVEL__ --replace_string="error" --targe
 mkdir -p /var/log/$app
 # Configure Mautrix-Bridge
 python3 -m venv $final_path
-#$final_path/bin/pip3 install --upgrade setuptools wheel
-$final_path/bin/pip3 install $final_path/src/mautrix-signal.tar.gz[metrics,formattednumbers,qrlink]
+$final_path/bin/pip3 install --upgrade setuptools wheel # HACK fixes "error: invalid command 'bdist_wheel'"
+$final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[postgres,speedups,webp_convert,qr_login] # metrics
 # -r optional-requirements.txt
-$final_path/bin/python3 -m mautrix_signal -g -c $mautrix_config_path -r $app_service_registration_path/$app.yaml
+$final_path/bin/python3 -m mautrix_telegram -g -c "$mautrix_config_path" -r "$app_service_registration_path/$app.yaml"
+# initialize the database
+# HACK alembic won't find its script dir using a relative path unless when started from $final_path
+# therefore we replace the script_location
+ynh_replace_string --match_string="script_location = alembic" \
+  --replace_string="script_location = $final_path/alembic" \
+  --target_file="$final_path/alembic.ini"
+$final_path/bin/alembic  -c "$final_path/alembic.ini" -x config="$mautrix_config_path" upgrade head
 
 /opt/yunohost/matrix-$synapse_instance/update_synapse_for_appservice.sh \
     || ynh_die "Synapse can't restart with the appservice configuration"
@@ -264,7 +282,7 @@ chown $mautrix_bridge_user:root -R /var/log/$app
 #=================================================
 #yunohost service add $app --log "/var/log/$app/log.log"
 # if using yunohost version 3.2 or more in the 'manifest.json', a description can be added
-yunohost service add $app --description "$app daemon for bridging Signal and Matrix messages" --log "/var/log/$app/$app.log"
+yunohost service add $app --description "$app daemon for bridging Telegram and Matrix messages" --log "/var/log/$app/$app.log"
 
 #=================================================
 # START SYSTEMD SERVICE

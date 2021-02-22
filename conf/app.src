@@ -1,7 +1,7 @@
-SOURCE_URL=https://github.com/tulir/mautrix-signal/archive/v0.1.0.tar.gz
-SOURCE_SUM=950249a464c636ad6134f43da7a19d5fe14175782ec02754479ded1330897ff7
+SOURCE_URL=https://github.com/tulir/mautrix-telegram/archive/v0.9.0.tar.gz
+SOURCE_SUM=e0fb30bf448f1bec6f27f73662c1dcddd36986367dcbe4f34509b23af67142a9
 SOURCE_SUM_PRG=sha256sum
 SOURCE_FORMAT=tar.gz
 SOURCE_IN_SUBDIR=true
-SOURCE_FILENAME=mautrix-signal.tar.gz
+SOURCE_FILENAME=mautrix-telegram.tar.gz
 SOURCE_EXTRACT=false
