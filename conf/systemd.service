@@ -1,0 +1,13 @@
+[Unit]
+Description=Matrix Signal Bridge
+After=matrix-synapse.service
+
+[Service]
+Type=simple
+User=__APP__
+Group=__APP__
+WorkingDirectory=__FINALPATH__/
+ExecStart=__FINALPATH__/bin/python3 -m mautrix_signal
+
+[Install]
+WantedBy=multi-user.target

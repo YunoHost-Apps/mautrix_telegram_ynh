@@ -1,0 +1,97 @@
+{
+	"name": "Matrix-Signal bridge",
+	"id": "mautrix_signal",
+	"packaging_format": 1,
+	"description": {
+		"en": "A Signal puppeting bridge for Matrix/Synapse.",
+		"fr": "Passerelle Signal pour Matrix/Synapse."
+	},
+	"version": "0.1.0~ynh1",
+	"url": "https://github.com/tulir/mautrix-signal",
+	"license": "AGPL-3.0-or-later",
+	"maintainer": {
+		"name": "Gredin67",
+		"email": "mautrix_signal_ynh@sans-nuage.fr",
+		"url": "https://github.com/YunoHost-Apps/mautrix_signal_ynh"
+	},
+	"requirements": {
+		"yunohost": ">= 4.0"
+	},
+	"multi_instance": true,
+	"services": [
+        "postgresql"
+    	],
+	"arguments": {
+		"install": [
+			{
+				"name": "synapsenumber",
+				"type": "string",
+				"ask": {
+					"en": "Choose the local synapse instance number to communicate with mautrix_signal",
+					"fr": "Choisissez le numéro de l'instance synapse qui doit communiquer avec mautrix_signal"
+				},
+				"example": "2 (for instance synapse__2)",
+				"help": {
+					"en": "If you installed synapse only once time, then leave default value 1.",
+					"fr": "Si vous n'avez installé qu'une fois synapse, gardez la valeur par défaut 1."
+				},
+				"default": "1"
+			},
+			{
+				"name": "botname",
+				"type": "string",
+				"ask": {
+					"en": "Choose a local synapse user name for the Signal bot",
+					"fr": "Choisissez un nom d'utilisateur synapse local pour le robot Signal"
+				},
+				"example": "signalbot",
+				"help": {
+					"en": "A system user will be created. Invite @signalbot:localsynapse.servername from an authorized Matrix account to start bridging. Give the matrix server_name, not the full domain/url.",
+					"fr": "Un utilisateur système sera créé. Inviter @signalbot:localsynapse.servername depuis un compte Matrix autorisé pour démarrer une passerelle. Donner le nom du serveur matrix, pas le domaine/url complet."
+				},
+				"default": "signalbot"
+			},
+			{
+				"name": "encryption",
+				"type": "boolean",
+				"ask": {
+					"en": "Enable end-to-bridge encryption ?",
+					"fr": "Activer le chiffrement entre synapse et le bridge ?"
+				},
+				"help": {
+					"en": "Only activate if you know the prerequisites and constraints related to e2b.",
+					"fr": "N'activer que si vous connaissez les prérequis et constraintes liées à e2b."
+				},
+				"default": false
+			},			
+			{
+				"name": "botadmin",
+				"type": "string",
+				"ask": {
+					"en": "Choose the Matrix account administrator of the Signal bot",
+					"fr": "Choisissez le compte Matrix administrateur du robot Signal"
+				},
+				"example": "@johndoe:localsynapse.servername or @johndoe:matrix.org",
+				"help": {
+					"en": "The Signal bot administrator does not need to be a local synapse account.",
+					"fr": "Le compte administrateur du robot Signal peut ne pas être un compte local synapse."
+				},
+				"default": "Your main Matrix account"
+			},
+			{
+				"name": "botusers",
+				"type": "string",
+				"ask": {
+					"en": "Choose Matrix user(s) authorized to bridge with the Signal bot",
+					"fr": "Choisissez le/les compte(s) Matrix autorisés à utiliser le robot Signal"
+				},
+				"example": "local or @johndoe:server.name or server.name or *",
+				"default": "local",
+				"help": {
+					"en": "All local synapse users (local), a remote or local user (@johndoe:server.name), a remote server (matrix.org), or all remote/local servers (*) can be authorized. Give the matrix server_name, not the full domain/url.",
+					"fr": "On peut autoriser tous les comptes synapse locaux (local), un compte local ou distant (@johndoe:server.name), un serveur distant (matrix.org), ou tous les serveurs remote/local (*). Donner le nom du serveur matrix, pas le domaine/url complet."
+				}
+			}
+		]
+	}
+}
