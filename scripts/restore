@@ -32,6 +32,7 @@ domain=$(ynh_app_setting_get --app=$app --key=domain)
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
 mautrix_bridge_db_name=$(ynh_app_setting_get --app=$app --key=mautrix_bridge_db_name)
 mautrix_bridge_db_pwd=$(ynh_app_setting_get --app=$app --key=mautrix_bridge_db_pwd)
+app_service_registration_path=$(ynh_app_setting_get --app=$app --key=app_service_registration_path)
 mautrix_bridge_db_user=$mautrix_bridge_db_name
 
 #=================================================
