@@ -16,23 +16,23 @@ ynh_script_progression --message="Loading installation settings..." --time --wei
 
 app=$YNH_APP_INSTANCE_NAME
 
-domain=$(ynh_app_setting_ --app=$app --key=domain)
-server_name=$(ynh_app_setting_ --app=$app --key=server_name)
-port=$(ynh_app_setting_ --app=$app --key=port)
-botname=$(ynh_app_setting_ --app=$app --key=botname)
-synapse_instance=$(ynh_app_setting_ --app=$app --key=synapse_instance)
-app_service_registration_path=$(ynh_app_setting_ --app=$app --key=app_service_registration_path)
-encryption=$(ynh_app_setting_ --app=$app --key=encryption)
-mautrix_bridge_db_name=$(ynh_app_setting_ --app=$app --key=mautrix_bridge_db_name)
-botadmin=$(ynh_app_setting_ --app=$app --key=botadmin)
-botusers=$(ynh_app_setting_ --app=$app --key=botusers)
+domain=$(ynh_app_setting_get --app=$app --key=domain)
+server_name=$(ynh_app_setting_get --app=$app --key=server_name)
+port=$(ynh_app_setting_get --app=$app --key=port)
+botname=$(ynh_app_setting_get --app=$app --key=botname)
+synapse_instance=$(ynh_app_setting_get --app=$app --key=synapse_instance)
+app_service_registration_path=$(ynh_app_setting_get --app=$app --key=app_service_registration_path)
+encryption=$(ynh_app_setting_get --app=$app --key=encryption)
+mautrix_bridge_db_name=$(ynh_app_setting_get --app=$app --key=mautrix_bridge_db_name)
+botadmin=$(ynh_app_setting_get --app=$app --key=botadmin)
+botusers=$(ynh_app_setting_get --app=$app --key=botusers)
 
-apiid=$(ynh_app_setting_ --app=$app --key=apiid)
-apihash=$(ynh_app_setting_ --app=$app --key=apihash)
-bottoken=$(ynh_app_setting_ --app=$app --key=bottoken)
+apiid=$(ynh_app_setting_get --app=$app --key=apiid)
+apihash=$(ynh_app_setting_get --app=$app --key=apihash)
+bottoken=$(ynh_app_setting_get --app=$app --key=bottoken)
 
-upstream_version=$(ynh_app_setting_ --app=$app --key=mautrix_version)
-final_path=$(ynh_app_setting_ --app=$app --key=final_path)
+upstream_version=$(ynh_app_setting_get --app=$app --key=mautrix_version)
+final_path=$(ynh_app_setting_get --app=$app --key=final_path)
 
 
 
