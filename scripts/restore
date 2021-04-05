@@ -90,7 +90,7 @@ ynh_psql_create_user $mautrix_bridge_db_user $mautrix_bridge_db_pwd
 ynh_print_ON
 ynh_psql_execute_as_root \
 --sql="CREATE DATABASE ""$mautrix_bridge_db_name"" ENCODING 'UTF8' LC_COLLATE='C' LC_CTYPE='C' template=template0 OWNER ""$mautrix_bridge_db_user"";"
-ynh_psql_connect_as --user=$mautrix_bridge_db_user --password=$mautrix_bridge_db_pwd --database=$db_name < ./db.sql
+ynh_psql_connect_as --user=$mautrix_bridge_db_user --password=$mautrix_bridge_db_pwd --database=$mautrix_bridge_db_name < ./db.sql
 
 #=================================================
 # RESTORE SYSTEMD
