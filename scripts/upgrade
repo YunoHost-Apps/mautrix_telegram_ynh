@@ -131,7 +131,7 @@ if [ "$upgrade_type" == "UPGRADE_APP" ]
 then
 ynh_script_progression --message="Upgrading python packages..." --time --weight=1
 $final_path/bin/pip3 install --upgrade setuptools wheel # HACK fixes "error: invalid command 'bdist_wheel'"
-$final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[postgres,speedups,qr_login,hq_thumbnails]
+$final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[postgres,speedups,qr_login] #,hq_thumbnails
 fi
 #
 #=================================================
