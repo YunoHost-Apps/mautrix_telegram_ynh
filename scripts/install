@@ -85,7 +85,6 @@ port=$(ynh_find_port --port=29317)
 # STORE SETTINGS FROM MANIFEST
 #=================================================
 ynh_script_progression --message="Storing installation settings..." --weight=7
-
 ynh_app_setting_set --app=$app --key=domain --value=$domain
 ynh_app_setting_set --app=$app --key=server_name --value=$server_name
 ynh_app_setting_set --app=$app --key=port --value=$port
@@ -93,7 +92,8 @@ ynh_app_setting_set --app=$app --key=botname --value=$botname
 ynh_app_setting_set --app=$app --key=synapse_instance --value=$synapse_instance
 ynh_app_setting_set --app=$app --key=app_service_registration_path --value=$app_service_registration_path
 ynh_app_setting_set --app=$app --key=encryption --value=$encryption
-ynh_app_setting_set --app=$app --key=mautrix_bridge_db_name --value=$mautrix_bridge_db_name ynh_app_setting_set --app=$app --key=botadmin --value=$botadmin
+ynh_app_setting_set --app=$app --key=mautrix_bridge_db_name --value=$mautrix_bridge_db_name
+ynh_app_setting_set --app=$app --key=botadmin --value=$botadmin
 ynh_app_setting_set --app=$app --key=botusers --value=$botusers
 
 ynh_app_setting_set --app=$app --key=apiid --value=$apiid
@@ -189,6 +189,7 @@ mautrix_config_path="$final_path/config.yaml"
 #Copy example-config.yaml to config.yaml
 cp ../conf/config.yaml "$mautrix_config_path"
 
+
 ynh_replace_string --match_string=__DOMAIN__ --replace_string="https://$domain" --target_file="$mautrix_config_path"
 ynh_replace_string --match_string=__SERVER_NAME__ --replace_string=$server_name --target_file="$mautrix_config_path"
 ynh_replace_string --match_string=__VERIFY_SERVER_SSL_CERTIFICATES__ --replace_string=true --target_file="$mautrix_config_path"
@@ -214,6 +215,10 @@ ynh_replace_string --match_string=__LOG_LEVEL__ --replace_string="error" --targe
 ynh_replace_string --match_string=__TELEGRAM_API_ID__ --replace_string=$apiid --target_file="$mautrix_config_path"
 ynh_replace_string --match_string=__TELEGRAM_API_HASH__ --replace_string=$apihash --target_file="$mautrix_config_path"
 ynh_replace_string --match_string=__TELEGRAM_BOT_TOKEN__ --replace_string=$bottoken --target_file="$mautrix_config_path"
+
+generated="\"This value is generated when generating the registration\""
+ynh_replace_string --match_string=__AS_TOKEN__ --replace_string="$generated" --target_file="$mautrix_config_path"
+ynh_replace_string --match_string=__HS_TOKEN__ --replace_string="$generated" --target_file="$mautrix_config_path"
 
 
 #=================================================

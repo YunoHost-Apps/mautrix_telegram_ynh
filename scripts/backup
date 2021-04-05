@@ -30,8 +30,15 @@ app=$YNH_APP_INSTANCE_NAME
 
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
 domain=$(ynh_app_setting_get --app=$app --key=domain)
-db_name=$(ynh_app_setting_get --app=$app --key=db_name)
 phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
+
+app_service_registration_path=$(ynh_app_setting_get --app=$app --key=app_service_registration_path)
+
+# synapse_instance=$(ynh_app_setting_get --app=$app --key=synapse_instance)
+# mautrix_bridge_db_name=$(ynh_app_setting_get --app=$app --key=mautrix_bridge_db_name)
+# mautrix_bridge_db_user=$app
+# mautrix_bridge_db_pwd=$(ynh_app_setting_get --app=$app --key=mautrix_bridge_db_pwd)
+# mautrix_bridge_db_pwd=$(ynh_app_setting_get --app=$app --key=mautrix_bridge_db_pwd)
 
 #=================================================
 # DECLARE DATA AND CONF FILES TO BACKUP
@@ -47,6 +54,7 @@ ynh_print_info --message="Declaring files to be backed up..."
 # BACKUP THE APP MAIN DIR
 #=================================================
 
+# includes config file
 ynh_backup --src_path="$final_path"
 
 #=================================================
@@ -67,7 +75,8 @@ ynh_backup --src_path="/etc/systemd/system/$app.service"
 # BACKUP VARIOUS FILES
 #=================================================
 
-# ynh_backup --src_path="/etc/$app/"
+# backup synapse registration file
+ynh_backup --src_path="$app_service_registration_path"
 
 #=================================================
 # BACKUP THE PostrgeSQL DATABASE
