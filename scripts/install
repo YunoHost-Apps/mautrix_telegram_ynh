@@ -186,40 +186,40 @@ ynh_script_progression --message="Configuring Mautrix-Bridge..." --weight=2
 
 mautrix_config_path="$final_path/config.yaml"
 
+# ynh_replace_string --match_string=__AS_TOKEN__ --replace_string="$generated" --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__HS_TOKEN__ --replace_string="$generated" --target_file="$mautrix_config_path"
+as_token="\"This value is generated when generating the registration\""
+hs_token="\"This value is generated when generating the registration\""
+
+write_bridge_config
+
 #Copy example-config.yaml to config.yaml
-cp ../conf/config.yaml "$mautrix_config_path"
+# cp ../conf/config.yaml "$mautrix_config_path"
+# ynh_replace_string --match_string=__DOMAIN__ --replace_string="$domain" --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__SERVER_NAME__ --replace_string=$server_name --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__VERIFY_SERVER_SSL_CERTIFICATES__ --replace_string=true --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__MATRIX_SERVER_SUPPORTS_ASMUX__ --replace_string=false --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__PORT__ --replace_string=$port --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__MAUTRIX_BRIDGE_USER__ --replace_string=$mautrix_bridge_user --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__MAUTRIX_BRIDGE_DB_PWD__ --replace_string=$mautrix_bridge_db_pwd --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__MAUTRIX_BRIDGE_DB_NAME__ --replace_string=$mautrix_bridge_db_name --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__BOTNAME__ --replace_string=$botname --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__ENCRYPTION__ --replace_string=$encryption --target_file="$mautrix_config_path"
+# if [ "$botusers" = "local" ]
+# then
+# ynh_replace_string --match_string=__BOTUSERS__ --replace_string=$server_name --target_file="$mautrix_config_path"
+# else
+# ynh_replace_string --match_string=__BOTUSERS__ --replace_string=$botusers --target_file="$mautrix_config_path"
+# fi
+# ynh_replace_string --match_string=__BOTADMIN__ --replace_string=$botadmin --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__APP__ --replace_string=$app --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__LOG_FILENAME__ --replace_string="/var/log/$app/$app.log" --target_file="$mautrix_config_path"
+#     # Options: debug, info, warn, error, fatal
+# ynh_replace_string --match_string=__LOG_LEVEL__ --replace_string="error" --target_file="$mautrix_config_path"
 
-
-ynh_replace_string --match_string=__DOMAIN__ --replace_string="https://$domain" --target_file="$mautrix_config_path"
-ynh_replace_string --match_string=__SERVER_NAME__ --replace_string=$server_name --target_file="$mautrix_config_path"
-ynh_replace_string --match_string=__VERIFY_SERVER_SSL_CERTIFICATES__ --replace_string=true --target_file="$mautrix_config_path"
-ynh_replace_string --match_string=__MATRIX_SERVER_SUPPORTS_ASMUX__ --replace_string=false --target_file="$mautrix_config_path"
-ynh_replace_string --match_string=__PORT__ --replace_string=$port --target_file="$mautrix_config_path"
-ynh_replace_string --match_string=__MAUTRIX_BRIDGE_USER__ --replace_string=$mautrix_bridge_user --target_file="$mautrix_config_path"
-ynh_replace_string --match_string=__MAUTRIX_BRIDGE_DB_PWD__ --replace_string=$mautrix_bridge_db_pwd --target_file="$mautrix_config_path"
-ynh_replace_string --match_string=__MAUTRIX_BRIDGE_DB_NAME__ --replace_string=$mautrix_bridge_db_name --target_file="$mautrix_config_path"
-ynh_replace_string --match_string=__BOTNAME__ --replace_string=$botname --target_file="$mautrix_config_path"
-ynh_replace_string --match_string=__ENCRYPTION__ --replace_string=$encryption --target_file="$mautrix_config_path"
-if [ "$botusers" = "local" ]
-then
-ynh_replace_string --match_string=__BOTUSERS__ --replace_string=$server_name --target_file="$mautrix_config_path"
-else
-ynh_replace_string --match_string=__BOTUSERS__ --replace_string=$botusers --target_file="$mautrix_config_path"
-fi
-ynh_replace_string --match_string=__BOTADMIN__ --replace_string=$botadmin --target_file="$mautrix_config_path"
-ynh_replace_string --match_string=__APP__ --replace_string=$app --target_file="$mautrix_config_path"
-ynh_replace_string --match_string=__LOG_FILENAME__ --replace_string="/var/log/$app/$app.log" --target_file="$mautrix_config_path"
-    # Options: debug, info, warn, error, fatal
-ynh_replace_string --match_string=__LOG_LEVEL__ --replace_string="error" --target_file="$mautrix_config_path"
-
-ynh_replace_string --match_string=__TELEGRAM_API_ID__ --replace_string=$apiid --target_file="$mautrix_config_path"
-ynh_replace_string --match_string=__TELEGRAM_API_HASH__ --replace_string=$apihash --target_file="$mautrix_config_path"
-ynh_replace_string --match_string=__TELEGRAM_BOT_TOKEN__ --replace_string=$bottoken --target_file="$mautrix_config_path"
-
-generated="\"This value is generated when generating the registration\""
-ynh_replace_string --match_string=__AS_TOKEN__ --replace_string="$generated" --target_file="$mautrix_config_path"
-ynh_replace_string --match_string=__HS_TOKEN__ --replace_string="$generated" --target_file="$mautrix_config_path"
-
+# ynh_replace_string --match_string=__TELEGRAM_API_ID__ --replace_string=$apiid --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__TELEGRAM_API_HASH__ --replace_string=$apihash --target_file="$mautrix_config_path"
+# ynh_replace_string --match_string=__TELEGRAM_BOT_TOKEN__ --replace_string=$bottoken --target_file="$mautrix_config_path"
 
 #=================================================
 # INSTALL MAUTRIX-BRIDGE PYTHON MODULE
@@ -229,7 +229,7 @@ mkdir -p /var/log/$app
 # Configure Mautrix-Bridge
 python3 -m venv $final_path
 $final_path/bin/pip3 install --upgrade setuptools wheel # HACK fixes "error: invalid command 'bdist_wheel'"
-$final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[postgres,speedups,webp_convert,qr_login] # metrics
+$final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[postgres,speedups,qr_login,hq_thumbnails] # metrics
 # -r optional-requirements.txt
 $final_path/bin/python3 -m mautrix_telegram -g -c "$mautrix_config_path" -r "$app_service_registration_path/$app.yaml"
 # initialize the database
@@ -253,8 +253,9 @@ $final_path/bin/alembic  -c "$final_path/alembic.ini" -x config="$mautrix_config
 ### you can make a backup of this file before modifying it again if the admin had modified it.
 
 # Calculate and store the config file checksum into the app settings
-ynh_store_file_checksum --file="$app_service_registration_path/$app.yaml"
 ynh_store_file_checksum --file="$mautrix_config_path"
+ynh_store_file_checksum --file="$app_service_registration_path/$app.yaml"
+ynh_store_file_checksum --file="$final_path/alembic.ini"
 
 #=================================================
 # GENERIC FINALIZATION
@@ -266,9 +267,6 @@ ynh_store_file_checksum --file="$mautrix_config_path"
 ### Then, if write authorization is needed, any access should be given only to directories
 ### that really need such authorization.
 
-# Set permissions to app files
-chown -R root: $final_path
-
 # WARNING : theses command are used in INSTALL, UPGRADE, RESTORE
 # For any update do it in all files
 chown $mautrix_bridge_user:root -R $final_path
@@ -279,6 +277,7 @@ chown $mautrix_bridge_user:root -R $final_path
 ynh_script_progression --message="Configuring log rotation..." --weight=3
 
 # Use logrotate to manage application logfile(s)
+# TODO maybe --specific-user??
 ynh_use_logrotate --logfile "/var/log/$app/$app.log"
 chown $mautrix_bridge_user:root -R /var/log/$app
 
