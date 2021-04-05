@@ -35,7 +35,7 @@ phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
 app_service_registration_path=$(ynh_app_setting_get --app=$app --key=app_service_registration_path)
 
 # synapse_instance=$(ynh_app_setting_get --app=$app --key=synapse_instance)
-# mautrix_bridge_db_name=$(ynh_app_setting_get --app=$app --key=mautrix_bridge_db_name)
+mautrix_bridge_db_name=$(ynh_app_setting_get --app=$app --key=mautrix_bridge_db_name)
 # mautrix_bridge_db_user=$app
 # mautrix_bridge_db_pwd=$(ynh_app_setting_get --app=$app --key=mautrix_bridge_db_pwd)
 # mautrix_bridge_db_pwd=$(ynh_app_setting_get --app=$app --key=mautrix_bridge_db_pwd)
@@ -86,7 +86,7 @@ ynh_print_info --message="Backing up the PostgreSQL database..."
 ### (However, things like MySQL dumps *do* take some time to run, though the
 ### copy of the generated dump to the archive still happens later)
 
-ynh_psql_dump_db --database="$db_name" > db.sql
+ynh_psql_dump_db --database="$mautrix_bridge_db_name" > db.sql
 
 #=================================================
 # END OF SCRIPT
