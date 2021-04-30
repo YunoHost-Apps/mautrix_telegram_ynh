@@ -1,0 +1,139 @@
+{
+	"name": "Matrix-Telegram bridge",
+	"id": "mautrix_telegram",
+	"packaging_format": 1,
+	"description": {
+		"en": "A Telegram puppeting bridge for Matrix/Synapse.",
+		"fr": "Passerelle Telegram pour Matrix/Synapse."
+	},
+	"version": "0.10.0-rc1~ynh1",
+	"url": "https://github.com/tulir/mautrix-telegram",
+	"license": "AGPL-3.0-or-later",
+	"maintainer": {
+		"name": "Gredin67",
+		"email": "mautrix_telegram_ynh@sans-nuage.fr",
+		"url": "https://github.com/YunoHost-Apps/mautrix_telegram_ynh"
+	},
+	"requirements": {
+		"yunohost": ">= 4.0"
+	},
+	"multi_instance": true,
+	"services": [
+        "postgresql"
+    	],
+	"arguments": {
+		"install": [
+			{
+				"name": "synapsenumber",
+				"type": "string",
+				"ask": {
+					"en": "Choose the local synapse instance number to communicate with mautrix_telegram",
+					"fr": "Choisissez le numéro de l'instance synapse qui doit communiquer avec mautrix_telegram"
+				},
+				"example": "2 (for instance synapse__2)",
+				"help": {
+					"en": "If you installed synapse only once time, then leave default value 1.",
+					"fr": "Si vous n'avez installé qu'une fois synapse, gardez la valeur par défaut 1."
+				},
+				"default": "1"
+			},
+			{
+				"name": "botname",
+				"type": "string",
+				"ask": {
+					"en": "Choose a local synapse user name for the Telegram bot",
+					"fr": "Choisissez un nom d'utilisateur synapse local pour le robot Telegram"
+				},
+				"example": "telegrambot",
+				"help": {
+					"en": "A system user will be created. Invite @telegrambot:localsynapse.servername from an authorized Matrix account to start bridging. Give the matrix server_name, not the full domain/url.",
+					"fr": "Un utilisateur système sera créé. Inviter @telegrambot:localsynapse.servername depuis un compte Matrix autorisé pour démarrer une passerelle. Donner le nom du serveur matrix, pas le domaine/url complet."
+				},
+				"default": "telegrambot"
+			},
+			{
+				"name": "encryption",
+				"type": "boolean",
+				"ask": {
+					"en": "Enable end-to-bridge encryption ?",
+					"fr": "Activer le chiffrement entre synapse et le bridge ?"
+				},
+				"help": {
+					"en": "Only activate if you know the prerequisites and constraints related to e2b.",
+					"fr": "N'activer que si vous connaissez les prérequis et constraintes liées à e2b."
+				},
+				"default": false
+			},			
+			{
+				"name": "botadmin",
+				"type": "string",
+				"ask": {
+					"en": "Choose the Matrix account administrator of the Telegram bot; admin permission",
+					"fr": "Choisissez le compte Matrix administrateur du robot Telegram"
+				},
+				"example": "@johndoe:localsynapse.servername or @johndoe:matrix.org",
+				"help": {
+					"en": "The Telegram bot administrator does not need to be a local synapse account.",
+					"fr": "Le compte administrateur du robot Telegram peut ne pas être un compte local synapse."
+				},
+				"default": ""
+			},
+			{
+				"name": "botusers",
+				"type": "string",
+				"ask": {
+					"en": "Choose Matrix user(s) authorized to bridge with the Telegram bot; puppeting permission",
+					"fr": "Choisissez le/les compte(s) Matrix autorisés à utiliser le robot Telegram"
+				},
+				"example": "local or @johndoe:server.name or server.name or *",
+				"default": "local",
+				"help": {
+					"en": "All local synapse users (local), a remote or local user (@johndoe:server.name), a remote server (matrix.org), or all remote/local servers (*) can be authorized. Give the matrix server_name, not the full domain/url.",
+					"fr": "On peut autoriser tous les comptes synapse locaux (local), un compte local ou distant (@johndoe:server.name), un serveur distant (matrix.org), ou tous les serveurs remote/local (*). Donner le nom du serveur matrix, pas le domaine/url complet."
+				}
+			},
+			{
+				"name": "apiid",
+				"type": "string",
+				"ask": {
+					"en": "Telegram API keys (https://my.telegram.org/apps): ID",
+					"fr": "TODO"
+				},
+				"example": "12345",
+				"default": "",
+				"help": {
+					"en": "Get your own API keys at https://my.telegram.org/apps",
+					"fr": "TODO"
+				}
+			},
+			{
+				"name": "apihash",
+				"type": "string",
+				"ask": {
+					"en": "Telegram API keys (https://my.telegram.org/apps): Hash",
+					"fr": "TODO"
+				},
+				"example": "tjyd5yge35lbodk1xwzw2jstp90k55qz",
+				"default": "",
+				"help": {
+					"en": "Get your own API keys at https://my.telegram.org/apps",
+					"fr": "TODO"
+				}
+			},
+			{
+				"name": "bottoken",
+				"type": "string",
+				"ask": {
+					"en": "Telegram bot token (optional)",
+					"fr": "TODO"
+				},
+				"example": "disabled",
+				"default": "disabled",
+				"help": {
+					"en": "Create your own telegram bot.",
+					"fr": "TODO"
+				}
+			}
+		]
+	}
+}
