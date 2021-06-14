@@ -6,7 +6,7 @@
 		"en": "A Telegram puppeting bridge for Matrix/Synapse.",
 		"fr": "Passerelle Telegram pour Matrix/Synapse."
 	},
-	"version": "0.10.0-rc1~ynh1",
+	"version": "0.10.0~ynh1",
 	"url": "https://github.com/tulir/mautrix-telegram",
 	"license": "AGPL-3.0-or-later",
 	"maintainer": {
