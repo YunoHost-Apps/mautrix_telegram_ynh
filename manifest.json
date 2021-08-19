@@ -6,12 +6,12 @@
 		"en": "A Telegram puppeting bridge for Matrix/Synapse.",
 		"fr": "Passerelle Telegram pour Matrix/Synapse."
 	},
-	"version": "0.10.0~ynh1",
-	"url": "https://github.com/tulir/mautrix-telegram",
+	"version": "0.10.1~ynh1",
+	"url": "https://github.com/mautrix/telegram",
 	"license": "AGPL-3.0-or-later",
 	"maintainer": {
-		"name": "Gredin67",
-		"email": "mautrix_telegram_ynh@sans-nuage.fr",
+		"name": "",
+		"email": "",
 		"url": "https://github.com/YunoHost-Apps/mautrix_telegram_ynh"
 	},
 	"requirements": {

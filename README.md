@@ -110,7 +110,7 @@ https://docs.mau.fi/bridges/python/telegram/index.html
  * Report a bug: https://github.com/YunoHost-Apps/mautrix_telegram_ynh/issues
  * App website: https://github.com/YunoHost-Apps/mautrix-whatsapp_ynh
  * Upstream app documentation: https://docs.mau.fi/bridges/python/telegram/index.html
- * Upstream app repository: https://github.com/tulir/mautrix-telegram
+ * Upstream app repository: https://github.com/mautrix/telegram
  * Up-Upstream repository: https://gitlab.com/telegramd/telegramd
  * YunoHost website: https://yunohost.org/
 
