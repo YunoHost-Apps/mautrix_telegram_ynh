@@ -1,0 +1,41 @@
+# See here for more information
+# https://github.com/YunoHost/package_check#syntax-check_process-file
+
+# Move this file from check_process.default to check_process when you have filled it.
+
+;; Default test serie
+	; pre-install
+		sudo yunohost tools update apps
+		sudo yunohost app install https://github.com/YunoHost-Apps/synapse_ynh/ -a "domain=$domain&server_name=$server_name&is_public=$is_public&jitsi_server=$jitsi_server" --force
+	; Manifest
+		port="8449"	(PORT)
+		synapsenumber="1"
+		botname="telegrambot"
+		encryption=false
+		botadmin="@johndoe:synapsedomain.tld"
+		botusers="@johndoe:synapsedomain.tld"
+		apiid=""
+    # this is a random hash so this will not work
+		apihash="tjyd5yge35lbodk1xwzw2jstp90k55qz"
+    bottoken="disabled"
+	; Checks
+		pkg_linter=1
+		setup_sub_dir=0
+		setup_root=0
+		setup_nourl=1
+		setup_private=0
+		setup_public=0
+		upgrade=1
+		#upgrade=1	from_commit=636be2f9f900e578d9aa26ee887dcec2ef8d4e71
+		#upgrade=1	from_commit=a95215f2ea5d1f34b1c804f776e78c4785477023
+		backup_restore=1
+		multi_instance=1
+		port_already_use=1
+		change_url=0
+		actions=0
+		config_panel=0
+;;; Upgrade options
+#	; commit=636be2f9f900e578d9aa26ee887dcec2ef8d4e71
+#		name=0.1.6
+#	; commit=a95215f2ea5d1f34b1c804f776e78c4785477023
+#		name=0.1.7
