@@ -10,8 +10,8 @@
 	"url": "https://github.com/mautrix/telegram",
 	"license": "AGPL-3.0-or-later",
 	"maintainer": {
-		"name": "",
-		"email": "",
+		"name": "Benedikt Tissot",
+		"email": "benedikt.tissot@googlemail.com",
 		"url": "https://github.com/YunoHost-Apps/mautrix_telegram_ynh"
 	},
 	"requirements": {
