@@ -9,7 +9,7 @@
 		encryption=false
 		botadmin="@johndoe:synapsedomain.tld"
 		botusers="@johndoe:synapsedomain.tld"
-		apiid=""
+		apiid="12345"
     # this is a random hash so this will not work
 		apihash="tjyd5yge35lbodk1xwzw2jstp90k55qz"
     bottoken="disabled"
