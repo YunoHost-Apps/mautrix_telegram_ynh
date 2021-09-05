@@ -118,4 +118,4 @@ ynh_system_user_delete --username=$mautrix_bridge_user
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Removal of $app completed" --time --last
+ynh_script_progression --message="Removal of $app completed" --last

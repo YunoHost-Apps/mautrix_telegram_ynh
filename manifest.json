@@ -3,8 +3,8 @@
 	"id": "mautrix_telegram",
 	"packaging_format": 1,
 	"description": {
-		"en": "A Telegram puppeting bridge for Matrix/Synapse.",
-		"fr": "Passerelle Telegram pour Matrix/Synapse."
+		"en": "Telegram puppeting bridge for Matrix/Synapse",
+		"fr": "Passerelle Telegram pour Matrix/Synapse"
 	},
 	"version": "0.10.1~ynh2",
 	"url": "https://github.com/mautrix/telegram",
@@ -15,7 +15,7 @@
 		"url": "https://github.com/YunoHost-Apps/mautrix_telegram_ynh"
 	},
 	"requirements": {
-		"yunohost": ">= 4.0"
+		"yunohost": ">= 4.2.4"
 	},
 	"multi_instance": true,
 	"services": [
@@ -55,7 +55,7 @@
 				"name": "encryption",
 				"type": "boolean",
 				"ask": {
-					"en": "Enable end-to-bridge encryption ?",
+					"en": "Enable end-to-bridge encryption?",
 					"fr": "Activer le chiffrement entre synapse et le bridge ?"
 				},
 				"help": {

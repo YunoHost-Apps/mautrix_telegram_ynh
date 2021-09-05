@@ -76,7 +76,7 @@ test ! -e "$final_path" || ynh_die --message="This path already contains a folde
 #=================================================
 # FIND AND OPEN A PORT
 #=================================================
-ynh_script_progression --message="Configuring firewall..." --weight=1
+ynh_script_progression --message="Finding an available port..." --weight=1
 
 # Find a free port for communication between your local synapse instance (home server) and its app service mautrix_bridge.
 port=$(ynh_find_port --port=29317)
