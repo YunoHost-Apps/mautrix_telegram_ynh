@@ -56,7 +56,7 @@
 				"type": "boolean",
 				"ask": {
 					"en": "Enable end-to-bridge encryption?",
-					"fr": "Activer le chiffrement entre synapse et le bridge ?"
+					"fr": "Activer le chiffrement entre Synapse et le bridge ?"
 				},
 				"help": {
 					"en": "Only activate if you know the prerequisites and constraints related to e2b.",
@@ -103,7 +103,7 @@
 				"default": "",
 				"help": {
 					"en": "Get your own API keys at https://my.telegram.org/apps",
-					"fr": "TODO"
+					"fr": "Obtenez vos propres clés API sur https://my.telegram.org/apps"
 				}
 			},
 			{
@@ -111,7 +111,7 @@
 				"type": "string",
 				"ask": {
 					"en": "Telegram API keys (https://my.telegram.org/apps): Hash",
-					"fr": "TODO"
+					"fr": "Clés API Telegram (https://my.telegram.org/apps) : Hash"
 				},
 				"example": "tjyd5yge35lbodk1xwzw2jstp90k55qz",
 				"default": "",
@@ -125,13 +125,13 @@
 				"type": "string",
 				"ask": {
 					"en": "Telegram bot token (optional)",
-					"fr": "TODO"
+					"fr": "Jeton de bot de Telegram (facultatif) "
 				},
 				"example": "disabled",
 				"default": "disabled",
 				"help": {
 					"en": "Create your own telegram bot.",
-					"fr": "TODO"
+					"fr": "Créez votre propre bot de Telegram."
 				}
 			}
 		]
