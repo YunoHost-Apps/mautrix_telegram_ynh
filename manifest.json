@@ -99,7 +99,7 @@
 					"en": "Telegram API keys (https://my.telegram.org/apps): ID",
 					"fr": "TODO"
 				},
-				"example": "12345",
+				"example": "1234567",
 				"default": "",
 				"help": {
 					"en": "Get your own API keys at https://my.telegram.org/apps",
