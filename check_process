@@ -1,14 +1,16 @@
 ;; Default test serie
+	; pre-install
+		sudo yunohost tools update
+		sudo yunohost app list | grep synapse ||  sudo yunohost app install https://github.com/YunoHost-Apps/synapse_ynh/ -a "domain=$domain&server_name=$server_name&is_public=$is_public&jitsi_server=$jitsi_server" --force
 	; Manifest
-		port="8449"
+		port="29317"
 		synapsenumber="1"
 		botname="telegrambot"
 		encryption=false
 		botadmin="@johndoe:synapsedomain.tld"
 		botusers="@johndoe:synapsedomain.tld"
 		apiid="1234567"
-    # this is a random hash so this will not work
-		apihash="tjyd5yge35lbodk1xwzw2jstp90k55qz"
+		apihash="tjyd5yge35lbodl1jwzw2jstp90k55qz"
     bottoken="disabled"
 	; Checks
 		pkg_linter=1
@@ -25,7 +27,5 @@
 		port_already_use=1
 		change_url=0
 ;;; Upgrade options
-#	; commit=636be2f9f900e578d9aa26ee887dcec2ef8d4e71
-#		name=0.1.6
-#	; commit=a95215f2ea5d1f34b1c804f776e78c4785477023
-#		name=0.1.7
+#	; commit=e579544bf977e2b6b4221ecfaf1b1a5c6069560e
+#		name=0.10.1~ynh3

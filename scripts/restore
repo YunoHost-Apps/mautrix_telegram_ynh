@@ -107,7 +107,7 @@ systemctl enable $app.service --quiet
 #=================================================
 ynh_script_progression --message="Integrating service in YunoHost..." --weight=1
 
-yunohost service add $app --description $app daemon for bridging Telegram and Matrix messages --log /var/log/$app/$app.log
+yunohost service add $app --description "$app daemon for bridging Telegram and Matrix messages" --log /var/log/$app/$app.log
 
 #=================================================
 # START SYSTEMD SERVICE
