@@ -7,7 +7,6 @@
 		botadmin="@johndoe:synapsedomain.tld"
 		botusers="@johndoe:synapsedomain.tld"
 		apiid="1234567"
-    # this is a random hash so this will not work
 		apihash="tjyd5yge35lbodk1xwzw2jstp90k55qz"
     bottoken="disabled"
 	; Checks
