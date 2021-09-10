@@ -180,6 +180,8 @@ as_token="\"This value is generated when generating the registration\""
 hs_token="\"This value is generated when generating the registration\""
 write_bridge_config
 
+cat "$mautrix_config_path" # HACK show config in CI logs
+
 #=================================================
 # INSTALL MAUTRIX-BRIDGE PYTHON MODULE
 #=================================================
