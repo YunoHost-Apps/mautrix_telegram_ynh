@@ -185,8 +185,6 @@ write_bridge_config
 #=================================================
 
 mkdir -p /var/log/$app
-# HACK I am not sure whether matrix is installed in the CI environment therefore we need to ensure the directory exists
-mkdir -p "$app_service_registration_path"
 # Configure Mautrix-Bridge
 python3 -m venv $final_path
 $final_path/bin/pip3 install --upgrade setuptools wheel # HACK fixes "error: invalid command 'bdist_wheel'"
@@ -201,12 +199,9 @@ ynh_replace_string --match_string="script_location = alembic" \
   --target_file="$final_path/alembic.ini"
 $final_path/bin/alembic  -c "$final_path/alembic.ini" -x config="$mautrix_config_path" upgrade head
 
-# HACK I am not sure whether matrix is installed in the CI environment therefore we need to ensure the directory exists
-if [ -e "/opt/yunohost/matrix-$synapse_instance/update_synapse_for_appservice.sh" ]; then
-  /opt/yunohost/matrix-$synapse_instance/update_synapse_for_appservice.sh \
+# Handled by synapse: synapse_ynh adds all registration files added in $app_service_registration_path to the app_service_config_files list
+/opt/yunohost/matrix-$synapse_instance/update_synapse_for_appservice.sh \
     || ynh_die "Synapse can't restart with the appservice configuration"
-  # Handled by synapse: synapse_ynh adds all registration files added in $app_service_registration_path to the app_service_config_files list
-fi
 
 #=================================================
 # STORE THE CONFIG FILE CHECKSUM
