@@ -7,7 +7,14 @@
 		"fr": "Passerelle Telegram pour Matrix/Synapse"
 	},
 	"version": "0.10.1~ynh3",
-	"url": "https://github.com/mautrix/telegram",
+	"url": "https://docs.mau.fi/bridges/python/telegram/index.html",
+	"upstream": {
+        "license": "free",
+        "website": "https://docs.mau.fi/bridges/python/telegram/index.html",
+        "admindoc": "https://github.com/YunoHost-Apps/mautrix_telegram_ynh",
+        "userdoc": "https://docs.mau.fi/bridges/python/telegram/management-commands.html",
+        "code": "https://github.com/mautrix/telegram"
+	},
 	"license": "AGPL-3.0-or-later",
 	"maintainer": {
 		"name": "Benedikt Tissot",
