@@ -62,8 +62,8 @@ fi
 
 # If final_path doesn't exist, create it
 #if [ -z "$final_path" ]; then
-#	final_path=/var/www/$app
-#	ynh_app_setting_set --app=$app --key=final_path --value=$final_path
+#   final_path=/var/www/$app
+#   ynh_app_setting_set --app=$app --key=final_path --value=$final_path
 #fi
 
 #=================================================
