@@ -70,7 +70,20 @@
 					"fr": "N'activer que si vous connaissez les prérequis et constraintes liées à e2b."
 				},
 				"default": false
-			},			
+			},
+			{
+				"name": "bot_synapse_adm",
+				"type": "boolean",
+				"ask": {
+					"en": "Give the Telegram bot administrator rights to the synapse instance?",
+					"fr": "Donner au robot Telegram des droits administrateur à l'instance synapse ?"
+				},
+				"help": {
+					"en": "If true, the bot can group Telegram chats in a Matrix community. Not required if you set up synapse so that non-admins are authorized to create communities.",
+					"fr": "Si true, le robot groupera les conversations Telegram dans une communauté Matrix. Pas nécessaire si vous avez réglé synapse pour qu'il autorise les non-admin à créer des communautés."
+				},
+				"default": true
+			},
 			{
 				"name": "botadmin",
 				"type": "string",

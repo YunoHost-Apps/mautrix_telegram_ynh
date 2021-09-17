@@ -53,11 +53,12 @@ ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
 # some legacy installs and you therefore want to initiaze stuff during upgrade)
 #
 
-# If db_name doesn't exist, create it
-#if [ -z "$db_name" ]; then
-#	db_name=$(ynh_sanitize_dbid --db_name=$app)
-#	ynh_app_setting_set --app=$app --key=db_name --value=$db_name
-#fi
+bot_synapse_adm=$(ynh_app_setting_get --app=$app --key=bot_synapse_adm)
+# If bot_synapse_adm doesn't exist, create it
+if [ -z "$bot_synapse_adm" ]; then
+  bot_synapse_adm=true
+  ynh_app_setting_set --app=$app --key=bot_synapse_adm --value=$bot_synapse_adm
+fi
 
 # If final_path doesn't exist, create it
 #if [ -z "$final_path" ]; then
