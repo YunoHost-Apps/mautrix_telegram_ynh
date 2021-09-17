@@ -189,6 +189,9 @@ write_bridge_config
 mkdir -p /var/log/$app
 # Configure Mautrix-Bridge
 python3 -m venv $final_path
+if [ -z $HOME ]; then
+  HOME=$final_path # HACK see https://github.com/mautrix/telegram/issues/661
+fi
 $final_path/bin/pip3 install --upgrade setuptools wheel # HACK fixes "error: invalid command 'bdist_wheel'"
 $final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[postgres,speedups,qr_login] # metrics,hq_thumbnails,e2be
 # -r optional-requirements.txt
