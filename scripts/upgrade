@@ -23,9 +23,9 @@ botname=$(ynh_app_setting_get --app=$app --key=botname)
 synapse_instance=$(ynh_app_setting_get --app=$app --key=synapse_instance)
 app_service_registration_path=$(ynh_app_setting_get --app=$app --key=app_service_registration_path)
 encryption=$(ynh_app_setting_get --app=$app --key=encryption)
-mautrix_bridge_user=$app
-mautrix_bridge_db_name=$(ynh_app_setting_get --app=$app --key=mautrix_bridge_db_name)
-mautrix_bridge_db_pwd=$(ynh_app_setting_get --app=$app --key=mautrix_bridge_db_pwd)
+db_name=$(ynh_app_setting_get --app=$app --key=db_name)
+db_user=$db_name
+db_pwd=$(ynh_app_setting_get --app=$app --key=psqlpwd)
 botadmin=$(ynh_app_setting_get --app=$app --key=botadmin)
 botusers=$(ynh_app_setting_get --app=$app --key=botusers)
 
@@ -41,6 +41,20 @@ final_path=$(ynh_app_setting_get --app=$app --key=final_path)
 #=================================================
 
 upgrade_type=$(ynh_check_app_version_changed)
+
+#=================================================
+# BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
+#=================================================
+ynh_script_progression --message="Backing up the app before upgrading (may take a while)..." --weight=1
+
+# Backup the current version of the app
+ynh_backup_before_upgrade
+ynh_clean_setup () {
+  # Restore it if the upgrade fails
+  ynh_restore_upgradebackup
+}
+# Exit if an error occurs during the execution of the script
+ynh_abort_if_errors
 
 #=================================================
 # ENSURE DOWNWARD COMPATIBILITY
@@ -65,20 +79,6 @@ fi
 #   final_path=/var/www/$app
 #   ynh_app_setting_set --app=$app --key=final_path --value=$final_path
 #fi
-
-#=================================================
-# BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
-#=================================================
-ynh_script_progression --message="Backing up the app before upgrading (may take a while)..." --weight=1
-
-# Backup the current version of the app
-ynh_backup_before_upgrade
-ynh_clean_setup () {
-	# Restore it if the upgrade fails
-	ynh_restore_upgradebackup
-}
-# Exit if an error occurs during the execution of the script
-ynh_abort_if_errors
 
 #=================================================
 # STANDARD UPGRADE STEPS
@@ -114,7 +114,7 @@ ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies
 ynh_script_progression --message="Making sure dedicated system user exists..." --weight=1
 
 # Create a dedicated user (if not existing)
-ynh_system_user_create --username=$mautrix_bridge_user
+ynh_system_user_create --username=$app
 
 #=================================================
 # SPECIFIC UPGRADE
@@ -177,7 +177,7 @@ ynh_store_file_checksum --file="$final_path/alembic.ini"
 #=================================================
 
 # Set permissions on app files
-chown $mautrix_bridge_user:root -R $final_path
+chown $app:root -R $final_path
 
 #=================================================
 # SETUP LOGROTATE
@@ -204,7 +204,7 @@ ynh_systemd_action --service_name=$app --action="start"
 #=================================================
 # RELOAD synapse
 #=================================================
-ynh_script_progression --message="Reloading synapse server..." --weight=1
+ynh_script_progression --message="Reloading Synapse server..." --weight=1
 
 /opt/yunohost/matrix-$synapse_instance/update_synapse_for_appservice.sh \
     || ynh_die "Synapse can't restart with the appservice configuration"
