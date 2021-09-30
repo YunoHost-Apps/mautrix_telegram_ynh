@@ -61,24 +61,12 @@ ynh_abort_if_errors
 #=================================================
 ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
 
-#
-# N.B. : the followings setting migrations snippets are provided as *EXAMPLES*
-# of what you may want to do in some cases (e.g. a setting was not defined on
-# some legacy installs and you therefore want to initiaze stuff during upgrade)
-#
-
 bot_synapse_adm=$(ynh_app_setting_get --app=$app --key=bot_synapse_adm)
 # If bot_synapse_adm doesn't exist, create it
 if [ -z "$bot_synapse_adm" ]; then
   bot_synapse_adm=true
   ynh_app_setting_set --app=$app --key=bot_synapse_adm --value=$bot_synapse_adm
 fi
-
-# If final_path doesn't exist, create it
-#if [ -z "$final_path" ]; then
-#   final_path=/var/www/$app
-#   ynh_app_setting_set --app=$app --key=final_path --value=$final_path
-#fi
 
 #=================================================
 # STANDARD UPGRADE STEPS
@@ -98,7 +86,7 @@ then
 	ynh_script_progression --message="Upgrading source files..." --weight=1
 
 	# Download, check integrity, uncompress and patch the source from app.src
-	ynh_setup_source --dest_dir="$final_path"
+	ynh_setup_source --dest_dir="$final_path/src"
 fi
 
 #=================================================
