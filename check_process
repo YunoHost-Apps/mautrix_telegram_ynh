@@ -6,7 +6,6 @@
 		port="29317"
 		synapsenumber="1"
 		botname="telegrambot"
-    bot_synapse_adm=true
 		encryption=false
 		botadmin="@johndoe:synapsedomain.tld"
 		botusers="@johndoe:synapsedomain.tld"
