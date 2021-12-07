@@ -53,16 +53,10 @@ ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
 # some legacy installs and you therefore want to initiaze stuff during upgrade)
 #
 
-# If db_name doesn't exist, create it
-#if [ -z "$db_name" ]; then
-#	db_name=$(ynh_sanitize_dbid --db_name=$app)
-#	ynh_app_setting_set --app=$app --key=db_name --value=$db_name
-#fi
-
 # If final_path doesn't exist, create it
 #if [ -z "$final_path" ]; then
-#	final_path=/var/www/$app
-#	ynh_app_setting_set --app=$app --key=final_path --value=$final_path
+#   final_path=/var/www/$app
+#   ynh_app_setting_set --app=$app --key=final_path --value=$final_path
 #fi
 
 #=================================================
@@ -121,11 +115,11 @@ ynh_system_user_create --username=$mautrix_bridge_user
 # ...
 #=================================================
 
-if [ "$upgrade_type" == "UPGRADE_APP" ]
-then
-ynh_script_progression --message="Upgrading python packages..." --weight=1
-$final_path/bin/pip3 install --upgrade setuptools wheel # HACK fixes "error: invalid command 'bdist_wheel'"
-$final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[postgres,speedups,qr_login] #,hq_thumbnails
+if [ "$upgrade_type" == "UPGRADE_APP" ]; then
+  ynh_script_progression --message="Upgrading python packages..." --weight=1
+  export HOME=$final_path # HACK see https://github.com/mautrix/telegram/issues/661
+  $final_path/bin/pip3 install --upgrade setuptools wheel # HACK fixes "error: invalid command 'bdist_wheel'"
+  $final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[postgres,speedups,qr_login] #,hq_thumbnails
 fi
 
 #=================================================

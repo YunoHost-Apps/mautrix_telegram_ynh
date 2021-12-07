@@ -6,7 +6,7 @@
 		"en": "Telegram puppeting bridge for Matrix/Synapse",
 		"fr": "Passerelle Telegram pour Matrix/Synapse"
 	},
-	"version": "0.10.1~ynh3",
+	"version": "0.10.2~ynh3",
 	"url": "https://docs.mau.fi/bridges/python/telegram/index.html",
 	"upstream": {
         "license": "free",
@@ -17,8 +17,8 @@
 	},
 	"license": "AGPL-3.0-or-later",
 	"maintainer": {
-		"name": "Benedikt Tissot",
-		"email": "benedikt.tissot@googlemail.com",
+		"name": "",
+		"email": "",
 		"url": "https://github.com/YunoHost-Apps/mautrix_telegram_ynh"
 	},
 	"requirements": {
@@ -70,7 +70,7 @@
 					"fr": "N'activer que si vous connaissez les prérequis et constraintes liées à e2b."
 				},
 				"default": false
-			},			
+			},
 			{
 				"name": "botadmin",
 				"type": "string",

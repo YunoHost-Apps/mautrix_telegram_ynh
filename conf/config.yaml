@@ -424,10 +424,10 @@ bridge:
 # Telegram config
 telegram:
     # Get your own API keys at https://my.telegram.org/apps
-    api_id: __TELEGRAM_API_ID__
-    api_hash: __TELEGRAM_API_HASH__
+    api_id: __APIID__
+    api_hash: __APIHASH__
     # (Optional) Create your own bot at https://t.me/BotFather
-    bot_token: __TELEGRAM_BOT_TOKEN__
+    bot_token: __BOTTOKEN__
 
     # Telethon connection options.
     connection:
