@@ -117,6 +117,7 @@ ynh_system_user_create --username=$mautrix_bridge_user
 
 if [ "$upgrade_type" == "UPGRADE_APP" ]; then
   ynh_script_progression --message="Upgrading python packages..." --weight=1
+  python3 -m venv $final_path
   export HOME=$final_path
   $final_path/bin/pip3 install --upgrade pip setuptools wheel
   $final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[postgres,speedups,qr_login] #,hq_thumbnails
