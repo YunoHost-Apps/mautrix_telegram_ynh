@@ -99,6 +99,11 @@ fi
 #=================================================
 ynh_script_progression --message="Upgrading dependencies..." --weight=1
 
+if [ $encryption -eq 1 ]; then
+    # Install libolm-dev from backports to avoid break on Debian Buster
+    ynh_install_extra_app_dependencies --repo="http://ftp.debian.org/debian/ buster-backports main" --package="$pkg_dependencies_e2be" --key="https://ftp-master.debian.org/keys/archive-key-10.asc" --name="$app"
+fi
+
 ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
@@ -120,6 +125,10 @@ if [ "$upgrade_type" == "UPGRADE_APP" ]; then
   export HOME=$final_path # HACK see https://github.com/mautrix/telegram/issues/661
   $final_path/bin/pip3 install --upgrade setuptools wheel # HACK fixes "error: invalid command 'bdist_wheel'"
   $final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[postgres,speedups,qr_login] #,hq_thumbnails
+
+  if [ $encryption -eq 1 ]; then
+    $final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[e2be]
+  fi
 fi
 
 #=================================================
@@ -142,6 +151,12 @@ as_token=$(grep "as_token:" "$mautrix_config_path" | sed -r "s/ *as_token: *//")
 hs_token=$(grep "hs_token:" "$mautrix_config_path" | sed -r "s/ *hs_token: *//")
 # ynh_replace_string --match_string=__AS_TOKEN__ --replace_string="$as_token" --target_file="$mautrix_config_path"
 # ynh_replace_string --match_string=__HS_TOKEN__ --replace_string="$hs_token" --target_file="$mautrix_config_path"
+is_encryption_enabled=$encryption
+
+if [ $encryption -eq 1 ]; then
+  is_encryption_enabled=true
+fi
+
 write_bridge_config
 
 # upgrade the app-service-registration
