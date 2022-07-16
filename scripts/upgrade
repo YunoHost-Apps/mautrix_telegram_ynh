@@ -135,10 +135,8 @@ $final_path/bin/python3 -m mautrix_telegram -g -c "$mautrix_config_path" -r "$ap
 # upgrade the alembic database
 # TODO remove on next upgrade
 # ynh_backup_if_checksum_is_different --file="$final_path/alembic.ini"
-ynh_replace_string --match_string="script_location = alembic" \
-  --replace_string="script_location = $final_path/alembic" \
-  --target_file="$final_path/alembic.ini"
-$final_path/bin/alembic  -c "$final_path/alembic.ini" -x config="$mautrix_config_path" upgrade head
+ynh_replace_string --match_string="script_location = alembic" --replace_string="script_location = $final_path/alembic" --target_file="$final_path/alembic.ini"
+ynh_exec_warn_less $final_path/bin/alembic  -c "$final_path/alembic.ini" -x config="$mautrix_config_path" upgrade head
 
 # Recalculate and store the checksum of the file for the next upgrade.
 ynh_store_file_checksum --file="$mautrix_config_path"
@@ -190,7 +188,7 @@ ynh_systemd_action --service_name=$app --action="start"
 ynh_script_progression --message="Reloading synapse server..." --weight=1
 
 /opt/yunohost/matrix-$synapse_instance/update_synapse_for_appservice.sh \
-    || ynh_die "Synapse can't restart with the appservice configuration"
+    || ynh_die --message="Synapse can't restart with the appservice configuration"
 
 #=================================================
 # END OF SCRIPT
