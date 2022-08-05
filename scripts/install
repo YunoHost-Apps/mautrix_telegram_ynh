@@ -14,8 +14,7 @@ source /usr/share/yunohost/helpers
 #=================================================
 
 ynh_clean_setup () {
-	### Remove this function if there's nothing to clean before calling the remove script.
-	true
+	ynh_clean_check_starting
 }
 # Exit if an error occurs during the execution of the script
 ynh_abort_if_errors
@@ -36,7 +35,6 @@ apihash=$YNH_APP_ARG_APIHASH
 bottoken=$YNH_APP_ARG_BOTTOKEN
 
 app=$YNH_APP_INSTANCE_NAME
-final_path=/opt/yunohost/$app
 
 # TODO check (in manifest?) if the selected synapse instance is not already connected to a mautrix_bridge bridge
 if [ $synapsenumber -eq "1" ]
@@ -69,17 +67,8 @@ upstream_version=$(ynh_app_upstream_version)
 #=================================================
 ynh_script_progression --message="Validating installation parameters..." --weight=1
 
+final_path=/opt/yunohost/$app
 test ! -e "$final_path" || ynh_die --message="This path already contains a folder"
-
-#=================================================
-# STANDARD MODIFICATIONS
-#=================================================
-# FIND AND OPEN A PORT
-#=================================================
-ynh_script_progression --message="Finding an available port..." --weight=1
-
-# Find a free port for communication between your local synapse instance (home server) and its app service mautrix_bridge.
-port=$(ynh_find_port --port=29317)
 
 #=================================================
 # STORE SETTINGS FROM MANIFEST
@@ -87,7 +76,6 @@ port=$(ynh_find_port --port=29317)
 ynh_script_progression --message="Storing installation settings..." --weight=7
 ynh_app_setting_set --app=$app --key=domain --value=$domain
 ynh_app_setting_set --app=$app --key=server_name --value=$server_name
-ynh_app_setting_set --app=$app --key=port --value=$port
 ynh_app_setting_set --app=$app --key=botname --value=$botname
 ynh_app_setting_set --app=$app --key=synapse_instance --value=$synapse_instance
 ynh_app_setting_set --app=$app --key=app_service_registration_path --value=$app_service_registration_path
@@ -104,6 +92,17 @@ ynh_app_setting_set --app=$app --key=mautrix_version --value=$upstream_version
 ynh_app_setting_set --app=$app --key=final_path --value=$final_path
 
 #=================================================
+# STANDARD MODIFICATIONS
+#=================================================
+# FIND AND OPEN A PORT
+#=================================================
+ynh_script_progression --message="Finding an available port..." --weight=1
+
+# Find a free port for communication between your local synapse instance (home server) and its app service mautrix_bridge.
+port=$(ynh_find_port --port=29317)
+ynh_app_setting_set --app=$app --key=port --value=$port
+
+#=================================================
 # INSTALL DEPENDENCIES
 #=================================================
 ynh_script_progression --message="Installing dependencies..." --weight=97
@@ -111,31 +110,30 @@ ynh_script_progression --message="Installing dependencies..." --weight=97
 ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
+# CREATE DEDICATED USER
+#=================================================
+ynh_script_progression --message="Configuring system user..." --weight=1
+
+# Create a system user
+ynh_system_user_create --username=$mautrix_bridge_user
+
+#=================================================
 # CREATE A POSTGRESQL DATABASE
 #=================================================
 ynh_script_progression --message="Creating a PostgreSQL database..." --weight=3
 
-ynh_print_OFF
 mautrix_bridge_db_pwd=$(ynh_string_random --length=30)
 ynh_app_setting_set --app=$app --key=mautrix_bridge_db_pwd --value=$mautrix_bridge_db_pwd
-ynh_print_ON
 
 # Create postgresql database
 ynh_psql_test_if_first_run
-ynh_print_OFF
 ynh_psql_create_user $mautrix_bridge_db_user $mautrix_bridge_db_pwd
-ynh_print_ON
-ynh_psql_execute_as_root \
---sql="CREATE DATABASE ""$mautrix_bridge_db_name"" ENCODING 'UTF8' LC_COLLATE='C' LC_CTYPE='C' template=template0 OWNER ""$mautrix_bridge_db_user"";"
+ynh_psql_execute_as_root --sql="CREATE DATABASE ""$mautrix_bridge_db_name"" ENCODING 'UTF8' LC_COLLATE='C' LC_CTYPE='C' template=template0 OWNER ""$mautrix_bridge_db_user"";"
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 ynh_script_progression --message="Setting up source files..." --weight=3
-
-### `ynh_setup_source` is used to install an app from a zip or tar.gz file,
-### downloaded from an upstream source, like a git repository.
-### `ynh_setup_source` use the file conf/app.src
 
 ynh_app_setting_set --app=$app --key=final_path --value=$final_path
 
@@ -150,24 +148,7 @@ ynh_app_setting_set --app=$app --key=final_path --value=$final_path
 ynh_setup_source --dest_dir="$final_path/src"
 
 #=================================================
-# CREATE DEDICATED USER
-#=================================================
-ynh_script_progression --message="Configuring system user..." --weight=1
-
-# Create a system user
-ynh_system_user_create --username=$mautrix_bridge_user
-
-#=================================================
-# SETUP SYSTEMD
-#=================================================
-ynh_script_progression --message="Configuring a systemd service..." --weight=20
-
-# Create systemd config for Mautrix-Bridge
-#cp ../conf/default_mautrix-facebook /etc/default/$app
-ynh_add_systemd_config --service=$app
-
-#=================================================
-
+# SPECIFIC SETUP
 #=================================================
 # SET MAUTRIX-BRIDGE CONFIG
 #=================================================
@@ -195,22 +176,15 @@ $final_path/bin/python3 -m mautrix_telegram -g -c "$mautrix_config_path" -r "$ap
 # initialize the database
 # HACK alembic won't find its script dir using a relative path unless when started from $final_path
 # therefore we replace the script_location
-ynh_replace_string --match_string="script_location = alembic" \
-  --replace_string="script_location = $final_path/alembic" \
-  --target_file="$final_path/alembic.ini"
-$final_path/bin/alembic  -c "$final_path/alembic.ini" -x config="$mautrix_config_path" upgrade head
+ynh_replace_string --match_string="script_location = alembic" --replace_string="script_location = $final_path/alembic" --target_file="$final_path/alembic.ini"
+ynh_exec_warn_less $final_path/bin/alembic  -c "$final_path/alembic.ini" -x config="$mautrix_config_path" upgrade head
 
 # Handled by synapse: synapse_ynh adds all registration files added in $app_service_registration_path to the app_service_config_files list
-/opt/yunohost/matrix-$synapse_instance/update_synapse_for_appservice.sh \
-    || ynh_die "Synapse can't restart with the appservice configuration"
+/opt/yunohost/matrix-$synapse_instance/update_synapse_for_appservice.sh || ynh_die --message="Synapse can't restart with the appservice configuration"
 
 #=================================================
 # STORE THE CONFIG FILE CHECKSUM
 #=================================================
-
-### `ynh_store_file_checksum` is used to store the checksum of a file.
-### That way, during the upgrade script, by using `ynh_backup_if_checksum_is_different`,
-### you can make a backup of this file before modifying it again if the admin had modified it.
 
 # Calculate and store the config file checksum into the app settings
 ynh_store_file_checksum --file="$mautrix_config_path"
@@ -218,19 +192,23 @@ ynh_store_file_checksum --file="$app_service_registration_path/$app.yaml"
 ynh_store_file_checksum --file="$final_path/alembic.ini"
 
 #=================================================
-# GENERIC FINALIZATION
+# SETUP SYSTEMD
+#=================================================
+ynh_script_progression --message="Configuring a systemd service..." --weight=20
+
+# Create a dedicated systemd config
+ynh_add_systemd_config
+
 #=================================================
 # SECURE FILES AND DIRECTORIES
 #=================================================
-
-### For security reason, any app should set the permissions to root: before anything else.
-### Then, if write authorization is needed, any access should be given only to directories
-### that really need such authorization.
 
 # WARNING : theses command are used in INSTALL, UPGRADE, RESTORE
 # For any update do it in all files
 chown $mautrix_bridge_user:root -R $final_path
 
+#=================================================
+# GENERIC FINALIZATION
 #=================================================
 # SETUP LOGROTATE
 #=================================================
@@ -242,10 +220,10 @@ ynh_use_logrotate --logfile "/var/log/$app/$app.log" --specific_user $mautrix_br
 chown $mautrix_bridge_user:root -R /var/log/$app
 
 #=================================================
-# ADVERTISE SERVICE IN ADMIN PANEL
+# INTEGRATE SERVICE IN YUNOHOST
 #=================================================
-#yunohost service add $app --log "/var/log/$app/log.log"
-# if using yunohost version 3.2 or more in the 'manifest.json', a description can be added
+ynh_script_progression --message="Integrating service in YunoHost..."
+
 yunohost service add $app --description "$app daemon for bridging Telegram and Matrix messages" --log "/var/log/$app/$app.log"
 
 #=================================================

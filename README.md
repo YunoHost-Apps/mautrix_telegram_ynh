@@ -50,7 +50,7 @@ See also [upstream wiki Authentication page](https://docs.mau.fi/bridges/python/
 * see https://docs.mau.fi/bridges/python/telegram/relay-bot.html
 
 
-**Shipped version:** 0.10.2~ynh3
+**Shipped version:** 0.10.2~ynh4
 ## Disclaimers / important information
 
 ### Configuration of the bridge
@@ -82,12 +82,6 @@ In case you need to upload your logs somewhere, be aware that they contain your 
 
 * Multi-instance installation should work. Several bridge instances could be installed for one Matrix-Synapse instance so that one Matrix user can bridge several Telegram accounts. 
 * Several bridge instances could be installed for each Matrix-Synapse instance to benefit from it. But one bridge can be used by users from several Matrix-Synapse instances.
-
-#### Supported architectures
-
-* x86-64 - [![Build Status](https://ci-apps.yunohost.org/ci/logs/mautrix_telegram%20%28Apps%29.svg)](https://ci-apps.yunohost.org/ci/apps/mautrix_telegram/)
-* ARMv8-A - [![Build Status](https://ci-apps-arm.yunohost.org/ci/logs/mautrix_telegram%20%28Apps%29.svg)](https://ci-apps-arm.yunohost.org/ci/apps/mautrix_telegram/)
-
 
 ### Troubleshooting
 
