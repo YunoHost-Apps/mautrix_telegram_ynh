@@ -11,7 +11,7 @@
 		botusers="@johndoe:synapsedomain.tld"
 		apiid="1234567"
 		apihash="tjyd5yge35lbodl1jwzw2jstp90k55qz"
-    bottoken="disabled"
+		bottoken="disabled"
 	; Checks
 		pkg_linter=1
 		setup_sub_dir=0
@@ -25,6 +25,9 @@
 		multi_instance=1
 		port_already_use=1
 		change_url=0
+;;; Options
+Email=
+Notification=none
 ;;; Upgrade options
 	; commit=78e25377746ff6a488614c6ea00b8ce7c7e6d88a
 		name=0.10.1~ynh3

@@ -36,13 +36,13 @@ mautrix_bridge_db_user=$app
 #=================================================
 # STANDARD REMOVE
 #=================================================
-# REMOVE SERVICE FROM ADMIN PANEL
+# REMOVE SERVICE INTEGRATION IN YUNOHOST
 #=================================================
 
-# Remove a service from the admin panel, added by `yunohost service add`
+# Remove the service from the list of services known by YunoHost (added from `yunohost service add`)
 if ynh_exec_warn_less yunohost service status $app >/dev/null
 then
-	ynh_script_progression --message="Removing $app service..." --weight=3
+	ynh_script_progression --message="Removing $app service integration..." --weight=3
 	yunohost service remove $app
 fi
 
@@ -53,6 +53,14 @@ ynh_script_progression --message="Stopping and removing the systemd service..." 
 
 # Remove the dedicated systemd config
 ynh_remove_systemd_config
+
+#=================================================
+# REMOVE LOGROTATE CONFIGURATION
+#=================================================
+ynh_script_progression --message="Removing logrotate configuration..." --weight=1
+
+# Remove the app-specific logrotate config
+ynh_remove_logrotate
 
 #=================================================
 # REMOVE THE POSTGRESQL DATABASE
@@ -66,6 +74,14 @@ ynh_psql_execute_as_root --database=$synapse_db_name --sql="DROP USER ""$botname
 #yunohost app action run $synapse_instance drop_user -a username=$botname
 
 #=================================================
+# REMOVE APP MAIN DIR
+#=================================================
+ynh_script_progression --message="Removing app main directory..." --weight=1
+
+# Remove the app directory securely
+ynh_secure_remove --file="$final_path"
+
+#=================================================
 # REMOVE DEPENDENCIES
 #=================================================
 ynh_script_progression --message="Removing dependencies..." --weight=8
@@ -74,24 +90,9 @@ ynh_script_progression --message="Removing dependencies..." --weight=8
 ynh_remove_app_dependencies
 
 #=================================================
-# REMOVE APP MAIN DIR
-#=================================================
-ynh_script_progression --message="Removing app main directory..." --weight=1
-
-# Remove the app directory securely
-#ynh_secure_remove --file="/etc/$app/"
-ynh_secure_remove --file="$final_path"
-    
-#=================================================
-# REMOVE LOGROTATE CONFIGURATION
-#=================================================
-ynh_script_progression --message="Removing logrotate configuration..." --weight=1
-
-# Remove the app-specific logrotate config
-ynh_remove_logrotate
-
-#=================================================
 # SPECIFIC REMOVE
+#=================================================
+# REMOVE VARIOUS FILES
 #=================================================
 ynh_script_progression --message="Removing synapse app service..." --weight=6
 
@@ -99,7 +100,7 @@ ynh_script_progression --message="Removing synapse app service..." --weight=6
 ynh_secure_remove --file="$app_service_registration_path/$app.yaml"
 
 /opt/yunohost/matrix-$synapse_instance/update_synapse_for_appservice.sh \
-    || ynh_die "Synapse can't restart with the appservice configuration"
+    || ynh_die --message="Synapse can't restart with the appservice configuration"
 
 # Remove the log files
 ynh_secure_remove --file="/var/log/$app"

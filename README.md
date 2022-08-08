@@ -5,7 +5,7 @@ It shall NOT be edited by hand.
 
 # Matrix-Telegram bridge for YunoHost
 
-[![Integration level](https://dash.yunohost.org/integration/mautrix_telegram.svg)](https://dash.yunohost.org/appci/app/mautrix_telegram) ![](https://ci-apps.yunohost.org/ci/badges/mautrix_telegram.status.svg) ![](https://ci-apps.yunohost.org/ci/badges/mautrix_telegram.maintain.svg)  
+[![Integration level](https://dash.yunohost.org/integration/mautrix_telegram.svg)](https://dash.yunohost.org/appci/app/mautrix_telegram) ![Working status](https://ci-apps.yunohost.org/ci/badges/mautrix_telegram.status.svg) ![Maintenance status](https://ci-apps.yunohost.org/ci/badges/mautrix_telegram.maintain.svg)  
 [![Install Matrix-Telegram bridge with YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=mautrix_telegram)
 
 *[Lire ce readme en français.](./README_fr.md)*
@@ -86,12 +86,6 @@ In case you need to upload your logs somewhere, be aware that they contain your 
 * Multi-instance installation should work. Several bridge instances could be installed for one Matrix-Synapse instance so that one Matrix user can bridge several Telegram accounts. 
 * Several bridge instances could be installed for each Matrix-Synapse instance to benefit from it. But one bridge can be used by users from several Matrix-Synapse instances.
 
-#### Supported architectures
-
-* x86-64 - [![Build Status](https://ci-apps.yunohost.org/ci/logs/mautrix_telegram%20%28Apps%29.svg)](https://ci-apps.yunohost.org/ci/apps/mautrix_telegram/)
-* ARMv8-A - [![Build Status](https://ci-apps-arm.yunohost.org/ci/logs/mautrix_telegram%20%28Apps%29.svg)](https://ci-apps-arm.yunohost.org/ci/apps/mautrix_telegram/)
-
-
 ### Troubleshooting
 
 * Check the spelling of the bot name!
@@ -105,22 +99,23 @@ such that it is ensured that synapse is running before the bridge tries to conne
 
 ## Documentation and resources
 
-* Official app website: https://docs.mau.fi/bridges/python/telegram/index.html
-* Official user documentation: https://docs.mau.fi/bridges/python/telegram/management-commands.html
-* Official admin documentation: https://github.com/YunoHost-Apps/mautrix_telegram_ynh
-* Upstream app code repository: https://github.com/mautrix/telegram
-* YunoHost documentation for this app: https://yunohost.org/app_mautrix_telegram
-* Report a bug: https://github.com/YunoHost-Apps/mautrix_telegram_ynh/issues
+* Official app website: <https://docs.mau.fi/bridges/python/telegram/index.html>
+* Official user documentation: <https://docs.mau.fi/bridges/python/telegram/management-commands.html>
+* Official admin documentation: <https://github.com/YunoHost-Apps/mautrix_telegram_ynh>
+* Upstream app code repository: <https://github.com/mautrix/telegram>
+* YunoHost documentation for this app: <https://yunohost.org/app_mautrix_telegram>
+* Report a bug: <https://github.com/YunoHost-Apps/mautrix_telegram_ynh/issues>
 
 ## Developer info
 
 Please send your pull request to the [testing branch](https://github.com/YunoHost-Apps/mautrix_telegram_ynh/tree/testing).
 
 To try the testing branch, please proceed like that.
-```
+
+``` bash
 sudo yunohost app install https://github.com/YunoHost-Apps/mautrix_telegram_ynh/tree/testing --debug
 or
 sudo yunohost app upgrade mautrix_telegram -u https://github.com/YunoHost-Apps/mautrix_telegram_ynh/tree/testing --debug
 ```
 
-**More info regarding app packaging:** https://yunohost.org/packaging_apps
+**More info regarding app packaging:** <https://yunohost.org/packaging_apps>

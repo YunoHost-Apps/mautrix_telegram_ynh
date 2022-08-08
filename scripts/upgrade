@@ -39,25 +39,9 @@ final_path=$(ynh_app_setting_get --app=$app --key=final_path)
 #=================================================
 # CHECK VERSION
 #=================================================
+ynh_script_progression --message="Checking version..."
 
 upgrade_type=$(ynh_check_app_version_changed)
-
-#=================================================
-# ENSURE DOWNWARD COMPATIBILITY
-#=================================================
-ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
-
-#
-# N.B. : the followings setting migrations snippets are provided as *EXAMPLES*
-# of what you may want to do in some cases (e.g. a setting was not defined on
-# some legacy installs and you therefore want to initiaze stuff during upgrade)
-#
-
-# If final_path doesn't exist, create it
-#if [ -z "$final_path" ]; then
-#   final_path=/var/www/$app
-#   ynh_app_setting_set --app=$app --key=final_path --value=$final_path
-#fi
 
 #=================================================
 # BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
@@ -67,6 +51,7 @@ ynh_script_progression --message="Backing up the app before upgrading (may take 
 # Backup the current version of the app
 ynh_backup_before_upgrade
 ynh_clean_setup () {
+	ynh_clean_check_starting
 	# Restore it if the upgrade fails
 	ynh_restore_upgradebackup
 }
@@ -81,6 +66,19 @@ ynh_abort_if_errors
 ynh_script_progression --message="Stopping a systemd service..." --weight=1
 
 ynh_systemd_action --service_name=$app --action="stop" --log_path="/var/log/$app/$app.log"
+
+#=================================================
+# ENSURE DOWNWARD COMPATIBILITY
+#=================================================
+ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
+
+#=================================================
+# CREATE DEDICATED USER
+#=================================================
+ynh_script_progression --message="Making sure dedicated system user exists..." --weight=1
+
+# Create a dedicated user (if not existing)
+ynh_system_user_create --username=$mautrix_bridge_user
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
@@ -107,17 +105,9 @@ fi
 ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
-# CREATE DEDICATED USER
-#=================================================
-ynh_script_progression --message="Making sure dedicated system user exists..." --weight=1
-
-# Create a dedicated user (if not existing)
-ynh_system_user_create --username=$mautrix_bridge_user
-
-#=================================================
 # SPECIFIC UPGRADE
 #=================================================
-# ...
+# UPGRADE PYTHON PACKAGE
 #=================================================
 
 if [ "$upgrade_type" == "UPGRADE_APP" ]; then
@@ -133,16 +123,9 @@ if [ "$upgrade_type" == "UPGRADE_APP" ]; then
 fi
 
 #=================================================
-# SETUP SYSTEMD
+# UPDATE A CONFIG FILE
 #=================================================
-ynh_script_progression --message="Upgrading systemd configuration..." --weight=1
-
-# Create a dedicated systemd config
-ynh_add_systemd_config
-
-#=================================================
-# UPDATE/MODIFY THE CONFIG FILE
-#=================================================
+ynh_script_progression --message="Updating a configuration file..."
 
 # main configuration
 mautrix_config_path="$final_path/config.yaml"
@@ -167,10 +150,8 @@ $final_path/bin/python3 -m mautrix_telegram -g -c "$mautrix_config_path" -r "$ap
 # upgrade the alembic database
 # TODO remove on next upgrade
 # ynh_backup_if_checksum_is_different --file="$final_path/alembic.ini"
-ynh_replace_string --match_string="script_location = alembic" \
-  --replace_string="script_location = $final_path/alembic" \
-  --target_file="$final_path/alembic.ini"
-$final_path/bin/alembic  -c "$final_path/alembic.ini" -x config="$mautrix_config_path" upgrade head
+ynh_replace_string --match_string="script_location = alembic" --replace_string="script_location = $final_path/alembic" --target_file="$final_path/alembic.ini"
+ynh_exec_warn_less $final_path/bin/alembic  -c "$final_path/alembic.ini" -x config="$mautrix_config_path" upgrade head
 
 # Recalculate and store the checksum of the file for the next upgrade.
 ynh_store_file_checksum --file="$mautrix_config_path"
@@ -178,7 +159,13 @@ ynh_store_file_checksum --file="$app_service_registration_path/$app.yaml"
 ynh_store_file_checksum --file="$final_path/alembic.ini"
 
 #=================================================
-# GENERIC FINALIZATION
+# SETUP SYSTEMD
+#=================================================
+ynh_script_progression --message="Upgrading systemd configuration..." --weight=1
+
+# Create a dedicated systemd config
+ynh_add_systemd_config
+
 #=================================================
 # SECURE FILES AND DIRECTORIES
 #=================================================
@@ -186,6 +173,8 @@ ynh_store_file_checksum --file="$final_path/alembic.ini"
 # Set permissions on app files
 chown $mautrix_bridge_user:root -R $final_path
 
+#=================================================
+# GENERIC FINALIZATION
 #=================================================
 # SETUP LOGROTATE
 #=================================================
@@ -209,12 +198,12 @@ ynh_script_progression --message="Starting a systemd service..." --weight=1
 ynh_systemd_action --service_name=$app --action="start"
 
 #=================================================
-# RELOAD synapse
+# RELOAD SYNAPSE
 #=================================================
 ynh_script_progression --message="Reloading synapse server..." --weight=1
 
 /opt/yunohost/matrix-$synapse_instance/update_synapse_for_appservice.sh \
-    || ynh_die "Synapse can't restart with the appservice configuration"
+    || ynh_die --message="Synapse can't restart with the appservice configuration"
 
 #=================================================
 # END OF SCRIPT
