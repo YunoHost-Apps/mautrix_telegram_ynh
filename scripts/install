@@ -170,7 +170,7 @@ mkdir -p /var/log/$app
 python3 -m venv $final_path
 export HOME=$final_path # HACK see https://github.com/mautrix/telegram/issues/661
 $final_path/bin/pip3 install --upgrade pip setuptools wheel
-$final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[postgres,speedups,qr_login] # metrics,hq_thumbnails,e2be
+$final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[speedups,qr_login] # metrics,e2be,hq_thumbnails,sqlite,formattednumbers
 # -r optional-requirements.txt
 $final_path/bin/python3 -m mautrix_telegram -g -c "$mautrix_config_path" -r "$app_service_registration_path/$app.yaml"
 

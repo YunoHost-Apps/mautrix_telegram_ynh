@@ -110,7 +110,7 @@ if [ "$upgrade_type" == "UPGRADE_APP" ]; then
   python3 -m venv $final_path
   export HOME=$final_path
   $final_path/bin/pip3 install --upgrade pip setuptools wheel
-  $final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[postgres,speedups,qr_login] #,hq_thumbnails
+  $final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[speedups,qr_login] # metrics,e2be,hq_thumbnails,sqlite,formattednumbers
 fi
 
 #=================================================
