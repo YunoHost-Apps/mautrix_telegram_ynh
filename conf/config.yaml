@@ -45,9 +45,7 @@ appservice:
     # https://magicstack.github.io/asyncpg/current/api/index.html#asyncpg.pool.create_pool
     # https://docs.python.org/3/library/sqlite3.html#sqlite3.connect
     # For sqlite, min_size is used as the connection thread pool size and max_size is ignored.
-    database_opts:
-        min_size: 1
-        max_size: 10
+    database_opts: {}
 
     # Public part of web server for out-of-Matrix interaction with the bridge.
     # Used for things like login if the user wants to make sure the 2FA password isn't stored in
