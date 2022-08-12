@@ -108,8 +108,8 @@ ynh_app_setting_set --app=$app --key=port --value=$port
 ynh_script_progression --message="Installing dependencies..." --weight=97
 
 if [ $encryption -eq 1 ]; then
-    # Install libolm-dev from backports to avoid break on Debian Buster
-    ynh_install_extra_app_dependencies --repo="http://ftp.debian.org/debian/ buster-backports main" --package="$pkg_dependencies_e2be" --key="https://ftp-master.debian.org/keys/archive-key-10.asc" --name="$app"
+    # Install libolm-dev to be able to use encryption
+    ynh_install_extra_app_dependencies  $pkg_dependencies_e2be
 fi
 
 ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies
