@@ -20,7 +20,7 @@
 		setup_private=0
 		setup_public=0
 		upgrade=1
-		upgrade=1	from_commit=78e25377746ff6a488614c6ea00b8ce7c7e6d88a
+		upgrade=1	from_commit=dfed70e3419d23349690ea2234747ac1de2d7fb0
 		backup_restore=1
 		multi_instance=1
 		port_already_use=1
@@ -29,5 +29,5 @@
 Email=
 Notification=none
 ;;; Upgrade options
-	; commit=78e25377746ff6a488614c6ea00b8ce7c7e6d88a
-		name=0.10.1~ynh3
+	; commit=dfed70e3419d23349690ea2234747ac1de2d7fb0
+		name=0.10.2~ynh3
