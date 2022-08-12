@@ -51,6 +51,7 @@ See also [upstream wiki Authentication page](https://docs.mau.fi/bridges/python/
 
 
 **Shipped version:** 0.11.3~ynh1
+
 ## Disclaimers / important information
 
 ### Configuration of the bridge
