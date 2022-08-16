@@ -107,6 +107,11 @@ ynh_app_setting_set --app=$app --key=port --value=$port
 #=================================================
 ynh_script_progression --message="Installing dependencies..." --weight=97
 
+if [ $encryption -eq 1 ]; then
+    # Install libolm-dev to be able to use encryption
+    ynh_install_extra_app_dependencies  $pkg_dependencies_e2be
+fi
+
 ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
@@ -159,6 +164,12 @@ ynh_script_progression --message="Configuring Mautrix-Bridge..." --weight=2
 mautrix_config_path="$final_path/config.yaml"
 as_token="\"This value is generated when generating the registration\""
 hs_token="\"This value is generated when generating the registration\""
+is_encryption_enabled=$encryption
+
+if [ $encryption -eq 1 ]; then
+  is_encryption_enabled=true
+fi
+
 write_bridge_config
 
 #=================================================
@@ -171,6 +182,11 @@ python3 -m venv $final_path
 export HOME=$final_path # HACK see https://github.com/mautrix/telegram/issues/661
 $final_path/bin/pip3 install --upgrade pip setuptools wheel
 $final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[speedups,qr_login] # metrics,e2be,hq_thumbnails,sqlite,formattednumbers
+
+if [ $encryption -eq 1 ]; then
+  $final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[e2be]
+fi
+
 # -r optional-requirements.txt
 $final_path/bin/python3 -m mautrix_telegram -g -c "$mautrix_config_path" -r "$app_service_registration_path/$app.yaml"
 

@@ -50,7 +50,7 @@ See also [upstream wiki Authentication page](https://docs.mau.fi/bridges/python/
 * see https://docs.mau.fi/bridges/python/telegram/relay-bot.html
 
 
-**Shipped version:** 0.11.3~ynh1
+**Shipped version:** 0.11.3~ynh2
 
 ## Disclaimers / important information
 
