@@ -64,8 +64,8 @@
                     "fr": "Activer le chiffrement entre Synapse et le bridge ?"
                 },
                 "help": {
-                    "en": "Only activate if you know the prerequisites and constraints related to e2b. Voir aussi : https://docs.mau.fi/bridges/general/end-to-bridge-encryption.html",
-                    "fr": "N'activer que si vous connaissez les prérequis et constraintes liées à e2b. See more: https://docs.mau.fi/bridges/general/end-to-bridge-encryption.html"
+                    "en": "Only activate if you know the prerequisites and constraints related to e2b. See more: https://docs.mau.fi/bridges/general/end-to-bridge-encryption.html",
+                    "fr": "N'activer que si vous connaissez les prérequis et constraintes liées à e2b. Voir aussi : https://docs.mau.fi/bridges/general/end-to-bridge-encryption.html"
                 },
                 "default": false
             },
