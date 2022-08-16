@@ -97,6 +97,11 @@ fi
 #=================================================
 ynh_script_progression --message="Upgrading dependencies..." --weight=1
 
+if [ $encryption -eq 1 ]; then
+    # Install libolm-dev to be able to use encryption
+    ynh_install_extra_app_dependencies  $pkg_dependencies_e2be
+fi
+
 ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
@@ -110,7 +115,11 @@ if [ "$upgrade_type" == "UPGRADE_APP" ]; then
   python3 -m venv $final_path
   export HOME=$final_path
   $final_path/bin/pip3 install --upgrade pip setuptools wheel
-  $final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[postgres,speedups,qr_login] #,hq_thumbnails
+  $final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[speedups,qr_login] # metrics,e2be,hq_thumbnails,sqlite,formattednumbers
+
+  if [ $encryption -eq 1 ]; then
+    $final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[e2be]
+  fi
 fi
 
 #=================================================
@@ -126,22 +135,21 @@ as_token=$(grep "as_token:" "$mautrix_config_path" | sed -r "s/ *as_token: *//")
 hs_token=$(grep "hs_token:" "$mautrix_config_path" | sed -r "s/ *hs_token: *//")
 # ynh_replace_string --match_string=__AS_TOKEN__ --replace_string="$as_token" --target_file="$mautrix_config_path"
 # ynh_replace_string --match_string=__HS_TOKEN__ --replace_string="$hs_token" --target_file="$mautrix_config_path"
+is_encryption_enabled=$encryption
+
+if [ $encryption -eq 1 ]; then
+  is_encryption_enabled=true
+fi
+
 write_bridge_config
 
 # upgrade the app-service-registration
 ynh_backup_if_checksum_is_different --file="$app_service_registration_path/$app.yaml"
 $final_path/bin/python3 -m mautrix_telegram -g -c "$mautrix_config_path" -r "$app_service_registration_path/$app.yaml"
 
-# upgrade the alembic database
-# TODO remove on next upgrade
-# ynh_backup_if_checksum_is_different --file="$final_path/alembic.ini"
-ynh_replace_string --match_string="script_location = alembic" --replace_string="script_location = $final_path/alembic" --target_file="$final_path/alembic.ini"
-ynh_exec_warn_less $final_path/bin/alembic  -c "$final_path/alembic.ini" -x config="$mautrix_config_path" upgrade head
-
 # Recalculate and store the checksum of the file for the next upgrade.
 ynh_store_file_checksum --file="$mautrix_config_path"
 ynh_store_file_checksum --file="$app_service_registration_path/$app.yaml"
-ynh_store_file_checksum --file="$final_path/alembic.ini"
 
 #=================================================
 # SETUP SYSTEMD

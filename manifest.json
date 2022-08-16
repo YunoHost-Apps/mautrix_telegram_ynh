@@ -6,7 +6,7 @@
         "en": "Telegram puppeting bridge for Matrix/Synapse",
         "fr": "Passerelle Telegram pour Matrix/Synapse"
     },
-    "version": "0.10.2~ynh4",
+    "version": "0.11.3~ynh2",
     "url": "https://docs.mau.fi/bridges/python/telegram/index.html",
     "upstream": {
         "license": "AGPL-3.0-or-later",
@@ -21,7 +21,7 @@
         "email": ""
     },
     "requirements": {
-        "yunohost": ">= 4.3.0"
+        "yunohost": ">= 11.0.0"
     },
     "multi_instance": true,
     "services": [
@@ -64,8 +64,8 @@
                     "fr": "Activer le chiffrement entre Synapse et le bridge ?"
                 },
                 "help": {
-                    "en": "Only activate if you know the prerequisites and constraints related to e2b.",
-                    "fr": "N'activer que si vous connaissez les prérequis et constraintes liées à e2b."
+                    "en": "Only activate if you know the prerequisites and constraints related to e2b. See more: https://docs.mau.fi/bridges/general/end-to-bridge-encryption.html",
+                    "fr": "N'activer que si vous connaissez les prérequis et constraintes liées à e2b. Voir aussi : https://docs.mau.fi/bridges/general/end-to-bridge-encryption.html"
                 },
                 "default": false
             },
