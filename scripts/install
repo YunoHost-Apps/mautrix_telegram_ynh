@@ -164,10 +164,10 @@ ynh_script_progression --message="Configuring Mautrix-Bridge..." --weight=2
 mautrix_config_path="$final_path/config.yaml"
 as_token="\"This value is generated when generating the registration\""
 hs_token="\"This value is generated when generating the registration\""
-is_encryption_enabled=$encryption
+is_encryption_enabled="$encryption"
 
 if [ $encryption -eq 1 ]; then
-  is_encryption_enabled=true
+  is_encryption_enabled="true"
 fi
 
 write_bridge_config

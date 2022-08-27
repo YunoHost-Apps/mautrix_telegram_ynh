@@ -135,10 +135,10 @@ as_token=$(grep "as_token:" "$mautrix_config_path" | sed -r "s/ *as_token: *//")
 hs_token=$(grep "hs_token:" "$mautrix_config_path" | sed -r "s/ *hs_token: *//")
 # ynh_replace_string --match_string=__AS_TOKEN__ --replace_string="$as_token" --target_file="$mautrix_config_path"
 # ynh_replace_string --match_string=__HS_TOKEN__ --replace_string="$hs_token" --target_file="$mautrix_config_path"
-is_encryption_enabled=$encryption
+is_encryption_enabled="$encryption"
 
 if [ $encryption -eq 1 ]; then
-  is_encryption_enabled=true
+  is_encryption_enabled="true"
 fi
 
 write_bridge_config
