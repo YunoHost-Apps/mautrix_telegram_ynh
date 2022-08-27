@@ -99,11 +99,6 @@ ynh_script_progression --message="Upgrading dependencies..." --weight=1
 
 ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies
 
-if [ $encryption -eq 1 ]; then
-    # Install libolm-dev to be able to use encryption
-    ynh_add_app_dependencies  $pkg_dependencies_e2be
-fi
-
 #=================================================
 # SPECIFIC UPGRADE
 #=================================================
