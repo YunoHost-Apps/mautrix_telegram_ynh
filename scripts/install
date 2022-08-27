@@ -107,12 +107,12 @@ ynh_app_setting_set --app=$app --key=port --value=$port
 #=================================================
 ynh_script_progression --message="Installing dependencies..." --weight=97
 
+ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies
+
 if [ $encryption -eq 1 ]; then
     # Install libolm-dev to be able to use encryption
-    ynh_install_extra_app_dependencies  $pkg_dependencies_e2be
+    ynh_add_app_dependencies  $pkg_dependencies_e2be
 fi
-
-ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
 # CREATE DEDICATED USER
