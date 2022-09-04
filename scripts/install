@@ -34,7 +34,7 @@ bottoken=$YNH_APP_ARG_BOTTOKEN
 
 app=$YNH_APP_INSTANCE_NAME
 
-# TODO check (in manifest?) if the selected synapse instance is not already connected to a mautrix_bridge bridge
+# ToDo check (in manifest?) if the selected synapse instance is not already connected to a mautrix_bridge bridge
 if [ $synapsenumber -eq "1" ]
 then
 	synapse_instance="synapse"

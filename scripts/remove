@@ -82,7 +82,7 @@ ynh_remove_app_dependencies
 #=================================================
 # REMOVE VARIOUS FILES
 #=================================================
-ynh_script_progression --message="Removing synapse app service..." --weight=6
+ynh_script_progression --message="Removing various files..." --weight=6
 
 # Remove a directory securely
 ynh_secure_remove --file="$synapse_registration_path/$app.yaml"
