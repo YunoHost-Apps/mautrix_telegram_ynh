@@ -87,6 +87,8 @@ ynh_psql_execute_file_as_root --file="./db.sql" --database=$db_name
 #=================================================
 ynh_script_progression --message="Installing Mautrix-Bridge Python Module..." --weight=6
 
+mkdir -p /var/log/$app
+# Configure Mautrix-Bridge
 python3 -m venv $final_path
 export HOME=$final_path
 $final_path/bin/pip3 install --upgrade pip setuptools wheel
