@@ -107,11 +107,6 @@ ynh_app_setting_set --app=$app --key=port --value=$port
 #=================================================
 ynh_script_progression --message="Installing dependencies..." --weight=97
 
-if [ $encryption -eq 1 ]; then
-    # Install libolm-dev to be able to use encryption
-    ynh_install_extra_app_dependencies  $pkg_dependencies_e2be
-fi
-
 ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
@@ -164,10 +159,10 @@ ynh_script_progression --message="Configuring Mautrix-Bridge..." --weight=2
 mautrix_config_path="$final_path/config.yaml"
 as_token="\"This value is generated when generating the registration\""
 hs_token="\"This value is generated when generating the registration\""
-is_encryption_enabled=$encryption
+is_encryption_enabled="$encryption"
 
 if [ $encryption -eq 1 ]; then
-  is_encryption_enabled=true
+  is_encryption_enabled="true"
 fi
 
 write_bridge_config
