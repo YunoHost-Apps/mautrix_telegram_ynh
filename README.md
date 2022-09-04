@@ -17,7 +17,13 @@ If you don't have YunoHost, please consult [the guide](https://yunohost.org/#/in
 
 A puppeting bridge between Matrix and Telegram packaged as a YunoHost service. Messages, notifications (and sometimes media) are bridged between a Telegram user and a Matrix user. Currently the Matrix user can NOT invite other Matrix user in a bridged Telegram room, so only someone with a Telegram account can participate to Telegram group conversations. The ["Mautrix-Telegram"](https://docs.mau.fi/bridges/python/telegram/index.html) bridge is a Synapse App Service and relies on postgresql. Therefore, [Synapse for YunoHost](https://github.com/YunoHost-Apps/synapse_ynh) should be installed beforehand.
 
+
+**Shipped version:** 0.12.0~ynh1
+
+## Disclaimers / important information
+
 ## List of known public services
+
 * Ask on one of the following rooms: #mautrix_yunohost:matrix.fdn.fr or #telegram:maunium.net
 
 ## Bridging usage
@@ -49,19 +55,14 @@ See also [upstream wiki Authentication page](https://docs.mau.fi/bridges/python/
 ### Relaybot: Bridge a group for several Matrix and several Telegram users to chat together
 * see https://docs.mau.fi/bridges/python/telegram/relay-bot.html
 
-
-**Shipped version:** 0.12.0~ynh1
-
-## Disclaimers / important information
-
-### Configuration of the bridge
+## Configuration of the bridge
 
 The bridge is [roughly configured at installation](https://github.com/YunoHost-Apps/mautrix_telegram_ynh/blob/master/conf/config.yaml), e.g. allowed admin and user of the bot. Finer configuration can be done by modifying the
 following configuration file with SSH: 
 ```/opt/yunohost/mautrix_telegram/config.yaml```
 and then restarting the mautrix_telegram service.
 
-### Documentation
+## Documentation
 
  * Official "Mautrix-Telegram" documentation: https://docs.mau.fi/bridges/python/telegram/index.html
  * Matrix room (Matrix Bridges in Yunohost): #mautrix_yunohost:matrix.fdn.fr
@@ -70,6 +71,8 @@ In case you need to upload your logs somewhere, be aware that they contain your 
 ``| sed -r 's/[0-9]{10,}/📞/g' ``
  * "Mautrix-Telegram" bridge is based on the [telegram daemon](https://gitlab.com/telegramd/telegramd) project.
  * YunoHost documentation: If more specific documentation is needed, feel free to contribute.
+
+## YunoHost specific features
 
 #### Multi-user support
 
@@ -84,7 +87,7 @@ In case you need to upload your logs somewhere, be aware that they contain your 
 * Multi-instance installation should work. Several bridge instances could be installed for one Matrix-Synapse instance so that one Matrix user can bridge several Telegram accounts. 
 * Several bridge instances could be installed for each Matrix-Synapse instance to benefit from it. But one bridge can be used by users from several Matrix-Synapse instances.
 
-### Troubleshooting
+## Troubleshooting
 
 * Check the spelling of the bot name!
 * For slow servers it might be necessary to run ``systemctl edit mautrix_telegram.service`` (also for `coturn.service` and `coturn-synapse.service`) and insert
