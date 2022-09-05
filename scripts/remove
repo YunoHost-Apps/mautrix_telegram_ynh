@@ -23,6 +23,7 @@ db_name=$(ynh_app_setting_get --app=$app --key=db_name)
 db_user=$db_name
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
 synapse_registration_path=$(ynh_app_setting_get --app=$app --key=synapse_registration_path)
+synapse_db_name="matrix_$synapse_instance"
 
 #=================================================
 # STANDARD REMOVE
@@ -60,6 +61,8 @@ ynh_script_progression --message="Removing the PostgreSQL database..." --weight=
 
 # Remove a database if it exists, along with the associated user
 ynh_psql_remove_db --db_user=$db_user --db_name=$db_name
+ynh_psql_execute_as_root --database=$synapse_db_name --sql="DROP OWNED BY ""$botname"";"
+ynh_psql_execute_as_root --database=$synapse_db_name --sql="DROP USER ""$botname"";"
 
 #=================================================
 # REMOVE APP MAIN DIR
