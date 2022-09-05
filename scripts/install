@@ -138,7 +138,6 @@ if [ $encryption -eq 1 ]; then
   is_encryption_enabled="true"
 fi
 
-domain="https://$domain"
 if [ "$botusers" = "local" ]
 then
 	botusers="$server_name"
