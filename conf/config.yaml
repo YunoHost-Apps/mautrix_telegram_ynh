@@ -1,13 +1,13 @@
 # Homeserver details
 homeserver:
     # The address that this appservice can use to connect to the homeserver.
-    address: __DOMAIN__
+    address: https://__DOMAIN__
     # The domain of the homeserver (for MXIDs, etc).
     domain: __SERVER_NAME__
     # Whether or not to verify the SSL certificate of the homeserver.
     # Only applies if address starts with https://
-    verify_ssl: __VERIFY_SERVER_SSL_CERTIFICATES__
-    asmux: __MATRIX_SERVER_SUPPORTS_ASMUX__
+    verify_ssl: true
+    asmux: false
     # Number of retries for all HTTP requests if the homeserver isn't reachable.
     http_retry_count: 4
     # The URL to push real-time bridge status to.
@@ -40,7 +40,7 @@ appservice:
     # Format examples:
     #   SQLite:   sqlite:///filename.db
     #   Postgres: postgres://username:password@hostname/dbname
-    database: postgres://__MAUTRIX_BRIDGE_USER__:__MAUTRIX_BRIDGE_DB_PWD__@localhost:5432/__MAUTRIX_BRIDGE_DB_NAME__
+    database: postgres://__DB_USER__:__DB_PWD__@localhost:5432/__DB_NAME__
     # Additional arguments for asyncpg.create_pool() or sqlite3.connect()
     # https://magicstack.github.io/asyncpg/current/api/index.html#asyncpg.pool.create_pool
     # https://docs.python.org/3/library/sqlite3.html#sqlite3.connect
@@ -102,7 +102,7 @@ manhole:
     # The list of UIDs who can be added to the whitelist.
     # If empty, any UIDs can be specified in the open-manhole command.
     whitelist:
-        - 0
+    - 0
 
 # Bridge config
 bridge:
@@ -574,7 +574,7 @@ logging:
         file:
             class: logging.handlers.RotatingFileHandler
             formatter: normal
-            filename: __LOG_FILENAME__
+            filename: /var/log/__APP__/__APP__.log
             maxBytes: 10485760
             backupCount: 10
         console:
@@ -582,11 +582,11 @@ logging:
             formatter: colored
     loggers:
         mau:
-            level: DEBUG
+            level: INFO
         telethon:
             level: INFO
         aiohttp:
             level: INFO
     root:
-        level: DEBUG
+        level: INFO
         handlers: [file, console]
