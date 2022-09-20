@@ -16,22 +16,14 @@ ynh_script_progression --message="Loading installation settings..." --weight=5
 
 app=$YNH_APP_INSTANCE_NAME
 
-server_name=$(ynh_app_setting_get --app=$app --key=server_name)
-synapse_instance=$(ynh_app_setting_get --app=$app --key=synapse_instance)
-app_service_registration_path=$(ynh_app_setting_get --app=$app --key=app_service_registration_path)
 botname=$(ynh_app_setting_get --app=$app --key=botname)
-port=$(ynh_app_setting_get --app=$app --key=port)
+synapse_instance=$(ynh_app_setting_get --app=$app --key=synapse_instance)
+server_name=$(ynh_app_setting_get --app=$app --key=server_name)
+db_name=$(ynh_app_setting_get --app=$app --key=db_name)
+db_user=$db_name
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
-
-#=================================================
-# SET CONSTANTS
-#=================================================
-
+synapse_registration_path=$(ynh_app_setting_get --app=$app --key=synapse_registration_path)
 synapse_db_name="matrix_$synapse_instance"
-botname_synapse_db_user="@$botname:$server_name"
-mautrix_bridge_user=$app
-mautrix_bridge_db_name=$app
-mautrix_bridge_db_user=$app
 
 #=================================================
 # STANDARD REMOVE
@@ -68,10 +60,9 @@ ynh_remove_logrotate
 ynh_script_progression --message="Removing the PostgreSQL database..." --weight=4
 
 # Remove a database if it exists, along with the associated user
-ynh_psql_remove_db --db_user=$mautrix_bridge_db_name --db_name=$mautrix_bridge_db_user
+ynh_psql_remove_db --db_user=$db_user --db_name=$db_name
 ynh_psql_execute_as_root --database=$synapse_db_name --sql="DROP OWNED BY ""$botname"";"
 ynh_psql_execute_as_root --database=$synapse_db_name --sql="DROP USER ""$botname"";"
-#yunohost app action run $synapse_instance drop_user -a username=$botname
 
 #=================================================
 # REMOVE APP MAIN DIR
@@ -94,13 +85,11 @@ ynh_remove_app_dependencies
 #=================================================
 # REMOVE VARIOUS FILES
 #=================================================
-ynh_script_progression --message="Removing synapse app service..." --weight=6
+ynh_script_progression --message="Removing various files..." --weight=6
 
 # Remove a directory securely
-ynh_secure_remove --file="$app_service_registration_path/$app.yaml"
-
-/opt/yunohost/matrix-$synapse_instance/update_synapse_for_appservice.sh \
-    || ynh_die --message="Synapse can't restart with the appservice configuration"
+ynh_secure_remove --file="$synapse_registration_path/$app.yaml"
+/opt/yunohost/matrix-$synapse_instance/update_synapse_for_appservice.sh || ynh_die --message="Synapse can't restart with the appservice configuration"
 
 # Remove the log files
 ynh_secure_remove --file="/var/log/$app"
@@ -113,7 +102,7 @@ ynh_secure_remove --file="/var/log/$app"
 ynh_script_progression --message="Removing the dedicated system user..." --weight=5
 
 # Delete a system user
-ynh_system_user_delete --username=$mautrix_bridge_user
+ynh_system_user_delete --username=$app
 
 #=================================================
 # END OF SCRIPT

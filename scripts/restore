@@ -15,7 +15,7 @@ source /usr/share/yunohost/helpers
 #=================================================
 
 ynh_clean_setup () {
-	ynh_clean_check_starting
+	true
 }
 # Exit if an error occurs during the execution of the script
 ynh_abort_if_errors
@@ -27,14 +27,11 @@ ynh_script_progression --message="Loading installation settings..." --weight=1
 
 app=$YNH_APP_INSTANCE_NAME
 
-mautrix_bridge_user=$app
-domain=$(ynh_app_setting_get --app=$app --key=domain)
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
-mautrix_bridge_db_name=$(ynh_app_setting_get --app=$app --key=mautrix_bridge_db_name)
-mautrix_bridge_db_user=$mautrix_bridge_db_name
-mautrix_bridge_db_pwd=$(ynh_app_setting_get --app=$app --key=mautrix_bridge_db_pwd)
-app_service_registration_path=$(ynh_app_setting_get --app=$app --key=app_service_registration_path)
+db_name=$(ynh_app_setting_get --app=$app --key=db_name)
+db_user=$db_name
 synapse_instance=$(ynh_app_setting_get --app=$app --key=synapse_instance)
+synapse_registration_path=$(ynh_app_setting_get --app=$app --key=synapse_registration_path)
 
 #=================================================
 # CHECK IF THE APP CAN BE RESTORED
@@ -52,7 +49,7 @@ test ! -d $final_path \
 ynh_script_progression --message="Recreating the dedicated system user..." --weight=1
 
 # Create the dedicated user (if not existing)
-ynh_system_user_create --username=$app
+ynh_system_user_create --username=$app --home_dir="$final_path"
 
 #=================================================
 # RESTORE THE APP MAIN DIR
@@ -61,7 +58,9 @@ ynh_script_progression --message="Restoring the app main directory..." --weight=
 
 ynh_restore_file --origin_path="$final_path"
 
-chown $mautrix_bridge_user:root -R $final_path
+chmod 750 "$final_path"
+chmod -R o-rwx "$final_path"
+chown -R $app:$app "$final_path"
 
 #=================================================
 # SPECIFIC RESTORATION
@@ -74,21 +73,33 @@ ynh_script_progression --message="Reinstalling dependencies..." --weight=1
 ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
-# RESTORE THE MYSQL DATABASE
+# RESTORE THE POSTGRESQL DATABASE
 #=================================================
-ynh_script_progression --message="Restoring the MySQL database..." --weight=1
+ynh_script_progression --message="Restoring the PostgreSQL database..." --weight=8
 
 ynh_psql_test_if_first_run
-ynh_psql_create_user $mautrix_bridge_db_user $mautrix_bridge_db_pwd
-ynh_psql_execute_as_root --sql="CREATE DATABASE ""$mautrix_bridge_db_name"" ENCODING 'UTF8' LC_COLLATE='C' LC_CTYPE='C' template=template0 OWNER ""$mautrix_bridge_db_user"";"
-ynh_psql_execute_file_as_root --file="db.sql" --database="$mautrix_bridge_db_name"
+db_pwd=$(ynh_app_setting_get --app=$app --key=psqlpwd)
+ynh_psql_setup_db --db_user=$db_user --db_name=$db_name --db_pwd=$db_pwd
+ynh_psql_execute_file_as_root --file="./db.sql" --database=$db_name
 
 #=================================================
-# RESTORE VARIOUS FILES
+# INSTALL MAUTRIX-BRIDGE PYTHON MODULE
 #=================================================
-ynh_script_progression --message="Restoring various files..."
+ynh_script_progression --message="Installing Mautrix-Bridge Python Module..." --weight=6
 
-ynh_restore_file --origin_path="$app_service_registration_path"
+mkdir -p /var/log/$app
+# Configure Mautrix-Bridge
+python3 -m venv $final_path
+export HOME=$final_path
+$final_path/bin/pip3 install --upgrade pip setuptools wheel
+
+#=================================================
+# REGISTER SYNAPSE APP-SERVICE
+#=================================================
+ynh_script_progression --message="Registering Synapse app-service" --weight=1
+
+$final_path/bin/python3 -m mautrix_telegram -g -c $final_path/config.yaml -r "$synapse_registration_path/$app.yaml"
+/opt/yunohost/matrix-$synapse_instance/update_synapse_for_appservice.sh || echo "Synapse can't restart with the appservice configuration"
 
 #=================================================
 # RESTORE SYSTEMD
@@ -101,7 +112,7 @@ systemctl enable $app.service --quiet
 #=================================================
 # RESTORE THE LOGROTATE CONFIGURATION
 #=================================================
-ynh_script_progression --message="Restoring the logrotate configuration..."
+ynh_script_progression --message="Restoring the logrotate configuration..." --weight=1
 
 ynh_restore_file --origin_path="/etc/logrotate.d/$app"
 
@@ -110,28 +121,15 @@ ynh_restore_file --origin_path="/etc/logrotate.d/$app"
 #=================================================
 ynh_script_progression --message="Integrating service in YunoHost..." --weight=1
 
-yunohost service add $app --description "$app daemon for bridging Telegram and Matrix messages" --log /var/log/$app/$app.log
+yunohost service add $app --description="$app daemon for bridging Telegram and Matrix messages" --log="/var/log/$app/$app.log"
 
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
 ynh_script_progression --message="Starting a systemd service..." --weight=1
 
+# Start a systemd service
 ynh_systemd_action --service_name=$app --action="start" --log_path="/var/log/$app/$app.log"
-
-#=================================================
-# GENERIC FINALIZATION
-#=================================================
-#
-# also create an initial log file else the service fails
-mkdir /var/log/$app
-mkdir /var/log/$app/$app.log
-chown $mautrix_bridge_user:root -R /var/log/$app
-
-# after restoring files ensure synapse knows about the bot but don't die on failure
-# TODO check (in manifest?) if the selected synapse instance is not already connected to a mautrix_bridge bridge
-/opt/yunohost/matrix-$synapse_instance/update_synapse_for_appservice.sh \
-    || echo "Synapse can't restart with the appservice configuration"
 
 #=================================================
 # END OF SCRIPT

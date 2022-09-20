@@ -14,7 +14,7 @@ source /usr/share/yunohost/helpers
 #=================================================
 
 ynh_clean_setup () {
-	ynh_clean_check_starting
+	true
 }
 # Exit if an error occurs during the execution of the script
 ynh_abort_if_errors
@@ -28,39 +28,22 @@ botname=$YNH_APP_ARG_BOTNAME
 encryption=$YNH_APP_ARG_ENCRYPTION
 botadmin=$YNH_APP_ARG_BOTADMIN
 botusers=$YNH_APP_ARG_BOTUSERS
-
-# TODO new settings specific to telegram
 apiid=$YNH_APP_ARG_APIID
 apihash=$YNH_APP_ARG_APIHASH
 bottoken=$YNH_APP_ARG_BOTTOKEN
 
 app=$YNH_APP_INSTANCE_NAME
 
-# TODO check (in manifest?) if the selected synapse instance is not already connected to a mautrix_bridge bridge
+# ToDo check (in manifest?) if the selected synapse instance is not already connected to a mautrix_bridge bridge
 if [ $synapsenumber -eq "1" ]
 then
-synapse_instance="synapse"
+	synapse_instance="synapse"
 else
-synapse_instance="synapse__$synapsenumber"
+	synapse_instance="synapse__$synapsenumber"
 fi
 server_name=$(ynh_app_setting_get --app $synapse_instance --key server_name)
 domain=$(ynh_app_setting_get --app $synapse_instance --key domain)
-synapse_config_path="/etc/matrix-$synapse_instance"
-app_service_registration_path="/etc/matrix-$synapse_instance/app-service"
-synapse_name="matrix-$synapse_instance"
-synapse_user="matrix-$synapse_instance"
-synapse_db_name="matrix_$synapse_instance"
-synapse_db_user="matrix_$synapse_instance"
-
-#=================================================
-# SET CONSTANTS
-#=================================================
-
-#botname_synapse_db_user="@$botname:$server_name"
-mautrix_bridge_user=$app
-mautrix_bridge_db_name=$app
-mautrix_bridge_db_user=$app
-upstream_version=$(ynh_app_upstream_version)
+synapse_registration_path="/etc/matrix-$synapse_instance/app-service"
 
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
@@ -74,22 +57,18 @@ test ! -e "$final_path" || ynh_die --message="This path already contains a folde
 # STORE SETTINGS FROM MANIFEST
 #=================================================
 ynh_script_progression --message="Storing installation settings..." --weight=7
-ynh_app_setting_set --app=$app --key=domain --value=$domain
-ynh_app_setting_set --app=$app --key=server_name --value=$server_name
+
 ynh_app_setting_set --app=$app --key=botname --value=$botname
-ynh_app_setting_set --app=$app --key=synapse_instance --value=$synapse_instance
-ynh_app_setting_set --app=$app --key=app_service_registration_path --value=$app_service_registration_path
 ynh_app_setting_set --app=$app --key=encryption --value=$encryption
-ynh_app_setting_set --app=$app --key=mautrix_bridge_db_name --value=$mautrix_bridge_db_name
 ynh_app_setting_set --app=$app --key=botadmin --value=$botadmin
 ynh_app_setting_set --app=$app --key=botusers --value=$botusers
-
 ynh_app_setting_set --app=$app --key=apiid --value=$apiid
 ynh_app_setting_set --app=$app --key=apihash --value=$apihash
 ynh_app_setting_set --app=$app --key=bottoken --value=$bottoken
-
-ynh_app_setting_set --app=$app --key=mautrix_version --value=$upstream_version
-ynh_app_setting_set --app=$app --key=final_path --value=$final_path
+ynh_app_setting_set --app=$app --key=synapse_instance --value=$synapse_instance
+ynh_app_setting_set --app=$app --key=server_name --value=$server_name
+ynh_app_setting_set --app=$app --key=domain --value=$domain
+ynh_app_setting_set --app=$app --key=synapse_registration_path --value=$synapse_registration_path
 
 #=================================================
 # STANDARD MODIFICATIONS
@@ -107,11 +86,6 @@ ynh_app_setting_set --app=$app --key=port --value=$port
 #=================================================
 ynh_script_progression --message="Installing dependencies..." --weight=97
 
-if [ $encryption -eq 1 ]; then
-    # Install libolm-dev to be able to use encryption
-    ynh_install_extra_app_dependencies  $pkg_dependencies_e2be
-fi
-
 ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
@@ -120,20 +94,19 @@ ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies
 ynh_script_progression --message="Configuring system user..." --weight=1
 
 # Create a system user
-ynh_system_user_create --username=$mautrix_bridge_user
+ynh_system_user_create --username=$app --home_dir="$final_path"
 
 #=================================================
 # CREATE A POSTGRESQL DATABASE
 #=================================================
 ynh_script_progression --message="Creating a PostgreSQL database..." --weight=3
 
-mautrix_bridge_db_pwd=$(ynh_string_random --length=30)
-ynh_app_setting_set --app=$app --key=mautrix_bridge_db_pwd --value=$mautrix_bridge_db_pwd
-
-# Create postgresql database
+db_name=$(ynh_sanitize_dbid --db_name=$app)
+db_user=$db_name
+ynh_app_setting_set --app=$app --key=db_name --value=$db_name
 ynh_psql_test_if_first_run
-ynh_psql_create_user $mautrix_bridge_db_user $mautrix_bridge_db_pwd
-ynh_psql_execute_as_root --sql="CREATE DATABASE ""$mautrix_bridge_db_name"" ENCODING 'UTF8' LC_COLLATE='C' LC_CTYPE='C' template=template0 OWNER ""$mautrix_bridge_db_user"";"
+ynh_psql_setup_db --db_user=$db_user --db_name=$db_name
+db_pwd=$(ynh_app_setting_get --app=$app --key=psqlpwd)
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
@@ -141,45 +114,49 @@ ynh_psql_execute_as_root --sql="CREATE DATABASE ""$mautrix_bridge_db_name"" ENCO
 ynh_script_progression --message="Setting up source files..." --weight=3
 
 ynh_app_setting_set --app=$app --key=final_path --value=$final_path
-
-# WARNING : theses command are used in INSTALL, UPGRADE (2 times)
-# For any update do it in all files
-#if [ -n "$(uname -m | grep 64)" ]
-#then
-#    ynh_setup_source --dest_dir=$final_path/ --source_id="amd64_$(lsb_release --codename --short)"
-#else
-
 # Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source --dest_dir="$final_path/src"
+
+chmod 750 "$final_path"
+chmod -R o-rwx "$final_path"
+chown -R $app:$app "$final_path"
 
 #=================================================
 # SPECIFIC SETUP
 #=================================================
-# SET MAUTRIX-BRIDGE CONFIG
+# ADD A CONFIGURATION
 #=================================================
-ynh_script_progression --message="Configuring Mautrix-Bridge..." --weight=2
+ynh_script_progression --message="Adding a configuration file..." --weight=2
 
 # WARNING : theses command are used in INSTALL, UPGRADE, CONFIG, CHANGE-URL (4 times)
 # For any update do it in all files
-mautrix_config_path="$final_path/config.yaml"
 as_token="\"This value is generated when generating the registration\""
 hs_token="\"This value is generated when generating the registration\""
-is_encryption_enabled=$encryption
+is_encryption_enabled="$encryption"
 
 if [ $encryption -eq 1 ]; then
-  is_encryption_enabled=true
+  is_encryption_enabled="true"
 fi
 
-write_bridge_config
+if [ "$botusers" = "local" ]
+then
+	botusers="$server_name"
+fi
+
+ynh_add_config --template="config.yaml" --destination="$final_path/config.yaml"
+
+chmod 400 "$final_path/config.yaml"
+chown $app:$app "$final_path/config.yaml"
 
 #=================================================
 # INSTALL MAUTRIX-BRIDGE PYTHON MODULE
 #=================================================
+ynh_script_progression --message="Installing Mautrix-Bridge Python Module..." --weight=6
 
 mkdir -p /var/log/$app
 # Configure Mautrix-Bridge
 python3 -m venv $final_path
-export HOME=$final_path # HACK see https://github.com/mautrix/telegram/issues/661
+export HOME=$final_path
 $final_path/bin/pip3 install --upgrade pip setuptools wheel
 $final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[speedups,qr_login] # metrics,e2be,hq_thumbnails,sqlite,formattednumbers
 
@@ -187,19 +164,17 @@ if [ $encryption -eq 1 ]; then
   $final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[e2be]
 fi
 
-# -r optional-requirements.txt
-$final_path/bin/python3 -m mautrix_telegram -g -c "$mautrix_config_path" -r "$app_service_registration_path/$app.yaml"
+#=================================================
+# REGISTER SYNAPSE APP-SERVICE
+#=================================================
+ynh_script_progression --message="Registering Synapse app-service" --weight=1
 
-# Handled by synapse: synapse_ynh adds all registration files added in $app_service_registration_path to the app_service_config_files list
+$final_path/bin/python3 -m mautrix_telegram -g -c $final_path/config.yaml -r "$synapse_registration_path/$app.yaml"
 /opt/yunohost/matrix-$synapse_instance/update_synapse_for_appservice.sh || ynh_die --message="Synapse can't restart with the appservice configuration"
 
-#=================================================
-# STORE THE CONFIG FILE CHECKSUM
-#=================================================
-
-# Calculate and store the config file checksum into the app settings
-ynh_store_file_checksum --file="$mautrix_config_path"
-ynh_store_file_checksum --file="$app_service_registration_path/$app.yaml"
+chown -R $app:$app "$final_path"
+ynh_store_file_checksum --file="$synapse_registration_path/$app.yaml"
+ynh_store_file_checksum --file="$final_path/config.yaml"
 
 #=================================================
 # SETUP SYSTEMD
@@ -210,14 +185,6 @@ ynh_script_progression --message="Configuring a systemd service..." --weight=20
 ynh_add_systemd_config
 
 #=================================================
-# SECURE FILES AND DIRECTORIES
-#=================================================
-
-# WARNING : theses command are used in INSTALL, UPGRADE, RESTORE
-# For any update do it in all files
-chown $mautrix_bridge_user:root -R $final_path
-
-#=================================================
 # GENERIC FINALIZATION
 #=================================================
 # SETUP LOGROTATE
@@ -226,15 +193,15 @@ ynh_script_progression --message="Configuring log rotation..." --weight=3
 
 # Use logrotate to manage application logfile(s)
 # TODO maybe --specific-user??
-ynh_use_logrotate --logfile "/var/log/$app/$app.log" --specific_user $mautrix_bridge_user
-chown $mautrix_bridge_user:root -R /var/log/$app
+ynh_use_logrotate --logfile "/var/log/$app/$app.log" --specific_user $app
+chown -R $app:$app /var/log/$app
 
 #=================================================
 # INTEGRATE SERVICE IN YUNOHOST
 #=================================================
 ynh_script_progression --message="Integrating service in YunoHost..."
 
-yunohost service add $app --description "$app daemon for bridging Telegram and Matrix messages" --log "/var/log/$app/$app.log"
+yunohost service add $app --description="$app daemon for bridging Telegram and Matrix messages" --log="/var/log/$app/$app.log"
 
 #=================================================
 # START SYSTEMD SERVICE
@@ -242,7 +209,7 @@ yunohost service add $app --description "$app daemon for bridging Telegram and M
 ynh_script_progression --message="Starting a systemd service..." --weight=1
 
 # Start a systemd service
-ynh_systemd_action --service_name=$app --action="start"
+ynh_systemd_action --service_name=$app --action="start" --log_path="/var/log/$app/$app.log"
 
 #=================================================
 # END OF SCRIPT

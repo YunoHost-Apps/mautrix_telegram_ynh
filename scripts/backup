@@ -26,9 +26,9 @@ ynh_abort_if_errors
 ynh_print_info --message="Loading installation settings..."
 
 app=$YNH_APP_INSTANCE_NAME
+
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
-app_service_registration_path=$(ynh_app_setting_get --app=$app --key=app_service_registration_path)
-mautrix_bridge_db_name=$(ynh_app_setting_get --app=$app --key=mautrix_bridge_db_name)
+db_name=$(ynh_app_setting_get --app=$app --key=db_name)
 
 #=================================================
 # DECLARE DATA AND CONF FILES TO BACKUP
@@ -56,18 +56,11 @@ ynh_backup --src_path="/etc/logrotate.d/$app"
 ynh_backup --src_path="/etc/systemd/system/$app.service"
 
 #=================================================
-# BACKUP VARIOUS FILES
-#=================================================
-
-# backup synapse registration file
-ynh_backup --src_path="$app_service_registration_path"
-
-#=================================================
-# BACKUP THE PostrgeSQL DATABASE
+# BACKUP THE POSTGRESQL DATABASE
 #=================================================
 ynh_print_info --message="Backing up the PostgreSQL database..."
 
-ynh_psql_dump_db --database="$mautrix_bridge_db_name" > db.sql
+ynh_psql_dump_db --database="$db_name" > db.sql
 
 #=================================================
 # END OF SCRIPT
