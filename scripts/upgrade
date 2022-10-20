@@ -129,6 +129,14 @@ chown $app:$app "$final_path/config.yaml"
 #=================================================
 ynh_script_progression --message="Upgrading Mautrix-Bridge Python Module..." --weight=2
 
+export PATH="$PATH:$final_path/.cargo/bin:$final_path/.local/bin:/usr/local/sbin"
+if [ -e $final_path/.rustup ]; then
+    sudo -u "$app" env PATH=$PATH rustup update
+else
+    sudo -u "$app" bash -c 'curl -sSf -L https://static.rust-lang.org/rustup.sh | sh -s -- -y --default-toolchain=stable --profile=minimal'
+fi
+
+
 python3 -m venv $final_path
 export HOME=$final_path
 $final_path/bin/pip3 install --upgrade pip setuptools wheel
