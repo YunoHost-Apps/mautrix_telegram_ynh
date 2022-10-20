@@ -155,8 +155,17 @@ ynh_script_progression --message="Installing Mautrix-Bridge Python Module..." --
 
 mkdir -p /var/log/$app
 # Configure Mautrix-Bridge
+export PATH="$PATH:$final_path/.cargo/bin:$final_path/.local/bin:/usr/local/sbin"
+if [ -e $final_path/.rustup ]; then
+    sudo -u "$app" env PATH=$PATH rustup update
+else
+    sudo -u "$app" bash -c 'curl -sSf -L https://static.rust-lang.org/rustup.sh | sh -s -- -y --default-toolchain=stable --profile=minimal'
+fi
+
 python3 -m venv $final_path
 export HOME=$final_path
+
+
 $final_path/bin/pip3 install --upgrade pip setuptools wheel
 $final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[speedups,qr_login] # metrics,e2be,hq_thumbnails,sqlite,formattednumbers
 
