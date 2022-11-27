@@ -1,5 +1,5 @@
-SOURCE_URL=https://github.com/mautrix/telegram/archive/refs/tags/v0.12.0.tar.gz
-SOURCE_SUM=bcc971d638a985d5196c1986f8f332b0f8236b6f34da712bec8662ab38523434
+SOURCE_URL=https://github.com/mautrix/telegram/archive/refs/tags/v0.12.1.tar.gz
+SOURCE_SUM=c149a83551247577c2c8c933be8a5ff7593335c64d4e3a577fc8c7d41f0a0999
 SOURCE_SUM_PRG=sha256sum
 SOURCE_FORMAT=tar.gz
 SOURCE_IN_SUBDIR=true
