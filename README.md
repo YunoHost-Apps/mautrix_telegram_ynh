@@ -19,7 +19,6 @@ A puppeting bridge between Matrix and Telegram packaged as a YunoHost service. M
 
 
 **Shipped version:** 0.12.1~ynh1
-
 ## Disclaimers / important information
 
 ## List of known public services
