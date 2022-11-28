@@ -23,6 +23,7 @@ ynh_abort_if_errors
 # RETRIEVE ARGUMENTS FROM THE MANIFEST
 #=================================================
 
+appserviceid=$YNH_APP_INSTANCE_NAME
 synapsenumber=$YNH_APP_ARG_SYNAPSENUMBER
 botname=$YNH_APP_ARG_BOTNAME
 encryption=$YNH_APP_ARG_ENCRYPTION
@@ -58,6 +59,7 @@ test ! -e "$final_path" || ynh_die --message="This path already contains a folde
 #=================================================
 ynh_script_progression --message="Storing installation settings..." --weight=7
 
+ynh_app_setting_set --app=$app --key=appserviceid --value=$appserviceid
 ynh_app_setting_set --app=$app --key=botname --value=$botname
 ynh_app_setting_set --app=$app --key=encryption --value=$encryption
 ynh_app_setting_set --app=$app --key=botadmin --value=$botadmin

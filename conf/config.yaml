@@ -74,7 +74,7 @@ appservice:
         shared_secret: generate
 
     # The unique ID of this appservice.
-    id: __BOTNAME__
+    id: __APPSERVICEID__
     # Username of the appservice bot.
     bot_username: __BOTNAME__
     # Display name and avatar for bot. Set to "remove" to remove display name/avatar, leave empty
