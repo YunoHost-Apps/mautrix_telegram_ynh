@@ -16,6 +16,7 @@ ynh_script_progression --message="Loading installation settings..." --weight=1
 
 app=$YNH_APP_INSTANCE_NAME
 
+appserviceid=$(ynh_app_setting_get --app=$app --key=appserviceid)
 botname=$(ynh_app_setting_get --app=$app --key=botname)
 encryption=$(ynh_app_setting_get --app=$app --key=encryption)
 botadmin=$(ynh_app_setting_get --app=$app --key=botadmin)
@@ -67,6 +68,13 @@ ynh_systemd_action --service_name=$app --action="stop" --log_path="/var/log/$app
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
 ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
+
+# If appserviceid doesn't exist, create it
+if [ -z "$appserviceid" ]
+then
+  appserviceid=$app
+  ynh_app_setting_set --app=$app --key=appserviceid --value=$appserviceid
+fi
 
 #=================================================
 # CREATE DEDICATED USER
