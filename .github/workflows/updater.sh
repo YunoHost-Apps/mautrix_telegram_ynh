@@ -36,7 +36,14 @@ echo "REPO=$repo" >> $GITHUB_ENV
 echo "PROCEED=false" >> $GITHUB_ENV
 
 # Proceed only if the retrieved version is greater than the current one
-
+if ! dpkg --compare-versions "$current_version" "lt" "$version" ; then
+	echo "::warning ::No new version available"
+	exit 0
+# Proceed only if a PR for this new version does not already exist
+elif git ls-remote -q --exit-code --heads https://github.com/$GITHUB_REPOSITORY.git ci-auto-update-v$version ; then
+	echo "::warning ::A branch already exists for this update"
+	exit 0
+fi
 
 #=================================================
 # UPDATE SOURCE FILES
