@@ -18,7 +18,7 @@ If you don't have YunoHost, please consult [the guide](https://yunohost.org/#/in
 A puppeting bridge between Matrix and Telegram packaged as a YunoHost service. Messages, notifications (and sometimes media) are bridged between a Telegram user and a Matrix user. Currently the Matrix user can NOT invite other Matrix user in a bridged Telegram room, so only someone with a Telegram account can participate to Telegram group conversations. The ["Mautrix-Telegram"](https://docs.mau.fi/bridges/python/telegram/index.html) bridge is a Synapse App Service and relies on postgresql. Therefore, [Synapse for YunoHost](https://github.com/YunoHost-Apps/synapse_ynh) should be installed beforehand.
 
 
-**Shipped version:** 0.12.2~ynh2
+**Shipped version:** 0.12.2~ynh3
 ## Disclaimers / important information
 
 ## List of known public services
@@ -116,6 +116,14 @@ To try the testing branch, please proceed like that.
 sudo yunohost app install https://github.com/YunoHost-Apps/mautrix_telegram_ynh/tree/testing --debug
 or
 sudo yunohost app upgrade mautrix_telegram -u https://github.com/YunoHost-Apps/mautrix_telegram_ynh/tree/testing --debug
+```
+
+The `.github/workflows/updater.sh` script needs to be synced with changes in `conf/config.yaml` so for now a `pre-commit`
+hook is used to display a reminder to update `.github/workflows/updater.sh` (if needed)  when `conf/config.yaml` has been modified.
+
+Please enable Git hooks using following command to ensure code quality and stability.
+``` bash
+git config --local core.hooksPath .githooks
 ```
 
 **More info regarding app packaging:** <https://yunohost.org/packaging_apps>

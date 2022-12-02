@@ -21,7 +21,7 @@ La passerelle ["Mautrix-Telegram"](https://docs.mau.fi/bridges/python/telegram/i
 ** Attention : sauvegardez et restaurez toujours les deux applications Yunohost matrix-synapse et mautrix_telegram en même temps!**
 
 
-**Version incluse :** 0.12.2~ynh2
+**Version incluse :** 0.12.2~ynh3
 ## Avertissements / informations importantes
 
 ## Liste de passerelles publiques
@@ -112,5 +112,11 @@ sudo yunohost app install https://github.com/YunoHost-Apps/mautrix_telegram_ynh/
 ou
 sudo yunohost app upgrade mautrix_telegram -u https://github.com/YunoHost-Apps/mautrix_telegram_ynh/tree/testing --debug
 ```
+
+Le script `.github/workflows/updater.sh` doit être synchronisé avec les changements dans `conf/config.yaml`,
+donc pour l'instant un hook `pre-commit` est utilisé pour afficher un rappel pour mettre à jour
+`.github/workflows/updater.sh` (si nécessaire) lorsque `conf/config.yaml` a été modifié.
+
+Veuillez activer les hooks Git en utilisant la commande suivante pour assurer la qualité et la stabilité du code.
 
 **Plus d'infos sur le packaging d'applications :** <https://yunohost.org/packaging_apps>
