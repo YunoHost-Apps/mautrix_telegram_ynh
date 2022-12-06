@@ -73,3 +73,13 @@ ExecStartPre=/bin/sleep 90
 ```
 such that it is ensured that synapse is running before the bridge tries to connect.
 (If it worked after installation but broke after a restart this probably is it.)
+
+## Development code quality
+
+The `.github/workflows/updater.sh` script needs to be synced with changes in `conf/config.yaml` therefore a `pre-commit`
+hook is used to display a reminder to update `.github/workflows/updater.sh` (if needed)  when `conf/config.yaml` has been modified.
+
+Please enable Git hooks using following command to ensure code quality and stability.
+``` bash
+git config --local core.hooksPath .githooks
+```
