@@ -97,6 +97,16 @@ ExecStartPre=/bin/sleep 90
 such that it is ensured that synapse is running before the bridge tries to connect.
 (If it worked after installation but broke after a restart this probably is it.)
 
+## Development code quality
+
+The `.github/workflows/updater.sh` script needs to be synced with changes in `conf/config.yaml` therefore a `pre-commit`
+hook is used to display a reminder to update `.github/workflows/updater.sh` (if needed)  when `conf/config.yaml` has been modified.
+
+Please enable Git hooks using following command to ensure code quality and stability.
+``` bash
+git config --local core.hooksPath .githooks
+```
+
 ## Documentation and resources
 
 * Official app website: <https://docs.mau.fi/bridges/python/telegram/index.html>
@@ -116,14 +126,6 @@ To try the testing branch, please proceed like that.
 sudo yunohost app install https://github.com/YunoHost-Apps/mautrix_telegram_ynh/tree/testing --debug
 or
 sudo yunohost app upgrade mautrix_telegram -u https://github.com/YunoHost-Apps/mautrix_telegram_ynh/tree/testing --debug
-```
-
-The `.github/workflows/updater.sh` script needs to be synced with changes in `conf/config.yaml` so for now a `pre-commit`
-hook is used to display a reminder to update `.github/workflows/updater.sh` (if needed)  when `conf/config.yaml` has been modified.
-
-Please enable Git hooks using following command to ensure code quality and stability.
-``` bash
-git config --local core.hooksPath .githooks
 ```
 
 **More info regarding app packaging:** <https://yunohost.org/packaging_apps>
