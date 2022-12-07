@@ -80,6 +80,8 @@ fi
 if [ -z "$db_name" ]
 then
   db_name=$(ynh_app_setting_get --app=$app --key=mautrix_bridge_db_name)
+  # db_name and db_user share the same value
+  db_user=$db_name
   ynh_app_setting_set --app=$app --key=db_name --value=$db_name
 fi
 
