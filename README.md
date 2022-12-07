@@ -18,7 +18,7 @@ If you don't have YunoHost, please consult [the guide](https://yunohost.org/#/in
 A puppeting bridge between Matrix and Telegram packaged as a YunoHost service. Messages, notifications (and sometimes media) are bridged between a Telegram user and a Matrix user. Currently the Matrix user can NOT invite other Matrix user in a bridged Telegram room, so only someone with a Telegram account can participate to Telegram group conversations. The ["Mautrix-Telegram"](https://docs.mau.fi/bridges/python/telegram/index.html) bridge is a Synapse App Service and relies on postgresql. Therefore, [Synapse for YunoHost](https://github.com/YunoHost-Apps/synapse_ynh) should be installed beforehand.
 
 
-**Shipped version:** 0.12.1~ynh1
+**Shipped version:** 0.12.2~ynh4
 ## Disclaimers / important information
 
 ## List of known public services
@@ -61,6 +61,13 @@ following configuration file with SSH:
 ```/opt/yunohost/mautrix_telegram/config.yaml```
 and then restarting the mautrix_telegram service.
 
+#### End-to-bridge encryption
+
+The bridge can optionally encrypt messages between Matrix users and the bridge to hide messages from the homeserver. Using Postgres is strongly recommended when using end-to-bridge encryption.
+If you want to enable it, look for the option ```bridge → encryption``` in the config file. If you only set ```allow: true```, the bridge won't enable encryption on its own, but will work in encrypted rooms. If you set ```default: true```, the bridge will automatically enable encryption in new portals.
+
+There is also the possibility to set ```require: true``` to enforce encryption on any of the messages that you send (this will drop any unencrypted messages).
+
 ## Documentation
 
  * Official "Mautrix-Telegram" documentation: https://docs.mau.fi/bridges/python/telegram/index.html
@@ -96,6 +103,16 @@ ExecStartPre=/bin/sleep 90
 ```
 such that it is ensured that synapse is running before the bridge tries to connect.
 (If it worked after installation but broke after a restart this probably is it.)
+
+## Development code quality
+
+The `.github/workflows/updater.sh` script needs to be synced with changes in `conf/config.yaml` therefore a `pre-commit`
+hook is used to display a reminder to update `.github/workflows/updater.sh` (if needed)  when `conf/config.yaml` has been modified.
+
+Please enable Git hooks using following command to ensure code quality and stability.
+``` bash
+git config --local core.hooksPath .githooks
+```
 
 ## Documentation and resources
 

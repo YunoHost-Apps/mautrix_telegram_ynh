@@ -16,6 +16,7 @@ ynh_script_progression --message="Loading installation settings..." --weight=1
 
 app=$YNH_APP_INSTANCE_NAME
 
+appserviceid=$(ynh_app_setting_get --app=$app --key=appserviceid)
 botname=$(ynh_app_setting_get --app=$app --key=botname)
 encryption=$(ynh_app_setting_get --app=$app --key=encryption)
 botadmin=$(ynh_app_setting_get --app=$app --key=botadmin)
@@ -67,6 +68,36 @@ ynh_systemd_action --service_name=$app --action="stop" --log_path="/var/log/$app
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
 ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
+
+# If appserviceid doesn't exist, create it
+if [ -z "$appserviceid" ]
+then
+  appserviceid=$app
+  ynh_app_setting_set --app=$app --key=appserviceid --value=$appserviceid
+fi
+
+# If db_name doesn't exist, create it
+if [ -z "$db_name" ]
+then
+  db_name=$(ynh_app_setting_get --app=$app --key=mautrix_bridge_db_name)
+  # db_name and db_user share the same value
+  db_user=$db_name
+  ynh_app_setting_set --app=$app --key=db_name --value=$db_name
+fi
+
+# If db_pwd doesn't exist, create it
+if [ -z "$db_pwd" ]
+then
+  db_pwd=$(ynh_app_setting_get --app=$app --key=mautrix_bridge_db_pwd)
+  ynh_app_setting_set --app=$app --key=psqlpwd --value=$db_pwd
+fi
+
+# If synapse_registration_path doesn't exist, create it
+if [ -z "$synapse_registration_path" ]
+then
+  synapse_registration_path=$(ynh_app_setting_get --app=$app --key=app_service_registration_path)
+  ynh_app_setting_set --app=$app --key=synapse_registration_path --value=$synapse_registration_path
+fi
 
 #=================================================
 # CREATE DEDICATED USER
@@ -132,11 +163,7 @@ ynh_script_progression --message="Upgrading Mautrix-Bridge Python Module..." --w
 python3 -m venv $final_path
 export HOME=$final_path
 $final_path/bin/pip3 install --upgrade pip setuptools wheel
-$final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[speedups,qr_login] # metrics,e2be,hq_thumbnails,sqlite,formattednumbers
-
-if [ $encryption -eq 1 ]; then
-	$final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[e2be]
-fi
+$final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[e2be,speedups,qr_login] # metrics,hq_thumbnails,sqlite,formattednumbers
 
 #=================================================
 # REGISTER SYNAPSE APP-SERVICE

@@ -21,7 +21,7 @@ La passerelle ["Mautrix-Telegram"](https://docs.mau.fi/bridges/python/telegram/i
 ** Attention : sauvegardez et restaurez toujours les deux applications Yunohost matrix-synapse et mautrix_telegram en même temps!**
 
 
-**Version incluse :** 0.12.1~ynh1
+**Version incluse :** 0.12.2~ynh4
 ## Avertissements / informations importantes
 
 ## Liste de passerelles publiques
@@ -57,6 +57,20 @@ See also [upstream wiki Authentication page](https://docs.mau.fi/bridges/python/
 ### Relaybot: Bridge a group for several Matrix and several Telegram users to chat together
 * see https://docs.mau.fi/bridges/python/telegram/relay-bot.html
 
+### Configuration de la passerelle
+
+La passerelle est [configurée avec les paramètres standards adaptés pour votre YunoHost et l'instance Matrix-Synapse sélectionnée](https://github.com/YunoHost-Apps/mautrix_telegram_ynh/blob/master/conf/config.yaml). Vous pouvez par exemple ajouter des administrateur.ice.s et utilisateur.ice.s du Robot autorisés en modifiant le fichier de configuration par liaison SSH:
+``` sudo nano /opt/yunohost/mautrix_whatsapp/config.yaml```
+puis en redémarrant le service:
+``` sudo yunohost service restart mautrix_whatsapp```
+
+#### End-to-bridge encryption
+
+Le robot peut éventuellement chiffrer les messages entre les utilisateurs de Matrix et la passarelle pour cacher les messages du serveur domestique. L'utilisation de Postgres est fortement recommandée lors de l'utilisation du chiffrement end-to-bridge.
+Si vous voulez l'activer, cherchez l'option ```bridge → encryption``` dans le fichier de configuration. Si vous définissez uniquement l'option ``allow: true``, le robot n'activera pas le chiffrement de lui-même, mais travaillera dans les portails chiffrés. Si vous définissez ```default: true```, la passerelle activera automatiquement le chiffrement dans les nouveaux portails.
+
+Il y a également la possibilité de définir ```require: true``` pour imposer le chiffrement sur tous les messages que vous envoyez (cela interdira tous les messages non chiffrés).
+
 ## Documentation
 
  * Official "Mautrix-Telegram" documentation: https://docs.mau.fi/bridges/python/telegram/index.html
@@ -91,6 +105,17 @@ ExecStartPre=/bin/sleep 90
 ```
 such that it is ensured that synapse is running before the bridge tries to connect.
 (If it worked after installation but broke after a restart this probably is it.)
+
+## Development code quality
+
+Le script `.github/workflows/updater.sh` doit être synchronisé avec les changements dans `conf/config.yaml`,
+donc un hook `pre-commit` est utilisé pour afficher un rappel pour mettre à jour
+`.github/workflows/updater.sh` (si nécessaire) lorsque `conf/config.yaml` a été modifié.
+
+Veuillez activer les hooks Git en utilisant la commande suivante pour assurer la qualité et la stabilité du code.
+``` bash
+git config --local core.hooksPath .githooks
+```
 
 ## Documentations et ressources
 

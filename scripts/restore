@@ -32,6 +32,7 @@ db_name=$(ynh_app_setting_get --app=$app --key=db_name)
 db_user=$db_name
 synapse_instance=$(ynh_app_setting_get --app=$app --key=synapse_instance)
 synapse_registration_path=$(ynh_app_setting_get --app=$app --key=synapse_registration_path)
+appserviceid=$(ynh_app_setting_get --app=$app --key=appserviceid)
 
 #=================================================
 # CHECK IF THE APP CAN BE RESTORED
