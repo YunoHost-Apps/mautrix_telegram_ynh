@@ -160,11 +160,36 @@ chown $app:$app "$final_path/config.yaml"
 #=================================================
 ynh_script_progression --message="Upgrading Mautrix-Bridge Python Module..." --weight=2
 
-python3 -m venv $final_path
+# Install rustup is not already installed
+# We need this to be able to install cryptgraphy
+export PATH="$PATH:$final_path/.cargo/bin:$final_path/.local/bin:/usr/local/sbin"
+if [ -e $final_path/.rustup ]; then
+    sudo -u "$app" env PATH=$PATH rustup update
+else
+    sudo -u "$app" bash -c 'curl -sSf -L https://static.rust-lang.org/rustup.sh | sh -s -- -y --default-toolchain=stable --profile=minimal'
+fi
+
+
+# Install virtualenv if it don't exist
+test -e $final_path/bin/python3 || python3 -m venv $final_path
 export HOME=$final_path
+# Install mautrix_telegram in virtualenv
+
+# We set all necessary environement variable to create a python virtualenvironnement.
+u_arg='u'
+set  +$u_arg;
+source $final_path/bin/activate
+set  -$u_arg;
+	
 $final_path/bin/pip3 install --upgrade pip setuptools wheel
+
 $final_path/bin/pip3 install --upgrade $final_path/src/mautrix-telegram.tar.gz[e2be,speedups,qr_login] # metrics,hq_thumbnails,sqlite,formattednumbers
 
+# This function was defined when we called "source $final_path/bin/activate". With this function we undo what "$final_path/bin/activate" does
+set  +$u_arg;
+deactivate
+set  -$u_arg;
+ 
 #=================================================
 # REGISTER SYNAPSE APP-SERVICE
 #=================================================
