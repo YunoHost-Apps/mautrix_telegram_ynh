@@ -6,7 +6,7 @@
         "en": "Telegram puppeting bridge for Matrix/Synapse",
         "fr": "Passerelle Telegram pour Matrix/Synapse"
     },
-    "version": "0.14.1~ynh1",
+    "version": "0.14.2~ynh1",
     "url": "https://docs.mau.fi/bridges/python/telegram/index.html",
     "upstream": {
         "license": "AGPL-3.0-or-later",
