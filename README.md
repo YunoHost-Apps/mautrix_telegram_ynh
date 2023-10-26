@@ -121,7 +121,7 @@ git config --local core.hooksPath .githooks
 * Official user documentation: <https://docs.mau.fi/bridges/python/telegram/management-commands.html>
 * Official admin documentation: <https://github.com/YunoHost-Apps/mautrix_telegram_ynh>
 * Upstream app code repository: <https://github.com/mautrix/telegram>
-* YunoHost documentation for this app: <https://yunohost.org/app_mautrix_telegram>
+* YunoHost Store: <https://apps.yunohost.org/app/mautrix_telegram>
 * Report a bug: <https://github.com/YunoHost-Apps/mautrix_telegram_ynh/issues>
 
 ## Developer info
