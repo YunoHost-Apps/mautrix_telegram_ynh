@@ -1,0 +1,37 @@
+test_format = 1.0
+
+[default]
+
+# ------------
+# Tests to run
+# ------------
+
+# For special usecases, sometimes you need to setup other things on the machine
+# prior to installing the app (such as installing another app)
+# (Remove this key entirely if not needed)
+preinstall = """
+    sudo yunohost tools update apps
+    sudo yunohost app install https://github.com/YunoHost-Apps/synapse_ynh/ -a "domain=$domain&server_name=$server_name&is_free_registration=$is_free_registration&jitsi_server=$jitsi_server" --force
+    """
+
+# -------------------------------
+# Default args to use for install
+# -------------------------------
+
+# By default, the CI will automagically fill the 'standard' args
+# such as domain, path, admin, is_public and password with relevant values
+# and also install args with a "default" provided in the manifest..
+# It should only make sense to declare custom args here for args with no default values
+
+args.botadmin = "@johndoe:server.name"
+args.botusers = "server.name"
+args.apiid = "1234567"
+args.apihash = "tjyd5yge35lbodk1xwzw2jstp90k55qz"
+
+# -------------------------------
+# Commits to test upgrade from
+# -------------------------------
+
+test_upgrade_from.644a075.name = "Upgrade from 0.12.0"
+
+test_upgrade_from.bf0ba45.name = "Upgrade from 0.13.0"
