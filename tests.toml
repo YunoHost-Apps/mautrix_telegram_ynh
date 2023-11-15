@@ -26,7 +26,7 @@ preinstall = """
 args.botadmin = "@johndoe:server.name"
 args.botusers = "server.name"
 args.apiid = "1234567"
-args.apihash = "tjyd5yge35lbodk1xwzw2jstp90k55qz"
+args.apihash = "0800fc577294c34e0b28ad2839435945"
 
 # -------------------------------
 # Commits to test upgrade from
