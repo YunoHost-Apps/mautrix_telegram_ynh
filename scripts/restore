@@ -43,17 +43,6 @@ ynh_script_progression --message="Restoring the PostgreSQL database..." --weight
 ynh_psql_execute_file_as_root --file="./db.sql" --database=$db_name
 
 #=================================================
-# INSTALL MAUTRIX-BRIDGE PYTHON MODULE
-#=================================================
-ynh_script_progression --message="Installing Mautrix-Bridge Python Module..." --weight=6
-
-mkdir -p /var/log/$app
-# Configure Mautrix-Bridge
-python3 -m venv $install_dir
-export HOME=$install_dir
-$install_dir/bin/pip3 install --upgrade pip setuptools wheel
-
-#=================================================
 # REGISTER SYNAPSE APP-SERVICE
 #=================================================
 ynh_script_progression --message="Registering Synapse app-service" --weight=1
