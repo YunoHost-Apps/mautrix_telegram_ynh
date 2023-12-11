@@ -1,0 +1,133 @@
+packaging_format = 2
+id = "mautrix_telegram"
+name = "Matrix-Telegram bridge"
+description.en = "Telegram puppeting bridge for Matrix/Synapse"
+description.fr = "Passerelle Telegram pour Matrix/Synapse"
+version = "0.14.2~ynh1"
+maintainers = ["thardev"]
+
+[upstream]
+license = "AGPL-3.0-or-later"
+website = "https://docs.mau.fi/bridges/python/telegram/index.html"
+code = "https://github.com/mautrix/telegram"
+admindoc = "https://github.com/YunoHost-Apps/mautrix_telegram_ynh"
+userdoc = "https://docs.mau.fi/bridges/python/telegram/management-commands.html"
+
+[integration]
+yunohost = ">= 11.1"
+architectures = ["amd64", "arm64", "armhf"]
+multi_instance = true
+ldap = false
+sso = false
+disk = "100M"
+ram.build = "256M"
+ram.runtime = "1024M"
+
+[install]
+
+[install.synapse_instance]
+ask.en = "Choose the local synapse instance number to communicate with mautrix_telegram"
+ask.fr = "Choisissez le numéro de l'instance synapse qui doit communiquer avec mautrix_telegram"
+type = "app"
+pattern.regexp = "synapse(__)*[0-9]*"
+pattern.error = "Invalid app selected. Please select a Synapse instance."
+help.en = "Usually the Synapse instances contain a number after it is installed more than one time. E.g. synapse__1 will be the second instance."
+help.fr = "En général, les instances de Synapse contiennent un numéro après avoir été installées plus d'une fois. Par exemple, synapse__1 sera la deuxième instance."
+default = "synapse"
+
+[install.botname]
+ask.en = "Choose a local synapse user name for the Telegram bot"
+ask.fr = "Choisissez un nom d'utilisateur synapse local pour le robot Telegram"
+type = "string"
+example = "telegrambot"
+help.en = "A system user will be created. Invite @telegrambot:localsynapse.servername from an authorized Matrix account to start bridging. Give the Matrix server_name, not the full domain/URL."
+help.fr = "Un utilisateur système sera créé. Inviter @telegrambot:localsynapse.servername depuis un compte Matrix autorisé pour démarrer une passerelle. Donner le nom du serveur Matrix, pas le domaine/URL complet."
+default = "telegrambot"
+
+[install.encryption]
+ask.en = "Enable end-to-bridge encryption?"
+ask.fr = "Activer le chiffrement entre Synapse et le bridge ?"
+type = "boolean"
+help.en = "Only activate if you know the prerequisites and constraints related to E2B."
+help.fr = "N'activer que si vous connaissez les prérequis et constraintes liées à E2B."
+default = true
+
+[install.botadmin]
+ask.en = "Choose the Matrix account administrator of the Telegram bot; admin permission"
+ask.fr = "Choisissez le compte Matrix administrateur du robot Telegram"
+type = "string"
+example = "@johndoe:localsynapse.servername or @johndoe:matrix.org"
+help.en = "The administrator does not need to be a local Synapse account. Valid formats are @johndoe:localsynapse.servername or @johndoe:matrix.org"
+help.fr = "L'administrateur peut ne pas être un compte local Synapse. Les formats valables sont @johndoe:localsynapse.servername or @johndoe:matrix.org"
+
+[install.botusers]
+ask.en = "Choose Matrix user(s) authorized to bridge with the Telegram bot; puppeting permission"
+ask.fr = "Choisissez le/les compte(s) Matrix autorisés à utiliser le robot Telegram"
+type = "string"
+example = "@johndoe:server.name or server.name or *"
+help.en = """
+A remote or local user (@johndoe:server.name),the local server (server.name), a remote server (matrix.org), or all remote/local servers (*) can be authorized.
+Give the Matrix server_name, not the full domain/URL.
+It is also possible to specify multiple values by separating them with comma. Example: @johndoe:server.name,domain.tld,matrix.org"""
+help.fr = """Un compte local ou distant (@johndoe:server.name), le serveur local (server.name), un serveur distant (matrix.org), ou tous les serveurs remote/local (*).
+Donner le nom du serveur Matrix, pas le domaine/URL complet.
+Il est également possible de spécifier plusieurs valeurs en les séparant par une virgule. Exemple : @johndoe:server.name,domain.tld,matrix.org"""
+
+[install.apiid]
+ask.en = "Telegram API keys (https://my.telegram.org/apps): ID"
+ask.fr = "Clés API Telegram API (https://my.telegram.org/apps): ID"
+type = "string"
+example = "1234567"
+help.en = "Get your own API keys at https://my.telegram.org/apps"
+help.fr = "Obtenez vos propres clés API sur https://my.telegram.org/apps"
+
+[install.apihash]
+ask.en = "Telegram API keys (https://my.telegram.org/apps): Hash"
+ask.fr = "Clés API Telegram (https://my.telegram.org/apps) : Hash"
+type = "string"
+example = "tjyd5yge35lbodk1xwzw2jstp90k55qz"
+help.en = "Get your own API keys at https://my.telegram.org/apps"
+help.fr = "Obtenez vos propres clés API sur https://my.telegram.org/apps"
+
+[install.bottoken]
+ask.en = "Telegram bot token (optional)"
+ask.fr = "Jeton de bot de Telegram (facultatif)"
+type = "string"
+example = "disabled"
+help.en = "Create your own telegram bot"
+help.fr = "Créez votre propre bot de Telegram"
+default = "disabled"
+
+[resources]
+
+[resources.apt]
+packages = "postgresql, python3, zlib1g-dev, libjpeg-dev, libwebp-dev, python3-venv, libpq-dev, libffi-dev, libolm-dev"
+
+[resources.database]
+type = "postgresql"
+
+[resources.permissions]
+main.allowed = "all_users"
+main.auth_header = false
+
+[resources.system_user]
+home = "/opt/yunohost/__APP__"
+
+[resources.install_dir]
+dir = "/opt/yunohost/__APP__"
+
+[resources.ports]
+main.default = 29317
+
+[resources.sources]
+
+[resources.sources.main]
+in_subdir = true
+extract = false
+rename = "mautrix-telegram.tar.gz"
+amd64.url = "https://github.com/mautrix/telegram/archive/refs/tags/v0.14.2.tar.gz"
+amd64.sha256 = "8071beb09970d7a337e1a1f7700ecd3f4ef774ba51f2e7199f0216883f023786"
+arm64.url = "https://github.com/mautrix/telegram/archive/refs/tags/v0.14.2.tar.gz"
+arm64.sha256 = "8071beb09970d7a337e1a1f7700ecd3f4ef774ba51f2e7199f0216883f023786"
+armhf.url = "https://github.com/mautrix/telegram/archive/refs/tags/v0.14.2.tar.gz"
+armhf.sha256 = "8071beb09970d7a337e1a1f7700ecd3f4ef774ba51f2e7199f0216883f023786"

@@ -1,7 +1,0 @@
-SOURCE_URL=https://github.com/mautrix/telegram/archive/refs/tags/v0.14.2.tar.gz
-SOURCE_SUM=8071beb09970d7a337e1a1f7700ecd3f4ef774ba51f2e7199f0216883f023786
-SOURCE_SUM_PRG=sha256sum
-SOURCE_FORMAT=tar.gz
-SOURCE_IN_SUBDIR=true
-SOURCE_FILENAME=mautrix-telegram.tar.gz
-SOURCE_EXTRACT=false
