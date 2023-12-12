@@ -14,8 +14,8 @@
 #=================================================
 
 # Fetching information
-current_version=$(cat manifest.json | jq -j '.version|split("~")[0]')
-repo=$(cat manifest.json | jq -j '.upstream.code|split("https://github.com/")[1]')
+current_version=$(yq ".version" manifest.toml | cut -d '~' -f 1 -)
+repo=$(yq ".upstream.code" manifest.toml | sed 's/https:\/\/github.com\///')
 # Some jq magic is needed, because the latest upstream release is not always the latest version (e.g. security patches for older versions)
 version=$(curl --silent "https://api.github.com/repos/$repo/releases" | jq -r '.[] | select( .prerelease != true ) | .tag_name' | sort -V | tail -1)
 assets="https://github.com/$repo/archive/refs/tags/$version.tar.gz"
@@ -30,10 +30,10 @@ fi
 # Setting up the environment variables
 echo "Current version: $current_version"
 echo "Latest release from upstream: $version"
-echo "VERSION=$version" >> $GITHUB_ENV
-echo "REPO=$repo" >> $GITHUB_ENV
+echo "VERSION=$version" >> "$GITHUB_ENV"
+echo "REPO=$repo" >> "$GITHUB_ENV"
 # For the time being, let's assume the script will fail
-echo "PROCEED=false" >> $GITHUB_ENV
+echo "PROCEED=false" >> "$GITHUB_ENV"
 
 # Proceed only if the retrieved version is greater than the current one
 if ! dpkg --compare-versions "$current_version" "lt" "$version" ; then
@@ -72,17 +72,14 @@ else
 fi
 
 # Rewrite source file
-cat <<EOT > conf/$src.src
-SOURCE_URL=$asset_url
-SOURCE_SUM=$checksum
-SOURCE_SUM_PRG=sha256sum
-SOURCE_FORMAT=$extension
-SOURCE_IN_SUBDIR=true
-SOURCE_FILENAME=mautrix-telegram.tar.gz
-SOURCE_EXTRACT=false
-EOT
-echo "... conf/$src.src updated"
+sed -i "s|amd64.url.*|amd64.url = \"$asset_url\"|g" manifest.toml
+sed -i "s|amd64.sha256.*|amd64.sha256 = \"$checksum\"|g" manifest.toml
+sed -i "s|arm64.url.*|arm64.url = \"$asset_url\"|g" manifest.toml
+sed -i "s|arm64.sha256.*|arm64.sha256 = \"$checksum\"|g" manifest.toml
+sed -i "s|armhf.url.*|armhf.url = \"$asset_url\"|g" manifest.toml
+sed -i "s|armhf.sha256.*|armhf.sha256 = \"$checksum\"|g" manifest.toml
 
+echo "manifest.toml assets updated"
 #=================================================
 # SPECIFIC UPDATE STEPS
 #=================================================
@@ -133,7 +130,7 @@ yq -i '.logging.root.level = "INFO"' $configFilePath
 #=================================================
 
 # Replace new version in manifest
-echo "$(jq -s --indent 4 ".[] | .version = \"$version~ynh1\"" manifest.json)" > manifest.json
+sed -i "s|version.*|version = \"$version~ynh1\"|g" manifest.toml
 
 # Delete temporary directory
 rm -rf $tempdir
