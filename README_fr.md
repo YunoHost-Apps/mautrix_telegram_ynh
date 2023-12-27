@@ -22,7 +22,7 @@ La passerelle ["Mautrix-Telegram"](https://docs.mau.fi/bridges/python/telegram/i
 ** Attention : sauvegardez et restaurez toujours les deux applications Yunohost matrix-synapse et mautrix_telegram en même temps!**
 
 
-**Version incluse :** 0.15.0~ynh1
+**Version incluse :** 0.15.1~ynh1
 ## Documentations et ressources
 
 * Site officiel de l’app : <https://docs.mau.fi/bridges/python/telegram/index.html>
