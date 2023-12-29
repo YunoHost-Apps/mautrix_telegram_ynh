@@ -3,7 +3,7 @@ id = "mautrix_telegram"
 name = "Matrix-Telegram bridge"
 description.en = "Telegram puppeting bridge for Matrix/Synapse"
 description.fr = "Passerelle Telegram pour Matrix/Synapse"
-version = "0.15.0~ynh1"
+version = "0.15.1~ynh1"
 maintainers = ["thardev"]
 
 [upstream]
@@ -125,9 +125,9 @@ main.default = 29317
 in_subdir = true
 extract = false
 rename = "mautrix-telegram.tar.gz"
-amd64.url = "https://github.com/mautrix/telegram/archive/refs/tags/v0.15.0.tar.gz"
-amd64.sha256 = "93060a58be005f441402e569d9ba3ad84bdc51e551a2e2d40b5e7e2b01f2413e"
-arm64.url = "https://github.com/mautrix/telegram/archive/refs/tags/v0.15.0.tar.gz"
-arm64.sha256 = "93060a58be005f441402e569d9ba3ad84bdc51e551a2e2d40b5e7e2b01f2413e"
-armhf.url = "https://github.com/mautrix/telegram/archive/refs/tags/v0.15.0.tar.gz"
-armhf.sha256 = "93060a58be005f441402e569d9ba3ad84bdc51e551a2e2d40b5e7e2b01f2413e"
+amd64.url = "https://github.com/mautrix/telegram/archive/refs/tags/v0.15.1.tar.gz"
+amd64.sha256 = "4a437a5be1d736aed50857dc38aa56f3f0ba0d01d6f62ca93b1433f693178950"
+arm64.url = "https://github.com/mautrix/telegram/archive/refs/tags/v0.15.1.tar.gz"
+arm64.sha256 = "4a437a5be1d736aed50857dc38aa56f3f0ba0d01d6f62ca93b1433f693178950"
+armhf.url = "https://github.com/mautrix/telegram/archive/refs/tags/v0.15.1.tar.gz"
+armhf.sha256 = "4a437a5be1d736aed50857dc38aa56f3f0ba0d01d6f62ca93b1433f693178950"
