@@ -22,6 +22,50 @@ ynh_app_setting_set --app=$app --key=domain --value=$domain
 ynh_app_setting_set --app=$app --key=appserviceid --value=$appserviceid
 
 #=================================================
+# SET STANDARD SETTINGS FROM DEFAULT CONFIG
+#=================================================
+
+appserviceid=$app
+async_media="false"
+bot_username="$botname"
+bot_displayname="Telegram bridge bot"
+bot_avatar="mxc://maunium.net/tJCRmUyJDsgRNgqhOgoiHWbX"
+device_model="mautrix-telegram"
+ephemeral_events="false"
+enable_metrics="false"
+listen_port="8000"
+alias_template="telegram_{userid}"
+displayname_template="{displayname} (Telegram)"
+username_template="telegram_{userid}"
+delivery_receipts="false"
+telegram_link_preview="false"
+encryption_default="false"
+encryption_require="false"
+listrelaybot="*"
+listuser=""
+listpuppeting="$botusers"
+listfull=""
+listadmin="$botadmin"
+
+ynh_app_setting_set --app=$app --key=appserviceid --value=$appserviceid
+ynh_app_setting_set --app=$app --key=async_media --value=$async_media
+ynh_app_setting_set --app=$app --key=bot_displayname --value=$bot_displayname
+ynh_app_setting_set --app=$app --key=bot_username --value=$bot_username
+ynh_app_setting_set --app=$app --key=bot_avatar --value=$bot_avatar
+ynh_app_setting_set --app=$app --key=device_model --value=$device_model
+ynh_app_setting_set --app=$app --key=ephemeral_events --value=$ephemeral_events
+ynh_app_setting_set --app=$app --key=enable_metrics --value=$enable_metrics
+ynh_app_setting_set --app=$app --key=listen_port --value=$listen_port
+ynh_app_setting_set --app=$app --key=alias_template --value=$alias_template
+ynh_app_setting_set --app=$app --key=displayname_template --value=$displayname_template
+ynh_app_setting_set --app=$app --key=username_template --value=$username_template
+ynh_app_setting_set --app=$app --key=delivery_receipts --value=$delivery_receipts
+ynh_app_setting_set --app=$app --key=telegram_link_preview --value=$telegram_link_preview
+ynh_app_setting_set --app=$app --key=encryption_default --value=$encryption_default
+ynh_app_setting_set --app=$app --key=encryption_require --value=$encryption_require
+ynh_app_setting_set --app=$app --key=listrelaybot --value=$listrelaybot
+
+#=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 ynh_script_progression --message="Setting up source files..." --weight=3
@@ -60,6 +104,13 @@ ynh_add_config --template="config.yaml" --destination="$install_dir/config.yaml"
 chmod 400 "$install_dir/config.yaml"
 chown $app:$app "$install_dir/config.yaml"
 
+# This calls allows to set multiple users during install question "botusers" specifying them separated by a comma
+set__listrelaybot
+set__listuser
+set__listpuppeting
+set__listfull
+set__listadmin
+
 #=================================================
 # INSTALL MAUTRIX-BRIDGE PYTHON MODULE
 #=================================================
@@ -70,7 +121,7 @@ mkdir -p /var/log/$app
 python3 -m venv $install_dir
 export HOME=$install_dir
 $install_dir/bin/pip3 install --upgrade pip setuptools wheel
-$install_dir/bin/pip3 install --upgrade $install_dir/src/mautrix-telegram.tar.gz[e2be,speedups,qr_login] # metrics,hq_thumbnails,sqlite,formattednumbers
+$install_dir/bin/pip3 install --upgrade $install_dir/src/mautrix-telegram.tar.gz[e2be,speedups] # metrics,hq_thumbnails,sqlite,formattednumbers
 
 #=================================================
 # REGISTER SYNAPSE APP-SERVICE
