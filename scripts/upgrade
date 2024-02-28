@@ -211,11 +211,11 @@ chown -R $app:$app "$install_dir"
 ynh_script_progression --message="Updating a configuration file..." --weight=2
 
 # reset permissions to be able to apply_permissions with app_setting values after upgrade
-listrelaybot=$listrelaybot
-listuser=$listuser
-listpuppeting=$listpuppeting
-listfull=$listfull
-listadmin=$listadmin
+listrelaybot_=$listrelaybot
+listuser_=$listuser
+listpuppeting_=$listpuppeting
+listfull_=$listfull
+listadmin_=$listadmin
 listrelaybot="*"
 listuser="@user:domain.tld"
 listpuppeting="@puppet:domain.tld"
