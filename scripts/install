@@ -27,47 +27,43 @@ ynh_app_setting_set --app=$app --key=appserviceid --value=$appserviceid
 
 appserviceid=$app
 async_media="false"
-displayname="Telegram bridge bot"
-avatar="mxc://maunium.net/tJCRmUyJDsgRNgqhOgoiHWbX"
+bot_username="$botname"
+bot_displayname="Telegram bridge bot"
+bot_avatar="mxc://maunium.net/tJCRmUyJDsgRNgqhOgoiHWbX"
+device_model="mautrix-telegram"
 ephemeral_events="false"
 enable_metrics="false"
 listen_port="8000"
-os_name="Mautrix-WhatsApp bridge"
-browser_name="unknown"
-username_template="whatsapp_{{.}}"
-personal_filtering_spaces="false"
+alias_template="telegram_{userid}"
+displayname_template="{displayname} (Telegram)"
+username_template="telegram_{userid}"
 delivery_receipts="false"
-send_presence_on_typing="false"
-url_previews="false"
+telegram_link_preview="false"
 encryption_default="false"
 encryption_require="false"
-admin_only="true"
-print_level="info"
-enable_relaybot="true"
-listrelay="*"
+listrelaybot="*"
+listuser=""
+listpuppeting="$botusers"
+listfull=""
 listadmin="$botadmin"
-listuser="$botusers"
 
 ynh_app_setting_set --app=$app --key=appserviceid --value=$appserviceid
 ynh_app_setting_set --app=$app --key=async_media --value=$async_media
-ynh_app_setting_set --app=$app --key=displayname --value=$displayname
-ynh_app_setting_set --app=$app --key=avatar --value=$avatar
+ynh_app_setting_set --app=$app --key=bot_displayname --value=$bot_displayname
+ynh_app_setting_set --app=$app --key=bot_username --value=$bot_username
+ynh_app_setting_set --app=$app --key=bot_avatar --value=$bot_avatar
+ynh_app_setting_set --app=$app --key=device_model --value=$device_model
 ynh_app_setting_set --app=$app --key=ephemeral_events --value=$ephemeral_events
 ynh_app_setting_set --app=$app --key=enable_metrics --value=$enable_metrics
 ynh_app_setting_set --app=$app --key=listen_port --value=$listen_port
-ynh_app_setting_set --app=$app --key=os_name --value=$os_name
-ynh_app_setting_set --app=$app --key=browser_name --value=$browser_name
+ynh_app_setting_set --app=$app --key=alias_template --value=$alias_template
+ynh_app_setting_set --app=$app --key=displayname_template --value=$displayname_template
 ynh_app_setting_set --app=$app --key=username_template --value=$username_template
-ynh_app_setting_set --app=$app --key=personal_filtering_spaces --value=$personal_filtering_spaces
 ynh_app_setting_set --app=$app --key=delivery_receipts --value=$delivery_receipts
-ynh_app_setting_set --app=$app --key=send_presence_on_typing --value=$send_presence_on_typing
-ynh_app_setting_set --app=$app --key=url_previews --value=$url_previews
+ynh_app_setting_set --app=$app --key=telegram_link_preview --value=$telegram_link_preview
 ynh_app_setting_set --app=$app --key=encryption_default --value=$encryption_default
 ynh_app_setting_set --app=$app --key=encryption_require --value=$encryption_require
-ynh_app_setting_set --app=$app --key=enable_relaybot --value=$enable_relaybot
-ynh_app_setting_set --app=$app --key=admin_only --value=$admin_only
-ynh_app_setting_set --app=$app --key=print_level --value=$print_level
-ynh_app_setting_set --app=$app --key=listrelay --value=$listrelay
+ynh_app_setting_set --app=$app --key=listrelaybot --value=$listrelaybot
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
@@ -108,6 +104,13 @@ ynh_add_config --template="config.yaml" --destination="$install_dir/config.yaml"
 chmod 400 "$install_dir/config.yaml"
 chown $app:$app "$install_dir/config.yaml"
 
+# This calls allows to set multiple users during install question "botusers" specifying them separated by a comma
+set__listrelaybot
+set__listuser
+set__listpuppeting
+set__listfull
+set__listadmin
+
 #=================================================
 # INSTALL MAUTRIX-BRIDGE PYTHON MODULE
 #=================================================
@@ -118,7 +121,7 @@ mkdir -p /var/log/$app
 python3 -m venv $install_dir
 export HOME=$install_dir
 $install_dir/bin/pip3 install --upgrade pip setuptools wheel
-$install_dir/bin/pip3 install --upgrade $install_dir/src/mautrix-telegram.tar.gz[e2be,speedups,qr_login] # metrics,hq_thumbnails,sqlite,formattednumbers
+$install_dir/bin/pip3 install --upgrade $install_dir/src/mautrix-telegram.tar.gz[e2be,speedups] # metrics,hq_thumbnails,sqlite,formattednumbers
 
 #=================================================
 # REGISTER SYNAPSE APP-SERVICE

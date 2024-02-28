@@ -17,7 +17,7 @@ services = ["__APP__"]
         '''
         type = "markdown"
 
-        [main.permissions.listrelay]
+        [main.permissions.listrelaybot]
         ask = "Users bridged thanks to Relay Mode"
         type = "tags"
         help = "Relay Role: Talk on Telegram through the RelayBot in a room. No access to commands."

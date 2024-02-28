@@ -13,6 +13,31 @@ server_name=$(ynh_app_setting_get --app=$app --key=server_name)
 synapse_db_name="matrix_$synapse_instance"
 
 #=================================================
+# GET CONFIG PANEL SETTINGS
+#=================================================
+async_media=$(ynh_app_setting_get --app=$app --key=async_media)
+bot_displayname=$(ynh_app_setting_get --app=$app --key=bot_displayname)
+bot_username=$(ynh_app_setting_get --app=$app --key=bot_username)
+bot_avatar=$(ynh_app_setting_get --app=$app --key=bot_avatar)
+device_model=$(ynh_app_setting_get --app=$app --key=device_model)
+ephemeral_events=$(ynh_app_setting_get --app=$app --key=ephemeral_events)
+enable_metrics=$(ynh_app_setting_get --app=$app --key=enable_metrics)
+listen_port=$(ynh_app_setting_get --app=$app --key=listen_port)
+alias_template=$(ynh_app_setting_get --app=$app --key=alias_template)
+displayname_template=$(ynh_app_setting_get --app=$app --key=displayname_template)
+username_template=$(ynh_app_setting_get --app=$app --key=username_template)
+delivery_receipts=$(ynh_app_setting_get --app=$app --key=delivery_receipts)
+telegram_link_preview=$(ynh_app_setting_get --app=$app --key=telegram_link_preview)
+encryption_default=$(ynh_app_setting_get --app=$app --key=encryption_default)
+encryption_require=$(ynh_app_setting_get --app=$app --key=encryption_require)
+
+listrelaybot=$(ynh_app_setting_get --app=$app --key=listrelaybot)
+listuser=$(ynh_app_setting_get --app=$app --key=listuser)
+listpuppeting=$(ynh_app_setting_get --app=$app --key=listpuppeting)
+listfull=$(ynh_app_setting_get --app=$app --key=listfull)
+listadmin=$(ynh_app_setting_get --app=$app --key=listadmin)
+
+#=================================================
 # CHECK VERSION
 #=================================================
 ynh_script_progression --message="Checking version..." --weight=1
@@ -57,6 +82,112 @@ then
 fi
 
 #=================================================
+# SET STANDARD SETTINGS FROM DEFAULT CONFIG
+#=================================================
+
+if [ -z "$async_media" ]
+then
+  async_media="false"
+  ynh_app_setting_set --app=$app --key=async_media --value=$async_media
+fi
+if [ -z "$bot_username" ]
+then
+  bot_username="$botname"
+  ynh_app_setting_set --app=$app --key=bot_username --value=$bot_username
+fi
+if [ -z "$bot_displayname" ]
+then
+  bot_displayname="Telegram bridge bot"
+  ynh_app_setting_set --app=$app --key=bot_displayname --value=$bot_displayname
+fi
+if [ -z "$bot_avatar" ]
+then
+  bot_avatar="mxc://maunium.net/tJCRmUyJDsgRNgqhOgoiHWbX"
+  ynh_app_setting_set --app=$app --key=bot_avatar --value=$bot_avatar
+fi
+if [ -z "$device_model" ]
+then
+  device_model="mautrix-telegram"
+  ynh_app_setting_set --app=$app --key=device_model --value=$device_model
+fi
+if [ -z "$ephemeral_events" ]
+then
+  ephemeral_events="false"
+  ynh_app_setting_set --app=$app --key=ephemeral_events --value=$ephemeral_events
+fi
+if [ -z "$enable_metrics" ]
+then
+  enable_metrics="false"
+  ynh_app_setting_set --app=$app --key=enable_metrics --value=$enable_metrics
+fi
+if [ -z "$listen_port" ]
+then
+  listen_port="8000"
+  ynh_app_setting_set --app=$app --key=listen_port --value=$listen_port
+fi
+if [ -z "$alias_template" ]
+then
+  alias_template="telegram_{userid}"
+  ynh_app_setting_set --app=$app --key=alias_template --value=$alias_template
+fi
+if [ -z "$displayname_template" ]
+then
+  displayname_template="{displayname} (Telegram)"
+  ynh_app_setting_set --app=$app --key=displayname_template --value=$displayname_template
+fi
+if [ -z "$username_template" ]
+then
+  username_template="telegram_{userid}"
+  ynh_app_setting_set --app=$app --key=username_template --value=$username_template
+fi
+if [ -z "$delivery_receipts" ]
+then
+  delivery_receipts="false"
+  ynh_app_setting_set --app=$app --key=delivery_receipts --value=$delivery_receipts
+fi
+if [ -z "$telegram_link_preview" ]
+then
+  telegram_link_preview="false"
+  ynh_app_setting_set --app=$app --key=telegram_link_preview --value=$telegram_link_preview
+fi
+if [ -z "$encryption_default" ]
+then
+  encryption_default="false"
+  ynh_app_setting_set --app=$app --key=encryption_default --value=$encryption_default
+fi
+if [ -z "$encryption_require" ]
+then
+  encryption_require="false"
+  ynh_app_setting_set --app=$app --key=encryption_require --value=$encryption_require
+fi
+if [ -z "$listrelaybot" ]
+then
+    listrelaybot="*"
+    ynh_app_setting_set --app=$app --key=listrelaybot --value=$listrelaybot
+fi
+if [ -z "$listuser" ]
+then
+    listuser=""
+    ynh_app_setting_set --app=$app --key=listuser --value=$listuser
+fi
+if [ -z "$listpuppeting" ]
+then
+    listpuppeting=$(ynh_app_setting_get --app=$app --key=botusers)
+    ynh_app_setting_set --app=$app --key=listpuppeting --value=$listpuppeting
+    ynh_app_setting_delete --app=$app --key=botusers
+fi
+if [ -z "$listfull" ]
+then
+    listfull=""
+    ynh_app_setting_set --app=$app --key=listfull --value=$listfull
+fi
+if [ -z "$listadmin" ]
+then
+    listadmin=$(ynh_app_setting_get --app=$app --key=botadmin)
+    ynh_app_setting_set --app=$app --key=listadmin --value=$listadmin
+    ynh_app_setting_delete --app=$app --key=botadmin
+fi
+#=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 
@@ -79,6 +210,18 @@ chown -R $app:$app "$install_dir"
 #=================================================
 ynh_script_progression --message="Updating a configuration file..." --weight=2
 
+# reset permissions to be able to apply_permissions with app_setting values after upgrade
+listrelaybot=$listrelaybot
+listuser=$listuser
+listpuppeting=$listpuppeting
+listfull=$listfull
+listadmin=$listadmin
+listrelaybot="*"
+listuser="@user:domain.tld"
+listpuppeting="@puppet:domain.tld"
+listfull="@full:domain.tld"
+listadmin="@admin:domain.tld"
+
 # main configuration
 ynh_backup_if_checksum_is_different --file="$install_dir/config.yaml"
 # as_token hs_token are autogenerated, save them before regenerating the config
@@ -94,6 +237,19 @@ ynh_add_config --template="../conf/config.yaml" --destination="$install_dir/conf
 
 chmod 400 "$install_dir/config.yaml"
 chown $app:$app "$install_dir/config.yaml"
+
+listrelaybot=$listrelaybot_
+listuser=$listuser_
+listpuppeting=$listpuppeting_
+listfull=$listfull_
+listadmin=$listadmin_
+
+# apply_permissions to have correct syntax in config file
+set__listrelaybot
+set__listuser
+set__listpuppeting
+set__listfull
+set__listadmin
 
 #=================================================
 # UPGRADE MAUTRIX-BRIDGE PYTHON MODULE

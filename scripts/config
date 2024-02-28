@@ -7,13 +7,19 @@ ynh_abort_if_errors
 # SPECIFIC GETTERS FOR TOML SHORT KEY
 #=================================================
 
+get_config_permission() {
+  result=$(grep -- ".*: $role" "$install_dir/config.yaml" | sed -r "s/: $role//" | tr -d '[:blank:]' | sed '/^#/d' | tr -d '\"' | tr -d "'" | tr '\n' ',')
+  echo $result
+}
+
 get__botname() {
     botname=$(ynh_app_setting_get --app $app --key botname)
     echo "${botname}"
 }
 
 get__listrelaybot() {
-  existingRelaybotUsers=$(grep -- "\".*: relaybot" "$install_dir/config.yaml" | sed -r 's/: relaybot//' | tr -d '[:blank:]' | sed '/^#/d' | tr -d '\"' | tr '\n' ',')
+  role="relaybot"
+  existingRelaybotUsers=$(get_config_permission)
 
   cat <<EOF
 "$existingRelaybotUsers"
@@ -21,7 +27,8 @@ EOF
 }
 
 get__listuser() {
-  existingUsers=$(grep -- "\".*: user" "$install_dir/config.yaml" | sed -r 's/: user//' | tr -d '[:blank:]' | sed '/^#/d' | tr -d '\"' | tr '\n' ',')
+  role="user"
+  existingUsers=$(get_config_permission)
 
   cat <<EOF
 "$existingUsers"
@@ -29,7 +36,8 @@ EOF
 }
 
 get__listpuppeting() {
-  existingPuppeting=$(grep -- "\".*: puppeting" "$install_dir/config.yaml" | sed -r 's/: puppeting//' | tr -d '[:blank:]' | sed '/^#/d' | tr -d '\"' | tr '\n' ',')
+  role="puppeting"
+  existingPuppeting=$(get_config_permission)
 
   cat <<EOF
 "$existingPuppeting"
@@ -37,7 +45,8 @@ EOF
 }
 
 get__listfull() {
-  existingFull=$(grep -- "\".*: full" "$install_dir/config.yaml" | sed -r 's/: full//' | tr -d '[:blank:]' | sed '/^#/d' | tr -d '\"' | tr '\n' ',')
+  role="full"
+  existingFull=$(get_config_permission)
 
   cat <<EOF
 "$existingFull"
@@ -45,7 +54,8 @@ EOF
 }
 
 get__listadmin() {
-  existingAdmins=$(grep -- "\".*: admin" "$install_dir/config.yaml" | sed -r 's/: admin//' | tr -d '[:blank:]' | sed '/^#/d' | tr -d '\"' | tr '\n' ',')
+  role="admin"
+  existingAdmins=$(get_config_permission)
 
   cat <<EOF
 "$existingAdmins"
