@@ -1,4 +1,5 @@
 packaging_format = 2
+
 id = "mautrix_telegram"
 name = "Matrix-Telegram bridge"
 description.en = "Telegram puppeting bridge for Matrix/Synapse"
@@ -120,14 +121,11 @@ dir = "/opt/yunohost/__APP__"
 main.default = 29317
 
 [resources.sources]
-
 [resources.sources.main]
+
 in_subdir = true
 extract = false
 rename = "mautrix-telegram.tar.gz"
-amd64.url = "https://github.com/mautrix/telegram/archive/refs/tags/v0.15.1.tar.gz"
-amd64.sha256 = "4a437a5be1d736aed50857dc38aa56f3f0ba0d01d6f62ca93b1433f693178950"
-arm64.url = "https://github.com/mautrix/telegram/archive/refs/tags/v0.15.1.tar.gz"
-arm64.sha256 = "4a437a5be1d736aed50857dc38aa56f3f0ba0d01d6f62ca93b1433f693178950"
-armhf.url = "https://github.com/mautrix/telegram/archive/refs/tags/v0.15.1.tar.gz"
-armhf.sha256 = "4a437a5be1d736aed50857dc38aa56f3f0ba0d01d6f62ca93b1433f693178950"
+url = "https://github.com/mautrix/telegram/archive/refs/tags/v0.15.1.tar.gz"
+sha256 = "4a437a5be1d736aed50857dc38aa56f3f0ba0d01d6f62ca93b1433f693178950"
+autoupdate.strategy = "latest_github_release"
