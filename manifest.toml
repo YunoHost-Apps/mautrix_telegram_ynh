@@ -4,9 +4,7 @@ id = "mautrix_telegram"
 name = "Matrix-Telegram bridge"
 description.en = "Telegram puppeting bridge for Matrix/Synapse"
 description.fr = "Passerelle Telegram pour Matrix/Synapse"
-
-version = "0.15.1~ynh1"
-
+version = "0.15.1~ynh2"
 maintainers = ["thardev"]
 
 [upstream]
