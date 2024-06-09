@@ -3,7 +3,7 @@
 请勿手动编辑。
 -->
 
-# YunoHost 的 Matrix-Telegram bridge
+# YunoHost 上的 Matrix-Telegram bridge
 
 [![集成程度](https://dash.yunohost.org/integration/mautrix_telegram.svg)](https://dash.yunohost.org/appci/app/mautrix_telegram) ![工作状态](https://ci-apps.yunohost.org/ci/badges/mautrix_telegram.status.svg) ![维护状态](https://ci-apps.yunohost.org/ci/badges/mautrix_telegram.maintain.svg)
 
