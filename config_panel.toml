@@ -73,7 +73,7 @@ services = ["__APP__"]
         [privacy.portal_rooms.text]
         ask = '''
         !! Inviting the Bridge in an encrypted room          !!
-        !! breaks real End-to-End Encryption (e2ee)          !! 
+        !! breaks real End-to-End Encryption (e2ee)          !!
         !! Messages will be unencrypted on the Bridge Server !!
         '''
         type = "markdown"
@@ -85,7 +85,7 @@ services = ["__APP__"]
 		no = "false"
         help = "Enable so-called End-to-Bridge (e2b) Encryption. For the Bridge to work in group chat Rooms with End-to-End Encryption (e2ee) enabled."
         bind = "encryption>allow:__INSTALL_DIR__/config.yaml"
-        
+
         [privacy.portal_rooms.encryption_default]
         ask = "Force-enable Encryption in all Portal Rooms the Bridge creates?"
         type = "boolean"
@@ -127,12 +127,10 @@ services = ["__APP__"]
 name = "Advanced Settings"
 services = ["__APP__"]
 
-    [advanced.help]
+    [advanced.helptext]
     name = "SETTINGS FOR EXPERTS IN SERVER ADMINISTRATION"
-
-        [advanced.help.text]
-        ask = "!! There are **security and privacy risks** if you change these settings without knowing what you do !!"
-        type = "markdown"
+    ask = "!! There are **security and privacy risks** if you change these settings without knowing what you do !!"
+    type = "markdown"
 
     [advanced.telegram]
     name = "Telegram API MetaData"
@@ -160,7 +158,7 @@ services = ["__APP__"]
         type = "string"
         help = "Defaults to 'mautrix-telegram'. 'auto' would set OS name+version"
         bind = ":__INSTALL_DIR__/config.yaml"
-        
+
     [advanced.appservice]
     name = "HomeServer Application Service"
 
@@ -197,4 +195,3 @@ services = ["__APP__"]
         help = "Defaults to: '8000'. The path is always /metrics"
         bind = "metrics>listen_port:__INSTALL_DIR__/config.yaml"
         visible = "enable_metrics"
-
