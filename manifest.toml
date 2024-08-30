@@ -15,7 +15,8 @@ admindoc = "https://github.com/YunoHost-Apps/mautrix_telegram_ynh"
 userdoc = "https://docs.mau.fi/bridges/python/telegram/management-commands.html"
 
 [integration]
-yunohost = ">= 11.1"
+yunohost = ">= 11.2.18"
+helpers_version = "2.1"
 architectures = ["amd64", "arm64", "armhf"]
 multi_instance = true
 ldap = false
