@@ -5,7 +5,9 @@ Il NE doit PAS être modifié à la main.
 
 # Matrix-Telegram bridge pour YunoHost
 
-[![Niveau d’intégration](https://dash.yunohost.org/integration/mautrix_telegram.svg)](https://dash.yunohost.org/appci/app/mautrix_telegram) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/mautrix_telegram.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/mautrix_telegram.maintain.svg)
+[![Niveau d’intégration](https://apps.yunohost.org/badge/integration/mautrix_telegram)](https://ci-apps.yunohost.org/ci/apps/mautrix_telegram/)
+![Statut du fonctionnement](https://apps.yunohost.org/badge/state/mautrix_telegram)
+![Statut de maintenance](https://apps.yunohost.org/badge/maintained/mautrix_telegram)
 
 [![Installer Matrix-Telegram bridge avec YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=mautrix_telegram)
 
@@ -22,7 +24,7 @@ La passerelle ["Mautrix-Telegram"](https://docs.mau.fi/bridges/python/telegram/i
 ** Attention : sauvegardez et restaurez toujours les deux applications Yunohost matrix-synapse et mautrix_telegram en même temps!**
 
 
-**Version incluse :** 0.15.1~ynh2
+**Version incluse :** 0.15.2~ynh1
 ## Documentations et ressources
 
 - Site officiel de l’app : <https://docs.mau.fi/bridges/python/telegram/index.html>
