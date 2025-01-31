@@ -5,7 +5,9 @@ EZ editatu eskuz.
 
 # Matrix-Telegram bridge YunoHost-erako
 
-[![Integrazio maila](https://dash.yunohost.org/integration/mautrix_telegram.svg)](https://ci-apps.yunohost.org/ci/apps/mautrix_telegram/) ![Funtzionamendu egoera](https://ci-apps.yunohost.org/ci/badges/mautrix_telegram.status.svg) ![Mantentze egoera](https://ci-apps.yunohost.org/ci/badges/mautrix_telegram.maintain.svg)
+[![Integrazio maila](https://apps.yunohost.org/badge/integration/mautrix_telegram)](https://ci-apps.yunohost.org/ci/apps/mautrix_telegram/)
+![Funtzionamendu egoera](https://apps.yunohost.org/badge/state/mautrix_telegram)
+![Mantentze egoera](https://apps.yunohost.org/badge/maintained/mautrix_telegram)
 
 [![Instalatu Matrix-Telegram bridge YunoHost-ekin](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=mautrix_telegram)
 

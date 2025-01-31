@@ -5,7 +5,9 @@ It shall NOT be edited by hand.
 
 # Matrix-Telegram bridge for YunoHost
 
-[![Integration level](https://dash.yunohost.org/integration/mautrix_telegram.svg)](https://ci-apps.yunohost.org/ci/apps/mautrix_telegram/) ![Working status](https://ci-apps.yunohost.org/ci/badges/mautrix_telegram.status.svg) ![Maintenance status](https://ci-apps.yunohost.org/ci/badges/mautrix_telegram.maintain.svg)
+[![Integration level](https://apps.yunohost.org/badge/integration/mautrix_telegram)](https://ci-apps.yunohost.org/ci/apps/mautrix_telegram/)
+![Working status](https://apps.yunohost.org/badge/state/mautrix_telegram)
+![Maintenance status](https://apps.yunohost.org/badge/maintained/mautrix_telegram)
 
 [![Install Matrix-Telegram bridge with YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=mautrix_telegram)
 
