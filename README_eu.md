@@ -5,7 +5,9 @@ EZ editatu eskuz.
 
 # Matrix-Telegram bridge YunoHost-erako
 
-[![Integrazio maila](https://dash.yunohost.org/integration/mautrix_telegram.svg)](https://dash.yunohost.org/appci/app/mautrix_telegram) ![Funtzionamendu egoera](https://ci-apps.yunohost.org/ci/badges/mautrix_telegram.status.svg) ![Mantentze egoera](https://ci-apps.yunohost.org/ci/badges/mautrix_telegram.maintain.svg)
+[![Integrazio maila](https://apps.yunohost.org/badge/integration/mautrix_telegram)](https://ci-apps.yunohost.org/ci/apps/mautrix_telegram/)
+![Funtzionamendu egoera](https://apps.yunohost.org/badge/state/mautrix_telegram)
+![Mantentze egoera](https://apps.yunohost.org/badge/maintained/mautrix_telegram)
 
 [![Instalatu Matrix-Telegram bridge YunoHost-ekin](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=mautrix_telegram)
 
@@ -19,7 +21,7 @@ EZ editatu eskuz.
 A puppeting bridge between Matrix and Telegram packaged as a YunoHost service. Messages, notifications (and sometimes media) are bridged between a Telegram user and a Matrix user. Currently the Matrix user can NOT invite other Matrix user in a bridged Telegram room, so only someone with a Telegram account can participate to Telegram group conversations. The ["Mautrix-Telegram"](https://docs.mau.fi/bridges/python/telegram/index.html) bridge is a Synapse App Service and relies on postgresql. Therefore, [Synapse for YunoHost](https://github.com/YunoHost-Apps/synapse_ynh) should be installed beforehand.
 
 
-**Paketatutako bertsioa:** 0.15.1~ynh2
+**Paketatutako bertsioa:** 0.15.2~ynh1
 ## Dokumentazioa eta baliabideak
 
 - Aplikazioaren webgune ofiziala: <https://docs.mau.fi/bridges/python/telegram/index.html>
