@@ -125,7 +125,7 @@ ynh_script_progression "Configuring $app's systemd service..."
 
 ynh_config_add_systemd
 
-ynh_config_add_logrotate  "/var/log/$app/$app.log"  $app
+ynh_config_add_logrotate "/var/log/$app/$app.log" $app
 
 yunohost service add $app --description="$app daemon for bridging Telegram and Matrix messages" --log="/var/log/$app/$app.log"
 

@@ -10,7 +10,6 @@ ynh_script_progression "Loading installation settings..."
 
 app=$YNH_APP_INSTANCE_NAME
 
-
 #=================================================
 # REMOVE SERVICE INTEGRATION IN YUNOHOST
 #=================================================
