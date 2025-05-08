@@ -4,7 +4,9 @@ id = "mautrix_telegram"
 name = "Matrix-Telegram bridge"
 description.en = "Telegram puppeting bridge for Matrix/Synapse"
 description.fr = "Passerelle Telegram pour Matrix/Synapse"
+
 version = "0.15.2~ynh2"
+
 maintainers = ["thardev"]
 
 [upstream]
@@ -99,31 +101,31 @@ default = "disabled"
 
 [resources]
 
-[resources.apt]
-packages = "postgresql, python3, zlib1g-dev, libjpeg-dev, libwebp-dev, python3-venv, libpq-dev, libffi-dev, libolm-dev"
+	[resources.sources]
 
-[resources.database]
-type = "postgresql"
+	[resources.sources.main]
+	in_subdir = true
+	extract = false
+	rename = "mautrix-telegram.tar.gz"
+	url = "https://github.com/mautrix/telegram/archive/refs/tags/v0.15.2.tar.gz"
+	sha256 = "32b517584ffe888196e816e40d9e2f748687e3b3bb386151847241c603bc7cd3"
+	autoupdate.strategy = "latest_github_release"
 
-[resources.permissions]
-main.allowed = "all_users"
-main.auth_header = false
+	[resources.system_user]
+	home = "/opt/yunohost/__APP__"
 
-[resources.system_user]
-home = "/opt/yunohost/__APP__"
+	[resources.install_dir]
+	dir = "/opt/yunohost/__APP__"
 
-[resources.install_dir]
-dir = "/opt/yunohost/__APP__"
+	[resources.permissions]
+	main.allowed = "all_users"
+	main.auth_header = false
 
-[resources.ports]
-main.default = 29317
+	[resources.ports]
+	main.default = 29317
 
-[resources.sources]
-[resources.sources.main]
+	[resources.apt]
+	packages = "postgresql, python3, zlib1g-dev, libjpeg-dev, libwebp-dev, python3-venv, libpq-dev, libffi-dev, libolm-dev"
 
-in_subdir = true
-extract = false
-rename = "mautrix-telegram.tar.gz"
-url = "https://github.com/mautrix/telegram/archive/refs/tags/v0.15.2.tar.gz"
-sha256 = "32b517584ffe888196e816e40d9e2f748687e3b3bb386151847241c603bc7cd3"
-autoupdate.strategy = "latest_github_release"
+	[resources.database]
+	type = "postgresql"
