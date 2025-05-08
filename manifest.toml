@@ -112,8 +112,10 @@ default = "disabled"
 	autoupdate.strategy = "latest_github_release"
 
 	[resources.system_user]
+	home = "/opt/yunohost/__APP__"
 
 	[resources.install_dir]
+	dir = "/opt/yunohost/__APP__"
 
 	[resources.permissions]
 	main.allowed = "all_users"
