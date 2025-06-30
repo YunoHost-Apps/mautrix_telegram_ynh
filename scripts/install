@@ -15,6 +15,7 @@ source /usr/share/yunohost/helpers
 
 # Retrieve some values from selected Synapse instance and store them
 appserviceid=$app
+synapse_install_dir=$(ynh_app_setting_get --app $synapse_instance --key install_dir)
 server_name=$(ynh_app_setting_get --app $synapse_instance --key server_name)
 domain=$(ynh_app_setting_get --app $synapse_instance --key domain)
 ynh_app_setting_set --app=$app --key=server_name --value=$server_name
@@ -129,7 +130,7 @@ $install_dir/bin/pip3 install --upgrade $install_dir/src/mautrix-telegram.tar.gz
 ynh_script_progression --message="Registering Synapse app-service" --weight=1
 
 $install_dir/bin/python3 -m mautrix_telegram -g -c $install_dir/config.yaml -r "/etc/matrix-$synapse_instance/app-service/$app.yaml"
-/opt/yunohost/matrix-$synapse_instance/update_synapse_for_appservice.sh || ynh_die --message="Synapse can't restart with the appservice configuration"
+$synapse_install_dir/update_synapse_for_appservice.sh || ynh_die --message="Synapse can't restart with the appservice configuration"
 
 chown -R $app:$app "$install_dir"
 ynh_store_file_checksum --file="/etc/matrix-$synapse_instance/app-service/$app.yaml"
