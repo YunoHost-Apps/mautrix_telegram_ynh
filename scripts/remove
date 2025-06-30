@@ -1,8 +1,6 @@
 #!/bin/bash
 
 #=================================================
-# GENERIC START
-#=================================================
 # IMPORT GENERIC HELPERS
 #=================================================
 
@@ -17,8 +15,6 @@ ynh_script_progression --message="Loading installation settings..." --weight=5
 app=$YNH_APP_INSTANCE_NAME
 synapse_install_dir=$(ynh_app_setting_get --app $synapse_instance --key install_dir)
 
-#=================================================
-# STANDARD REMOVE
 #=================================================
 # REMOVE SERVICE INTEGRATION IN YUNOHOST
 #=================================================
@@ -46,8 +42,6 @@ ynh_script_progression --message="Removing logrotate configuration..." --weight=
 # Remove the app-specific logrotate config
 ynh_remove_logrotate
 
-#=================================================
-# SPECIFIC REMOVE
 #=================================================
 # REMOVE VARIOUS FILES
 #=================================================

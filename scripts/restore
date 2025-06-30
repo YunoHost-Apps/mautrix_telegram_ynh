@@ -1,8 +1,6 @@
 #!/bin/bash
 
 #=================================================
-# GENERIC START
-#=================================================
 # IMPORT GENERIC HELPERS
 #=================================================
 
@@ -22,8 +20,6 @@ synapse_instance=$(ynh_app_setting_get --app=$app --key=synapse_instance)
 synapse_install_dir=$(ynh_app_setting_get --app $synapse_instance --key install_dir)
 
 #=================================================
-# STANDARD RESTORATION STEPS
-#=================================================
 # RESTORE THE APP MAIN DIR
 #=================================================
 ynh_script_progression --message="Restoring the app main directory..." --weight=1
@@ -34,8 +30,6 @@ chmod 750 "$install_dir"
 chmod -R 750 "$install_dir"
 chown -R "$app:$app" "$install_dir"
 
-#=================================================
-# SPECIFIC RESTORATION
 #=================================================
 # RESTORE THE POSTGRESQL DATABASE
 #=================================================

@@ -1,8 +1,6 @@
 #!/bin/bash
 
 #=================================================
-# GENERIC START
-#=================================================
 # IMPORT GENERIC HELPERS
 #=================================================
 
@@ -79,8 +77,6 @@ chmod -R 750 "$install_dir"
 chown -R $app:$app "$install_dir"
 
 #=================================================
-# SPECIFIC SETUP
-#=================================================
 # ADD A CONFIGURATION
 #=================================================
 ynh_script_progression --message="Adding a configuration file..." --weight=2
@@ -144,8 +140,6 @@ ynh_script_progression --message="Configuring a systemd service..." --weight=20
 # Create a dedicated systemd config
 ynh_add_systemd_config
 
-#=================================================
-# GENERIC FINALIZATION
 #=================================================
 # SETUP LOGROTATE
 #=================================================
