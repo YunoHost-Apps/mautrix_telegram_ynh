@@ -129,7 +129,7 @@ $install_dir/bin/pip3 install --upgrade $install_dir/src/mautrix-telegram.tar.gz
 ynh_script_progression --message="Registering Synapse app-service" --weight=1
 
 $install_dir/bin/python3 -m mautrix_telegram -g -c $install_dir/config.yaml -r "/etc/matrix-$synapse_instance/app-service/$app.yaml"
-/opt/yunohost/matrix-$synapse_instance/update_synapse_for_appservice.sh || ynh_die --message="Synapse can't restart with the appservice configuration"
+/var/www/$synapse_instance/update_synapse_for_appservice.sh || ynh_die --message="Synapse can't restart with the appservice configuration"
 
 chown -R $app:$app "$install_dir"
 ynh_store_file_checksum --file="/etc/matrix-$synapse_instance/app-service/$app.yaml"
