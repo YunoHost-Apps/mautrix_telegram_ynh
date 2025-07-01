@@ -13,7 +13,7 @@ source /usr/share/yunohost/helpers
 ynh_script_progression "Loading installation settings..."
 
 app=$YNH_APP_INSTANCE_NAME
-synapse_install_dir=$(ynh_app_setting_get --app $synapse_instance --key install_dir)
+synapse_install_dir=$(ynh_app_setting_get --app=$synapse_instance --key=install_dir)
 
 #=================================================
 # REMOVE SYSTEM CONFIGURATIONS

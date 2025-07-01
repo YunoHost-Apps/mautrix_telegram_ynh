@@ -14,6 +14,7 @@ synapse_db_name="matrix_$synapse_instance"
 #=================================================
 # GET CONFIG PANEL SETTINGS
 #=================================================
+
 async_media=$(ynh_app_setting_get --key=async_media)
 bot_displayname=$(ynh_app_setting_get --key=bot_displayname)
 bot_username=$(ynh_app_setting_get --key=bot_username)
@@ -49,27 +50,7 @@ ynh_systemctl --service=$app --action="stop"
 ynh_script_progression "Ensuring downward compatibility..."
 
 # If appserviceid doesn't exist, create it
-if [ -z "$appserviceid" ]
-then
-  appserviceid=$app
-  ynh_app_setting_set --key=appserviceid --value=$appserviceid
-fi
-
-# If db_name doesn't exist, create it
-if [ -z "$db_name" ]
-then
-  db_name=$(ynh_app_setting_get --key=mautrix_bridge_db_name)
-  # db_name and db_user share the same value
-  db_user=$db_name
-  ynh_app_setting_set --key=db_name --value=$db_name
-fi
-
-# If db_pwd doesn't exist, create it
-if [ -z "$db_pwd" ]
-then
-  db_pwd=$(ynh_app_setting_get --key=mautrix_bridge_db_pwd)
-  ynh_app_setting_set --key=psqlpwd --value=$db_pwd
-fi
+ynh_app_setting_set_default --key=appserviceid --value="$app"
 
 #=================================================
 # SET STANDARD SETTINGS FROM DEFAULT CONFIG
@@ -250,9 +231,9 @@ ynh_store_file_checksum "/etc/matrix-$synapse_instance/app-service/$app.yaml"
 ynh_store_file_checksum "$install_dir/config.yaml"
 
 #=================================================
-# SETUP SYSTEMD
+# REAPPLY SYSTEM CONFIGURATIONS
 #=================================================
-ynh_script_progression "Upgrading systemd configuration..."
+ynh_script_progression "Upgrading system configurations related to $app..."
 
 # Create a dedicated systemd config
 ynh_config_add_systemd

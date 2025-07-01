@@ -8,14 +8,14 @@ source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
-# RETRIEVE ARGUMENTS FROM THE MANIFEST
+# INITIALIZE AND STORE SETTINGS
 #=================================================
 
 # Retrieve some values from selected Synapse instance and store them
 appserviceid=$app
-synapse_install_dir=$(ynh_app_setting_get --app $synapse_instance --key install_dir)
-server_name=$(ynh_app_setting_get --app $synapse_instance --key server_name)
-domain=$(ynh_app_setting_get --app $synapse_instance --key domain)
+synapse_install_dir=$(ynh_app_setting_get --app=$synapse_instance --key=install_dir)
+server_name=$(ynh_app_setting_get --app=$synapse_instance --key=server_name)
+domain=$(ynh_app_setting_get --app=$synapse_instance --key=domain)
 ynh_app_setting_set --key=server_name --value=$server_name
 ynh_app_setting_set --key=domain --value=$domain
 ynh_app_setting_set --key=appserviceid --value=$appserviceid
@@ -125,13 +125,13 @@ ynh_store_file_checksum "/etc/matrix-$synapse_instance/app-service/$app.yaml"
 ynh_store_file_checksum "$install_dir/config.yaml"
 
 #=================================================
-# SETUP SYSTEMD
+# SYSTEM CONFIGURATION
 #=================================================
-ynh_script_progression "Configuring $app's systemd service..."
+ynh_script_progression "Adding system configurations related to $app..."
 
 ynh_config_add_systemd
 
-ynh_config_add_logrotate "/var/log/$app/$app.log" $app
+ynh_config_add_logrotate
 
 yunohost service add $app --description="$app daemon for bridging Telegram and Matrix messages" --log="/var/log/$app/$app.log"
 

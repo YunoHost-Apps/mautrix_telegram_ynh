@@ -1,3 +1,5 @@
+#:schema https://raw.githubusercontent.com/YunoHost/apps/master/schemas/manifest.v2.schema.json
+
 packaging_format = 2
 
 id = "mautrix_telegram"
@@ -12,9 +14,9 @@ maintainers = ["thardev"]
 [upstream]
 license = "AGPL-3.0-or-later"
 website = "https://docs.mau.fi/bridges/python/telegram/index.html"
-code = "https://github.com/mautrix/telegram"
 admindoc = "https://github.com/YunoHost-Apps/mautrix_telegram_ynh"
 userdoc = "https://docs.mau.fi/bridges/python/telegram/management-commands.html"
+code = "https://github.com/mautrix/telegram"
 
 [integration]
 yunohost = ">= 12.0.9"

@@ -17,7 +17,7 @@ app=$YNH_APP_INSTANCE_NAME
 
 db_name=$(ynh_app_setting_get --app=$app --key=db_name)
 synapse_instance=$(ynh_app_setting_get --app=$app --key=synapse_instance)
-synapse_install_dir=$(ynh_app_setting_get --app $synapse_instance --key install_dir)
+synapse_install_dir=$(ynh_app_setting_get --app=$synapse_instance --key=install_dir)
 
 #=================================================
 # RESTORE THE APP MAIN DIR
@@ -34,14 +34,6 @@ ynh_script_progression "Restoring the PostgreSQL database..."
 ynh_psql_db_shell < ./db.sql
 
 #=================================================
-# RESTORE THE LOGROTATE CONFIGURATION
-#=================================================
-ynh_script_progression "Restoring the logrotate configuration..."
-
-ynh_restore "/etc/logrotate.d/$app"
-mkdir -p "/var/log/$app"
-
-#=================================================
 # REGISTER SYNAPSE APP-SERVICE
 #=================================================
 ynh_script_progression "Registering Synapse app-service"
@@ -50,14 +42,17 @@ $install_dir/bin/python3 -m mautrix_telegram -g -c "$install_dir/config.yaml" -r
 $synapse_install_dir/update_synapse_for_appservice.sh || echo "Synapse can't restart with the appservice configuration"
 
 #=================================================
-# RESTORE SYSTEMD
+# RESTORE SYSTEM CONFIGURATIONS
 #=================================================
-ynh_script_progression "Restoring $app's systemd service..."
+ynh_script_progression "Restoring system configurations related to $app..."
 
 ynh_restore "/etc/systemd/system/$app.service"
 systemctl enable $app.service --quiet
 
 yunohost service add $app --description="$app daemon for bridging Telegram and Matrix messages" --log="/var/log/$app/$app.log"
+
+ynh_restore "/etc/logrotate.d/$app"
+mkdir -p "/var/log/$app"
 
 #=================================================
 # START SYSTEMD SERVICE
