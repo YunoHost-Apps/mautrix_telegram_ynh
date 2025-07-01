@@ -8,17 +8,17 @@ source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
-# RETRIEVE ARGUMENTS FROM THE MANIFEST
+# INITIALIZE AND STORE SETTINGS
 #=================================================
 
 # Retrieve some values from selected Synapse instance and store them
 appserviceid=$app
-synapse_install_dir=$(ynh_app_setting_get --app $synapse_instance --key install_dir)
-server_name=$(ynh_app_setting_get --app $synapse_instance --key server_name)
-domain=$(ynh_app_setting_get --app $synapse_instance --key domain)
-ynh_app_setting_set --app=$app --key=server_name --value=$server_name
-ynh_app_setting_set --app=$app --key=domain --value=$domain
-ynh_app_setting_set --app=$app --key=appserviceid --value=$appserviceid
+synapse_install_dir=$(ynh_app_setting_get --app=$synapse_instance --key=install_dir)
+server_name=$(ynh_app_setting_get --app=$synapse_instance --key=server_name)
+domain=$(ynh_app_setting_get --app=$synapse_instance --key=domain)
+ynh_app_setting_set --key=server_name --value=$server_name
+ynh_app_setting_set --key=domain --value=$domain
+ynh_app_setting_set --key=appserviceid --value=$appserviceid
 
 #=================================================
 # SET STANDARD SETTINGS FROM DEFAULT CONFIG
@@ -46,40 +46,35 @@ listpuppeting="$botusers"
 listfull=""
 listadmin="$botadmin"
 
-ynh_app_setting_set --app=$app --key=appserviceid --value=$appserviceid
-ynh_app_setting_set --app=$app --key=async_media --value=$async_media
-ynh_app_setting_set --app=$app --key=bot_displayname --value=$bot_displayname
-ynh_app_setting_set --app=$app --key=bot_username --value=$bot_username
-ynh_app_setting_set --app=$app --key=bot_avatar --value=$bot_avatar
-ynh_app_setting_set --app=$app --key=device_model --value=$device_model
-ynh_app_setting_set --app=$app --key=ephemeral_events --value=$ephemeral_events
-ynh_app_setting_set --app=$app --key=enable_metrics --value=$enable_metrics
-ynh_app_setting_set --app=$app --key=listen_port --value=$listen_port
-ynh_app_setting_set --app=$app --key=alias_template --value=$alias_template
-ynh_app_setting_set --app=$app --key=displayname_template --value=$displayname_template
-ynh_app_setting_set --app=$app --key=username_template --value=$username_template
-ynh_app_setting_set --app=$app --key=delivery_receipts --value=$delivery_receipts
-ynh_app_setting_set --app=$app --key=telegram_link_preview --value=$telegram_link_preview
-ynh_app_setting_set --app=$app --key=encryption_default --value=$encryption_default
-ynh_app_setting_set --app=$app --key=encryption_require --value=$encryption_require
-ynh_app_setting_set --app=$app --key=listrelaybot --value=$listrelaybot
+ynh_app_setting_set --key=appserviceid --value=$appserviceid
+ynh_app_setting_set --key=async_media --value=$async_media
+ynh_app_setting_set --key=bot_displayname --value=$bot_displayname
+ynh_app_setting_set --key=bot_username --value=$bot_username
+ynh_app_setting_set --key=bot_avatar --value=$bot_avatar
+ynh_app_setting_set --key=device_model --value=$device_model
+ynh_app_setting_set --key=ephemeral_events --value=$ephemeral_events
+ynh_app_setting_set --key=enable_metrics --value=$enable_metrics
+ynh_app_setting_set --key=listen_port --value=$listen_port
+ynh_app_setting_set --key=alias_template --value=$alias_template
+ynh_app_setting_set --key=displayname_template --value=$displayname_template
+ynh_app_setting_set --key=username_template --value=$username_template
+ynh_app_setting_set --key=delivery_receipts --value=$delivery_receipts
+ynh_app_setting_set --key=telegram_link_preview --value=$telegram_link_preview
+ynh_app_setting_set --key=encryption_default --value=$encryption_default
+ynh_app_setting_set --key=encryption_require --value=$encryption_require
+ynh_app_setting_set --key=listrelaybot --value=$listrelaybot
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
-ynh_script_progression --message="Setting up source files..." --weight=3
+ynh_script_progression "Setting up source files..."
 
-# Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source --dest_dir="$install_dir/src"
-
-chmod 750 "$install_dir"
-chmod -R 750 "$install_dir"
-chown -R $app:$app "$install_dir"
 
 #=================================================
 # ADD A CONFIGURATION
 #=================================================
-ynh_script_progression --message="Adding a configuration file..." --weight=2
+ynh_script_progression "Adding $app's configuration..."
 
 # WARNING : theses command are used in INSTALL, UPGRADE, CONFIG, CHANGE-URL (4 times)
 # For any update do it in all files
@@ -96,10 +91,7 @@ then
 	botusers="$server_name"
 fi
 
-ynh_add_config --template="config.yaml" --destination="$install_dir/config.yaml"
-
-chmod 400 "$install_dir/config.yaml"
-chown $app:$app "$install_dir/config.yaml"
+ynh_config_add --template="config.yaml" --destination="$install_dir/config.yaml"
 
 # This calls allows to set multiple users during install question "botusers" specifying them separated by a comma
 set__listrelaybot
@@ -111,7 +103,7 @@ set__listadmin
 #=================================================
 # INSTALL MAUTRIX-BRIDGE PYTHON MODULE
 #=================================================
-ynh_script_progression --message="Installing Mautrix-Bridge Python Module..." --weight=6
+ynh_script_progression "Installing Mautrix-Bridge Python Module..."
 
 mkdir -p /var/log/$app
 # Configure Mautrix-Bridge
@@ -123,52 +115,35 @@ $install_dir/bin/pip3 install --upgrade $install_dir/src/mautrix-telegram.tar.gz
 #=================================================
 # REGISTER SYNAPSE APP-SERVICE
 #=================================================
-ynh_script_progression --message="Registering Synapse app-service" --weight=1
+ynh_script_progression "Registering Synapse app-service"
 
 $install_dir/bin/python3 -m mautrix_telegram -g -c $install_dir/config.yaml -r "/etc/matrix-$synapse_instance/app-service/$app.yaml"
+
 $synapse_install_dir/update_synapse_for_appservice.sh || ynh_die --message="Synapse can't restart with the appservice configuration"
 
-chown -R $app:$app "$install_dir"
-ynh_store_file_checksum --file="/etc/matrix-$synapse_instance/app-service/$app.yaml"
-ynh_store_file_checksum --file="$install_dir/config.yaml"
+ynh_store_file_checksum "/etc/matrix-$synapse_instance/app-service/$app.yaml"
+ynh_store_file_checksum "$install_dir/config.yaml"
 
 #=================================================
-# SETUP SYSTEMD
+# SYSTEM CONFIGURATION
 #=================================================
-ynh_script_progression --message="Configuring a systemd service..." --weight=20
+ynh_script_progression "Adding system configurations related to $app..."
 
-# Create a dedicated systemd config
-ynh_add_systemd_config
+ynh_config_add_systemd
 
-#=================================================
-# SETUP LOGROTATE
-#=================================================
-ynh_script_progression --message="Configuring log rotation..." --weight=3
-
-# Use logrotate to manage application logfile(s)
-# TODO maybe --specific-user??
-ynh_use_logrotate --logfile "/var/log/$app/$app.log" --specific_user $app
-chmod -R 600 "/var/log/$app"
-chmod 700 "/var/log/$app"
-chown -R $app:$app /var/log/$app
-
-#=================================================
-# INTEGRATE SERVICE IN YUNOHOST
-#=================================================
-ynh_script_progression --message="Integrating service in YunoHost..."
+ynh_config_add_logrotate
 
 yunohost service add $app --description="$app daemon for bridging Telegram and Matrix messages" --log="/var/log/$app/$app.log"
 
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Starting a systemd service..." --weight=1
+ynh_script_progression "Starting $app's systemd service..."
 
-# Start a systemd service
-ynh_systemd_action --service_name=$app --action="start" --log_path="/var/log/$app/$app.log"
+ynh_systemctl --service=$app --action="start"
 
 #=================================================
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Installation of $app completed" --last
+ynh_script_progression "Installation of $app completed"
