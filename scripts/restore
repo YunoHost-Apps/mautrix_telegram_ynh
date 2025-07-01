@@ -15,7 +15,9 @@ ynh_script_progression "Loading installation settings..."
 
 app=$YNH_APP_INSTANCE_NAME
 
-synapse_instance=$(ynh_app_setting_get --key=synapse_instance)
+db_name=$(ynh_app_setting_get --app=$app --key=db_name)
+synapse_instance=$(ynh_app_setting_get --app=$app --key=synapse_instance)
+synapse_install_dir=$(ynh_app_setting_get --app $synapse_instance --key install_dir)
 
 #=================================================
 # RESTORE THE APP MAIN DIR
@@ -45,7 +47,7 @@ mkdir -p "/var/log/$app"
 ynh_script_progression "Registering Synapse app-service"
 
 $install_dir/bin/python3 -m mautrix_telegram -g -c "$install_dir/config.yaml" -r "/etc/matrix-$synapse_instance/app-service/$app.yaml"
-/opt/yunohost/matrix-$synapse_instance/update_synapse_for_appservice.sh || echo "Synapse can't restart with the appservice configuration"
+$synapse_install_dir/update_synapse_for_appservice.sh || echo "Synapse can't restart with the appservice configuration"
 
 #=================================================
 # RESTORE SYSTEMD
