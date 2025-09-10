@@ -19,7 +19,7 @@ userdoc = "https://docs.mau.fi/bridges/python/telegram/management-commands.html"
 code = "https://github.com/mautrix/telegram"
 
 [integration]
-yunohost = ">= 12.0.9"
+yunohost = ">= 12.1.17"
 helpers_version = "2.1"
 architectures = ["amd64", "arm64", "armhf"]
 multi_instance = true
