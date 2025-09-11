@@ -8,8 +8,10 @@ test_format = 1.0
 
 preinstall = """
     sudo yunohost tools update apps
-    sudo yunohost app install https://github.com/YunoHost-Apps/synapse_ynh/ -a "domain=$domain&init_main_permission=all_users&server_name=$server_name&is_free_registration=$is_free_registration&jitsi_server=$jitsi_server" --force
-    """
+    sudo yunohost domain add matrix.domain.tld
+    domain=matrix.domain.tld
+    server_name=$domain
+    sudo yunohost app install https://github.com/YunoHost-Apps/synapse_ynh -a "domain=$domain&init_main_permission=all_users&server_name=$server_name&is_free_registration=false" --force    """
 
 # -------------------------------
 # Default args to use for install
