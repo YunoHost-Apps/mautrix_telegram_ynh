@@ -505,9 +505,9 @@ bridge:
   #   domain - All users on that homeserver
   #     mxid - Specific user
   permissions:
-    "*": "relaybot"
-    "__BOTUSERS__": "puppeting"
-    "__BOTADMIN__": "admin"
+    "__LISTRELAYBOT__": "relaybot"
+    "__LISTPUPPETING__": "puppeting"
+    "__LISTADMIN__": "admin"
   # Options related to the message relay Telegram bot.
   relaybot:
     private_chat:

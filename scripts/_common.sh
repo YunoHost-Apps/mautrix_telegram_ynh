@@ -13,7 +13,7 @@ apply_permissions() {
 
     if [ -n "$newValues" ]
     then
-        #ynh_systemd_action --service_name="$app" --action=stop
+        #ynh_systemctl --service="$app" --action=stop
         # Get all entries between "permissions:" and "relay:" keys, remove the role part, remove commented parts, format it with newlines and clean whitespaces and double quotes.
         allDefinedEntries=$(awk '/permissions:/{flag=1; next} /relaybot:/{flag=0} flag' "$install_dir/config.yaml" | sed "/: $role/d" | sed -r 's/: (admin|user|relaybot|full|puppeting)//' | tr -d '[:blank:]' | sed '/^#/d' | tr -d '\"' | tr ',' '\n' )
         # Delete everything from the corresponding role to insert the new defined values. This way we also handle deletion of users.
@@ -35,54 +35,41 @@ apply_permissions() {
     ynh_print_info "Users with role $role added in $install_dir/config.yaml"
 }
 
-
 set__listrelaybot() {
   role="relaybot"
-  ynh_app_setting_set --app=$app --key=listrelaybot --value="$listrelaybot"
+  ynh_app_setting_set --key=listrelaybot --value="$listrelaybot"
   apply_permissions
-  ynh_store_file_checksum --file="$install_dir/config.yaml"
+  ynh_store_file_checksum "$install_dir/config.yaml"
 }
 
 set__listuser() {
   role="user"
-  ynh_app_setting_set --app=$app --key=listuser --value="$listuser"
+  ynh_app_setting_set --key=listuser --value="$listuser"
   apply_permissions
-  ynh_store_file_checksum --file="$install_dir/config.yaml"
+  ynh_store_file_checksum "$install_dir/config.yaml"
 }
 
 set__listpuppeting() {
   role="puppeting"
-  ynh_app_setting_set --app=$app --key=listpuppeting --value="$listpuppeting"
+  ynh_app_setting_set --key=listpuppeting --value="$listpuppeting"
   apply_permissions
-  ynh_store_file_checksum --file="$install_dir/config.yaml"
+  ynh_store_file_checksum "$install_dir/config.yaml"
 }
 
 set__listfull() {
   role="full"
-  ynh_app_setting_set --app=$app --key=listfull --value="$listfull"
+  ynh_app_setting_set --key=listfull --value="$listfull"
   apply_permissions
-  ynh_store_file_checksum --file="$install_dir/config.yaml"
+  ynh_store_file_checksum "$install_dir/config.yaml"
 }
 
 set__listadmin() {
   role="admin"
-  ynh_app_setting_set --app=$app --key=listadmin --value="$listadmin"
+  ynh_app_setting_set --key=listadmin --value="$listadmin"
   apply_permissions
-  ynh_store_file_checksum --file="$install_dir/config.yaml"
+  ynh_store_file_checksum "$install_dir/config.yaml"
 }
 
 #=================================================
-# COMMON VARIABLES
-#=================================================
-
-#=================================================
-# PERSONAL HELPERS
-#=================================================
-
-#=================================================
-# EXPERIMENTAL HELPERS
-#=================================================
-
-#=================================================
-# FUTURE OFFICIAL HELPERS
+# COMMON VARIABLES AND CUSTOM HELPERS
 #=================================================
