@@ -34,6 +34,14 @@ ynh_script_progression "Restoring the PostgreSQL database..."
 ynh_psql_db_shell < ./db.sql
 
 #=================================================
+# RESTORE THE LOGROTATE CONFIGURATION
+#=================================================
+ynh_script_progression "Restoring logrotate configuration..."
+
+ynh_restore "/etc/logrotate.d/$app"
+mkdir -p "/var/log/$app"
+
+#=================================================
 # REGISTER SYNAPSE APP-SERVICE
 #=================================================
 ynh_script_progression "Registering Synapse app-service"
@@ -50,9 +58,6 @@ ynh_restore "/etc/systemd/system/$app.service"
 systemctl enable $app.service --quiet
 
 yunohost service add $app --description="$app daemon for bridging Telegram and Matrix messages" --log="/var/log/$app/$app.log"
-
-ynh_restore "/etc/logrotate.d/$app"
-mkdir -p "/var/log/$app"
 
 #=================================================
 # START SYSTEMD SERVICE
