@@ -7,7 +7,7 @@ name = "Matrix-Telegram bridge"
 description.en = "Telegram puppeting bridge for Matrix/Synapse"
 description.fr = "Passerelle Telegram pour Matrix/Synapse"
 
-version = "0.15.2~ynh2"
+version = "0.15.3~ynh1"
 
 maintainers = ["thardev"]
 
@@ -109,8 +109,8 @@ default = "disabled"
 	in_subdir = true
 	extract = false
 	rename = "mautrix-telegram.tar.gz"
-	url = "https://github.com/mautrix/telegram/archive/refs/tags/v0.15.2.tar.gz"
-	sha256 = "32b517584ffe888196e816e40d9e2f748687e3b3bb386151847241c603bc7cd3"
+	url = "https://github.com/mautrix/telegram/archive/refs/tags/v0.15.3.tar.gz"
+	sha256 = "e201b9604c04a927d12b7a23d218a32430eb4b721da555f3112e0150811a0572"
 	autoupdate.strategy = "latest_github_release"
 
 	[resources.system_user]
