@@ -113,11 +113,9 @@ default = "disabled"
 	sha256 = "e201b9604c04a927d12b7a23d218a32430eb4b721da555f3112e0150811a0572"
 	autoupdate.strategy = "latest_github_release"
 
-	[resources.system_user]
-	home = "/opt/yunohost/__APP__"
+  [resources.system_user]
 
-	[resources.install_dir]
-	dir = "/opt/yunohost/__APP__"
+  [resources.install_dir]
 
 	[resources.permissions]
 	main.allowed = "all_users"
