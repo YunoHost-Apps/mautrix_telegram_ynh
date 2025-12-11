@@ -573,7 +573,7 @@ bridge:
         # Whether or not to ignore incoming events sent by the relay bot.
         ignore_own_incoming_events: true
         # List of usernames/user IDs who are also allowed to use the bot commands.
-        whitelist:
+        whitelist: {}
         - myusername
         - 12345678
 
@@ -678,11 +678,11 @@ logging:
             formatter: colored
     loggers:
         mau:
-            level: DEBUG
+            level: INFO
         telethon:
             level: INFO
         aiohttp:
             level: INFO
     root:
-        level: DEBUG
+        level: INFO
         handlers: [file, console]
