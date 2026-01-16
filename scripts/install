@@ -1,141 +1,168 @@
 #!/bin/bash
 
-#=================================================
-# IMPORT GENERIC HELPERS
-#=================================================
-
 source _common.sh
 source /usr/share/yunohost/helpers
+
+# Satisfy shellcheck, those variables are known when starting the script:
+# shellcheck disable=SC2154
+echo From manifest: "$synapse_instance", \
+     From yunohost: "$app $install_dir" > /dev/null
 
 #=================================================
 # INITIALIZE AND STORE SETTINGS
 #=================================================
 
+# This is needed to convert the value from the manifest to a valid value for the config.yaml file.
+# Without this the install script will throw a warning.
+# Convert user choice boolean from the manifest into a config value
+if [ "$enable_relaybot" -eq "1" ]
+then
+  enable_relaybot="true"
+else
+  enable_relaybot="false"
+fi
+
+if [ "$encryption" -eq "1" ]
+then
+  encryption="true"
+else
+  encryption="false"
+fi
+
 # Retrieve some values from selected Synapse instance and store them
-appserviceid=$app
-synapse_install_dir=$(ynh_app_setting_get --app=$synapse_instance --key=install_dir)
-server_name=$(ynh_app_setting_get --app=$synapse_instance --key=server_name)
-domain=$(ynh_app_setting_get --app=$synapse_instance --key=domain)
+ynh_app_setting_set --key=synapse_instance --value="$synapse_instance"
+synapse_install_dir=$(ynh_app_setting_get --app $synapse_instance --key install_dir)
+server_name=$(ynh_app_setting_get --app $synapse_instance --key server_name)
+domain=$(ynh_app_setting_get --app $synapse_instance --key domain)
 ynh_app_setting_set --key=server_name --value=$server_name
 ynh_app_setting_set --key=domain --value=$domain
-ynh_app_setting_set --key=appserviceid --value=$appserviceid
 
 #=================================================
 # SET STANDARD SETTINGS FROM DEFAULT CONFIG
 #=================================================
 
-appserviceid=$app
-async_media="false"
-bot_username="$botname"
-bot_displayname="Telegram bridge bot"
-bot_avatar="mxc://maunium.net/tJCRmUyJDsgRNgqhOgoiHWbX"
+# Network-specific config options
 device_model="mautrix-telegram"
-ephemeral_events="false"
-enable_metrics="false"
-listen_port="8000"
-alias_template="telegram_{userid}"
-displayname_template="{displayname} (Telegram)"
-username_template="telegram_{userid}"
-delivery_receipts="false"
 telegram_link_preview="false"
-encryption_default="false"
-encryption_require="false"
-listrelaybot="*"
-listuser=""
-listpuppeting="$botusers"
-listfull=""
+ynh_app_setting_set --key=device_model --value=$device_model
+ynh_app_setting_set --key=telegram_link_preview --value=$telegram_link_preview
+
+
+# Config options that affect the central bridge module.
+personal_filtering_spaces="false"
+enable_relaybot="true"
+admin_only="true"
+displayname="Telegram bridge bot"
+listrelay="*"
+listuser="$botusers"
 listadmin="$botadmin"
 
-ynh_app_setting_set --key=appserviceid --value=$appserviceid
+# Homeserver details.
+async_media="false"
+
+# Application service host/registration related details.
+avatar="mxc://maunium.net/tJCRmUyJDsgRNgqhOgoiHWbX"
+ephemeral_events="true"
+username_template="telegram_{{.}}"  # Localpart template of MXIDs for remote users.
+                                    # {{.}} is replaced with the internal ID of the user.
+
+# Config options that affect the Matrix connector of the bridge.
+delivery_receipts="false"
+
+# End-to-bridge encryption support options.
+encryption_default="false"
+encryption_require="false"
+pickle_key=$(ynh_string_random)
+
+# Logging config. See https://github.com/tulir/zeroconfig for details.
+print_level="info"
+
+ynh_app_setting_set --key=personal_filtering_spaces --value=$personal_filtering_spaces
+ynh_app_setting_set --key=enable_relaybot --value=$enable_relaybot
+ynh_app_setting_set --key=admin_only --value=$admin_only
+ynh_app_setting_set --key=displayname --value=$displayname
+ynh_app_setting_set --key=listrelay --value=$listrelay
+ynh_app_setting_set --key=listuser --value=$listuser
+ynh_app_setting_set --key=listadmin --value=$listadmin
+
 ynh_app_setting_set --key=async_media --value=$async_media
-ynh_app_setting_set --key=bot_displayname --value=$bot_displayname
-ynh_app_setting_set --key=bot_username --value=$bot_username
-ynh_app_setting_set --key=bot_avatar --value=$bot_avatar
-ynh_app_setting_set --key=device_model --value=$device_model
+
+ynh_app_setting_set --key=avatar --value=$avatar
 ynh_app_setting_set --key=ephemeral_events --value=$ephemeral_events
-ynh_app_setting_set --key=enable_metrics --value=$enable_metrics
-ynh_app_setting_set --key=listen_port --value=$listen_port
-ynh_app_setting_set --key=alias_template --value=$alias_template
-ynh_app_setting_set --key=displayname_template --value=$displayname_template
 ynh_app_setting_set --key=username_template --value=$username_template
+
 ynh_app_setting_set --key=delivery_receipts --value=$delivery_receipts
-ynh_app_setting_set --key=telegram_link_preview --value=$telegram_link_preview
+
+ynh_app_setting_set --key=encryption --value=$encryption
 ynh_app_setting_set --key=encryption_default --value=$encryption_default
 ynh_app_setting_set --key=encryption_require --value=$encryption_require
-ynh_app_setting_set --key=listrelaybot --value=$listrelaybot
+ynh_app_setting_set --key=pickle_key --value=$pickle_key
+
+ynh_app_setting_set --key=print_level --value=$print_level
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 ynh_script_progression "Setting up source files..."
 
-ynh_setup_source --dest_dir="$install_dir/src"
+# Download, check integrity, uncompress and patch the source from app.src
+ynh_setup_source --dest_dir="$install_dir"
+#chmod u+x "$install_dir"/mautrix-telegram # Execute permissions for app user
 
-chmod 750 "$install_dir"
-chmod -R 750 "$install_dir"
-chown -R $app:$app "$install_dir"
-
+#=================================================
+# SPECIFIC SETUP
 #=================================================
 # ADD A CONFIGURATION
 #=================================================
 ynh_script_progression "Adding $app's configuration..."
-
-# WARNING : theses command are used in INSTALL, UPGRADE, CONFIG, CHANGE-URL (4 times)
-# For any update do it in all files
-as_token="\"This value is generated when generating the registration\""
-hs_token="\"This value is generated when generating the registration\""
-is_encryption_enabled="$encryption"
-
-if [ $encryption -eq 1 ]; then
-  is_encryption_enabled="true"
-fi
-
-if [ "$botusers" = "local" ]
-then
-	botusers="$server_name"
-fi
+# as_token="\"This value is generated when generating the registration\""
+# hs_token="\"This value is generated when generating the registration\""
 
 ynh_config_add --template="config.yaml" --destination="$install_dir/config.yaml"
+# Set permissions on app files
+chmod 750 "$install_dir"
+chmod -R 750 "$install_dir"
+chown -R $app:$app "$install_dir"
 
 # This calls allows to set multiple users during install question "botusers" specifying them separated by a comma
-set__listrelaybot
+# set__listrelaybot
 set__listuser
-set__listpuppeting
-set__listfull
+set__listrelay
+#set__listpuppeting
+#set__listfull
 set__listadmin
-
-#=================================================
-# INSTALL MAUTRIX-BRIDGE PYTHON MODULE
-#=================================================
-ynh_script_progression "Installing Mautrix-Bridge Python Module..."
-
-mkdir -p /var/log/$app
-# Configure Mautrix-Bridge
-python3 -m venv $install_dir
-export HOME=$install_dir
-$install_dir/bin/pip3 install --upgrade pip setuptools wheel
-$install_dir/bin/pip3 install --upgrade $install_dir/src/mautrix-telegram.tar.gz[e2be,speedups] # metrics,hq_thumbnails,sqlite,formattednumbers
 
 #=================================================
 # REGISTER SYNAPSE APP-SERVICE
 #=================================================
 ynh_script_progression "Registering Synapse app-service"
 
-$install_dir/bin/python3 -m mautrix_telegram -g -c $install_dir/config.yaml -r "/etc/matrix-$synapse_instance/app-service/$app.yaml"
-
-$synapse_install_dir/update_synapse_for_appservice.sh || ynh_die --message="Synapse can't restart with the appservice configuration"
+$install_dir/mautrix-telegram -g -c $install_dir/config.yaml -r /etc/matrix-$synapse_instance/app-service/$app.yaml
+$synapse_install_dir/update_synapse_for_appservice.sh || ynh_die "Synapse can't restart with the appservice configuration"
 
 ynh_store_file_checksum "/etc/matrix-$synapse_instance/app-service/$app.yaml"
 ynh_store_file_checksum "$install_dir/config.yaml"
 
 #=================================================
-# SYSTEM CONFIGURATION
+# SETUP SYSTEMD
 #=================================================
-ynh_script_progression "Adding system configurations related to $app..."
+ynh_script_progression "Configuring $app's systemd service..."
 
+# Create a dedicated systemd config
 ynh_config_add_systemd
 
-ynh_config_add_logrotate
+#=================================================
+# SETUP LOGROTATE
+#=================================================
+ynh_script_progression "Configuring log rotation..."
+
+# Use logrotate to manage application logfile(s)
+ynh_config_add_logrotate "/var/log/$app/$app.log" $app/$app
+
+#=================================================
+# INTEGRATE SERVICE IN YUNOHOST
+#=================================================
+ynh_script_progression "Integrating service in YunoHost..."
 
 yunohost service add $app --description="$app daemon for bridging Telegram and Matrix messages" --log="/var/log/$app/$app.log"
 
@@ -144,7 +171,8 @@ yunohost service add $app --description="$app daemon for bridging Telegram and M
 #=================================================
 ynh_script_progression "Starting $app's systemd service..."
 
-ynh_systemctl --service=$app --action="start"
+# Start a systemd service
+ynh_systemctl --service="$app" --action="start"
 
 #=================================================
 # END OF SCRIPT

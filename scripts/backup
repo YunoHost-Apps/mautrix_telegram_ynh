@@ -1,9 +1,5 @@
 #!/bin/bash
 
-#=================================================
-# IMPORT GENERIC HELPERS
-#=================================================
-
 # Keep this path for calling _common.sh inside the execution's context of backup and restore scripts
 source ../settings/scripts/_common.sh
 source /usr/share/yunohost/helpers
@@ -17,12 +13,12 @@ ynh_print_info "Declaring files to be backed up..."
 ynh_backup "$install_dir"
 
 #=================================================
-# BACKUP SYSTEM CONFIGURATION
+# SYSTEM CONFIGURATION
 #=================================================
 
-ynh_backup "/etc/systemd/system/$app.service"
-
 ynh_backup "/etc/logrotate.d/$app"
+
+ynh_backup "/etc/systemd/system/$app.service"
 
 #=================================================
 # BACKUP THE POSTGRESQL DATABASE
