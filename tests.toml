@@ -37,7 +37,7 @@ args.api_hash = "0800fc577294c34e0b28ad2839435945"
 # Commits to test upgrade from
 # -------------------------------
 
-#test_upgrade_from.bf0ba45.name = "Upgrade from 0.13.0"
+test_upgrade_from.3c68dd8.name = "Upgrade from 0.15.3"
 
 # -------------------------------
 # This is an additional test suite

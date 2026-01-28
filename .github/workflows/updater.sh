@@ -100,17 +100,16 @@ yq -i '.homeserver.domain = "__SERVER_NAME__"' $configFilePath
 yq -i '.appservice.address = "http://localhost:__PORT__"' $configFilePath
 yq -i '.appservice.port = "__PORT__"' $configFilePath
 yq -i '.appservice.database = "postgres://__DB_USER__:__DB_PWD__@localhost:5432/__DB_NAME__"' $configFilePath
-yq -i '.appservice.id = "__APPSERVICEID__"' $configFilePath
-yq -i '.appservice.bot_username = "__BOTNAME__"' $configFilePath
+yq -i '.appservice.id = "__APP__"' $configFilePath
+yq -i '.appservice.bot.username = "__BOTNAME__"' $configFilePath
 yq -i '.appservice.as_token = "__AS_TOKEN__" | .appservice.as_token style=""' $configFilePath
 yq -i '.appservice.hs_token = "__HS_TOKEN__" | .appservice.hs_token style=""' $configFilePath
-yq -i '.bridge.encryption.allow = "__IS_ENCRYPTION_ENABLED__"' $configFilePath
-yq -i '.bridge.encryption.default = "__IS_ENCRYPTION_ENABLED__"' $configFilePath
-yq -i '.bridge.encryption.require = "__IS_ENCRYPTION_ENABLED__"' $configFilePath
-yq -i 'with(.bridge.permissions ; . = { "*": "relaybot", "__BOTUSERS__": "puppeting", "__BOTADMIN__": "admin" } | ... style="double")' $configFilePath
-yq -i '.telegram.api_id = "__APIID__"' $configFilePath
-yq -i '.telegram.api_hash = "__APIHASH__"' $configFilePath
-yq -i '.telegram.bot_token = "__BOTTOKEN__"' $configFilePath
+yq -i '.bridge.encryption.allow = "__ENCRYPTION__"' $configFilePath
+yq -i '.bridge.encryption.default = "__ENCRYPTION_DEFAULT__"' $configFilePath
+yq -i '.bridge.encryption.require = "__ENCRYPTION_REQUIRE__"' $configFilePath
+yq -i 'with(.bridge.permissions ; . = { "*": "relay", "__BOTUSERS__": "user", "__BOTADMIN__": "admin" } | ... style="double")' $configFilePath
+yq -i '.telegram.api_id = "__API_ID__"' $configFilePath
+yq -i '.telegram.api_hash = "__API_HASH__"' $configFilePath
 yq -i '.logging.handlers.file.filename = "/var/log/__APP__/__APP__.log"' $configFilePath
 
 # Keep some default options turned off

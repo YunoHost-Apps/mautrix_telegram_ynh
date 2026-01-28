@@ -15,7 +15,6 @@ bot_synapse_db_user="@$botname:$server_name"
 # GET CONFIG PANEL SETTINGS
 #=================================================
 
-bottoken=$(ynh_app_setting_get --key=bottoken)
 api_id=$(ynh_app_setting_get --key=api_id)
 api_hash=$(ynh_app_setting_get --key=api_hash)
 bottoken=$(ynh_app_setting_get --key=bottoken)
