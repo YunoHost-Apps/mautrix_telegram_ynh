@@ -44,7 +44,9 @@ ynh_app_setting_set --key=domain --value=$domain
 # Network-specific config options
 device_model="mautrix-telegram"
 ynh_app_setting_set --key=device_model --value=$device_model
-
+ynh_app_setting_set --key=api_id --value=$api_id
+ynh_app_setting_set --key=api_hash --value=$api_hash
+ynh_app_setting_set --key=bottoken --value=$bottoken
 
 # Config options that affect the central bridge module.
 personal_filtering_spaces="false"
