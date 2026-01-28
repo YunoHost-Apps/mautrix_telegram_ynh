@@ -11,7 +11,7 @@ services = ["__APP__"]
 
         [main.permissions.helptext]
         ask = '''
-        Roles with Increasing Power: Relaybot<User<Puppeting<Full<Admin
+        Roles with Increasing Power: Relay<User<Admin
         Allowed values for roles:
         - * : All Matrix users
         - domain.tld : All users on a given homeserver
@@ -29,16 +29,6 @@ services = ["__APP__"]
         ask = "Bridge Users"
         type = "tags"
         help = "User Role: Access to use the bridge to chat with a Telegram account."
-
-        #[main.permissions.listpuppeting]
-        #ask = "Bridge Puppeting"
-        #type = "tags"
-        #help = "Puppeting Role: User level + logging in with a Telegram account."
-
-        #[main.permissions.listfull]
-        #ask = "Bridge Full"
-        #type = "tags"
-        #help = "Full Role: Full access to use the bridge, i.e. previous levels + Matrix login."
 
         [main.permissions.listadmin]
         ask = "Bridge Administrators"
@@ -64,18 +54,6 @@ services = ["__APP__"]
         help = "See User management -> Admins"
         bind = ":__INSTALL_DIR__/config.yaml"
         visible = "enable_relaybot"
-
-        [main.bridge.api_id]
-        ask = "Telegram API keys: ID"
-        type = "string"
-        help = "Get your own API keys at https://my.telegram.org/apps"
-        bind = ":__INSTALL_DIR__/config.yaml"
-
-        [main.bridge.api_hash]
-        ask = "Telegram API keys: Hash"
-        type = "string"
-        help = "Get your own API keys at https://my.telegram.org/apps"
-        bind = ":__INSTALL_DIR__/config.yaml"
 
         [main.bridge.bottoken]
         ask = "Telegram bot token, optional if you don't use relay mode"
@@ -183,6 +161,18 @@ services = ["__APP__"]
 
     [advanced.network]
     name = "Telegram specific config options"
+
+        [main.bridge.api_id]
+        ask = "Telegram API keys: ID"
+        type = "string"
+        help = "Get your own API keys at https://my.telegram.org/apps"
+        bind = ":__INSTALL_DIR__/config.yaml"
+
+        [main.bridge.api_hash]
+        ask = "Telegram API keys: Hash"
+        type = "string"
+        help = "Get your own API keys at https://my.telegram.org/apps"
+        bind = ":__INSTALL_DIR__/config.yaml"
 
         [advanced.network.disable_view_once]
         ask = "Should view-once messages disappear shortly after sending a read receipt on Matrix?"

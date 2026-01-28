@@ -1,6 +1,16 @@
 #!/bin/bash
 
 #=================================================
+# COMMON VARIABLES AND CUSTOM HELPERS
+#=================================================
+
+get_synapse_db_name() {
+	# Parameters: synapse instance identifier
+	# Returns: database name
+	ynh_app_setting_get --app="$1" --key=db_name
+}
+
+#=================================================
 # CONFIG PANEL SETTERS
 #=================================================
 
@@ -15,11 +25,11 @@ apply_permissions() {
     then
         #ynh_systemctl --service="$app" --action=stop
         # Get all entries between "permissions:" and "relay:" keys, remove the role part, remove commented parts, format it with newlines and clean whitespaces and double quotes.
-        allDefinedEntries=$(awk '/permissions:/{flag=1; next} /relaybot:/{flag=0} flag' "$install_dir/config.yaml" | sed "/: $role/d" | sed -r 's/: (admin|user|relaybot|full|puppeting)//' | tr -d '[:blank:]' | sed '/^#/d' | tr -d '\"' | tr ',' '\n' )
+        allDefinedEntries=$(awk '/permissions:/{flag=1; next} /relay:/{flag=0} flag' "$install_dir/config.yaml" | sed "/: $role/d" | sed -r 's/: (admin|user|relay)//' | tr -d '[:blank:]' | sed '/^#/d' | tr -d '\"' | tr ',' '\n' )
         # Delete everything from the corresponding role to insert the new defined values. This way we also handle deletion of users.
-        sed -i "/permissions:/,/relaybot:/{/: $role/d;}" "$install_dir/config.yaml"
+        sed -i "/permissions:/,/relay:/{/: $role/d;}" "$install_dir/config.yaml"
         # Ensure that entries with value surrounded with quotes are deleted too. E.g. "users".
-        sed -i "/permissions:/,/relaybot:/{/: \"$role\"/d;}" "$install_dir/config.yaml"
+        sed -i "/permissions:/,/relay:/{/: \"$role\"/d;}" "$install_dir/config.yaml"
       	for user in "${usersArray[@]}"
             do
               if grep -q -x "${user}" <<< "$allDefinedEntries"
@@ -35,6 +45,7 @@ apply_permissions() {
     ynh_print_info "Users with role $role added in $install_dir/config.yaml"
 }
 
+#deprecated
 set__listrelaybot() {
   role="relaybot"
   ynh_app_setting_set --key=listrelaybot --value="$listrelaybot"
@@ -49,13 +60,20 @@ set__listuser() {
   ynh_store_file_checksum "$install_dir/config.yaml"
 }
 
+set__listrelay() {
+  role="relay"
+  ynh_app_setting_set --key=listrelay --value="$listrelay"
+  apply_permissions
+  ynh_store_file_checksum "$install_dir/config.yaml"
+}
+#deprecated
 set__listpuppeting() {
   role="puppeting"
   ynh_app_setting_set --key=listpuppeting --value="$listpuppeting"
   apply_permissions
   ynh_store_file_checksum "$install_dir/config.yaml"
 }
-
+#deprecated
 set__listfull() {
   role="full"
   ynh_app_setting_set --key=listfull --value="$listfull"
@@ -69,7 +87,3 @@ set__listadmin() {
   apply_permissions
   ynh_store_file_checksum "$install_dir/config.yaml"
 }
-
-#=================================================
-# COMMON VARIABLES AND CUSTOM HELPERS
-#=================================================

@@ -16,25 +16,24 @@ synapse_db_name="matrix_$synapse_instance"
 #=================================================
 
 async_media=$(ynh_app_setting_get --key=async_media)
-bot_displayname=$(ynh_app_setting_get --key=bot_displayname)
-bot_username=$(ynh_app_setting_get --key=bot_username)
+displayname=$(ynh_app_setting_get --key=displayname)
+botname=$(ynh_app_setting_get --key=botname)
 bot_avatar=$(ynh_app_setting_get --key=bot_avatar)
 device_model=$(ynh_app_setting_get --key=device_model)
 ephemeral_events=$(ynh_app_setting_get --key=ephemeral_events)
 enable_metrics=$(ynh_app_setting_get --key=enable_metrics)
 listen_port=$(ynh_app_setting_get --key=listen_port)
 alias_template=$(ynh_app_setting_get --key=alias_template)
-displayname_template=$(ynh_app_setting_get --key=displayname_template)
 username_template=$(ynh_app_setting_get --key=username_template)
 delivery_receipts=$(ynh_app_setting_get --key=delivery_receipts)
 telegram_link_preview=$(ynh_app_setting_get --key=telegram_link_preview)
 encryption_default=$(ynh_app_setting_get --key=encryption_default)
 encryption_require=$(ynh_app_setting_get --key=encryption_require)
 
-listrelaybot=$(ynh_app_setting_get --key=listrelaybot)
+listrelay=$(ynh_app_setting_get --key=listrelay)
 listuser=$(ynh_app_setting_get --key=listuser)
-listpuppeting=$(ynh_app_setting_get --key=listpuppeting)
-listfull=$(ynh_app_setting_get --key=listfull)
+# listpuppeting=$(ynh_app_setting_get --key=listpuppeting)
+# listfull=$(ynh_app_setting_get --key=listfull)
 listadmin=$(ynh_app_setting_get --key=listadmin)
 
 #=================================================
@@ -56,25 +55,29 @@ ynh_app_setting_set_default --key=appserviceid --value="$app"
 # SET STANDARD SETTINGS FROM DEFAULT CONFIG
 #=================================================
 
+ynh_app_setting_delete --key=appserviceid
 if [ -z "$async_media" ]
 then
   async_media="false"
   ynh_app_setting_set --key=async_media --value=$async_media
 fi
-if [ -z "$bot_username" ]
+if [ -z "$botname" ]
 then
-  bot_username="$botname"
-  ynh_app_setting_set --key=bot_username --value=$bot_username
+  botname="$bot_username"
+  ynh_app_setting_set --key=botname --value=$botname
+  ynh_app_setting_delete --key=bot_username
 fi
-if [ -z "$bot_displayname" ]
+if [ -z "$displayname" ]
 then
-  bot_displayname="Telegram bridge bot"
-  ynh_app_setting_set --key=bot_displayname --value=$bot_displayname
+  displayname=bot_displayname
+  ynh_app_setting_set --key=displayname --value=$displayname
+  ynh_app_setting_delete --key=bot_displayname
 fi
-if [ -z "$bot_avatar" ]
+if [ -z "$avatar" ]
 then
-  bot_avatar="mxc://maunium.net/tJCRmUyJDsgRNgqhOgoiHWbX"
-  ynh_app_setting_set --key=bot_avatar --value=$bot_avatar
+  avatar=bot_avatar
+  ynh_app_setting_set --key=avatar --value=$avatar
+  ynh_app_setting_delete --key=bot_avatar
 fi
 if [ -z "$device_model" ]
 then
@@ -101,11 +104,7 @@ then
   alias_template="telegram_{userid}"
   ynh_app_setting_set --key=alias_template --value=$alias_template
 fi
-if [ -z "$displayname_template" ]
-then
-  displayname_template="{displayname} (Telegram)"
-  ynh_app_setting_set --key=displayname_template --value=$displayname_template
-fi
+ynh_app_setting_delete --key=displayname_template
 if [ -z "$username_template" ]
 then
   username_template="telegram_{userid}"
@@ -131,27 +130,30 @@ then
   encryption_require="false"
   ynh_app_setting_set --key=encryption_require --value=$encryption_require
 fi
-if [ -z "$listrelaybot" ]
+if [ -z "$listrelay" ]
 then
-    listrelaybot="*"
-    ynh_app_setting_set --key=listrelaybot --value=$listrelaybot
+    listrelay=$listrelaybot
+    ynh_app_setting_set --key=listrelay --value=$listrelay
+    ynh_app_setting_delete=listrelaybot
 fi
 if [ -z "$listuser" ]
 then
     listuser=""
     ynh_app_setting_set --key=listuser --value=$listuser
 fi
-if [ -z "$listpuppeting" ]
-then
-    listpuppeting=$(ynh_app_setting_get --key=botusers)
-    ynh_app_setting_set --key=listpuppeting --value=$listpuppeting
-    ynh_app_setting_delete --key=botusers
-fi
-if [ -z "$listfull" ]
-then
-    listfull=""
-    ynh_app_setting_set --key=listfull --value=$listfull
-fi
+ynh_app_setting_delete --key=listpuppeting
+# if [ -z "$listpuppeting" ]
+# then
+#     listpuppeting=$(ynh_app_setting_get --key=botusers)
+#     ynh_app_setting_set --key=listpuppeting --value=$listpuppeting
+#     ynh_app_setting_delete --key=botusers
+# fi
+ynh_app_setting_delete --key=listfull
+# if [ -z "$listfull" ]
+# then
+#     listfull=""
+#     ynh_app_setting_set --key=listfull --value=$listfull
+# fi
 if [ -z "$listadmin" ]
 then
     listadmin=$(ynh_app_setting_get --key=botadmin)
@@ -164,10 +166,6 @@ fi
 ynh_script_progression "Upgrading source files..."
 
 ynh_setup_source --dest_dir="$install_dir/src"
-
-chmod 750 "$install_dir"
-chmod -R 750 "$install_dir"
-chown -R $app:$app "$install_dir"
 
 #=================================================
 # UPDATE A CONFIG FILE
@@ -213,26 +211,19 @@ set__listfull
 set__listadmin
 
 #=================================================
-# UPGRADE MAUTRIX-BRIDGE PYTHON MODULE
-#=================================================
-ynh_script_progression "Upgrading Mautrix-Bridge Python Module..."
-
-python3 -m venv $install_dir
-export HOME=$install_dir
-$install_dir/bin/pip3 install --upgrade pip setuptools wheel
-$install_dir/bin/pip3 install --upgrade $install_dir/src/mautrix-telegram.tar.gz[e2be,speedups,qr_login] # metrics,hq_thumbnails,sqlite,formattednumbers
-
-#=================================================
 # REGISTER SYNAPSE APP-SERVICE
 #=================================================
 ynh_script_progression "Registering Synapse app-service"
 
-$install_dir/bin/python3 -m mautrix_telegram -g -c $install_dir/config.yaml -r "/etc/matrix-$synapse_instance/app-service/$app.yaml"
-$synapse_install_dir/update_synapse_for_appservice.sh || ynh_die --message="Synapse can't restart with the appservice configuration"
-
-# Set permissions on app files
-ynh_store_file_checksum "/etc/matrix-$synapse_instance/app-service/$app.yaml"
+chmod u+x "$install_dir"/mautrix-telegram # Execute permissions for app user
+$install_dir/mautrix-telegram -g -c $install_dir/config.yaml -r /etc/matrix-$synapse_instance/app-service/$app.yaml
+# We need to run mautrix-telegram -g (registration) as root to be able to write in /etc/matrix-...
+# Then config.yaml somehow gets chown root:root , so we need to chown $app:$app
+chown $app:$app "$install_dir/config.yaml"
 ynh_store_file_checksum "$install_dir/config.yaml"
+
+$synapse_install_dir/update_synapse_for_appservice.sh || ynh_die "Synapse can't restart with the appservice configuration"
+ynh_store_file_checksum "/etc/matrix-$synapse_instance/app-service/$app.yaml"
 
 #=================================================
 # REAPPLY SYSTEM CONFIGURATIONS
