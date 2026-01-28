@@ -1,125 +1,197 @@
 #!/bin/bash
 
-#=================================================
-# IMPORT GENERIC HELPERS
-#=================================================
-
 source _common.sh
 source /usr/share/yunohost/helpers
 
-synapse_install_dir=$(ynh_app_setting_get --app=$synapse_instance --key=install_dir)
-server_name=$(ynh_app_setting_get --app=$app --key=server_name)
-synapse_db_name="matrix_$synapse_instance"
+#=================================================
+# INITIALIZE AND STORE SETTINGS
+#=================================================
+# Retrieve some values from selected Synapse instance and store them
+synapse_install_dir=$(ynh_app_setting_get --app $synapse_instance --key install_dir)
+
+bot_synapse_db_user="@$botname:$server_name"
 
 #=================================================
 # GET CONFIG PANEL SETTINGS
 #=================================================
 
-async_media=$(ynh_app_setting_get --key=async_media)
-displayname=$(ynh_app_setting_get --key=displayname)
-botname=$(ynh_app_setting_get --key=botname)
-bot_avatar=$(ynh_app_setting_get --key=bot_avatar)
-device_model=$(ynh_app_setting_get --key=device_model)
-ephemeral_events=$(ynh_app_setting_get --key=ephemeral_events)
-enable_metrics=$(ynh_app_setting_get --key=enable_metrics)
-listen_port=$(ynh_app_setting_get --key=listen_port)
-alias_template=$(ynh_app_setting_get --key=alias_template)
-username_template=$(ynh_app_setting_get --key=username_template)
-delivery_receipts=$(ynh_app_setting_get --key=delivery_receipts)
-telegram_link_preview=$(ynh_app_setting_get --key=telegram_link_preview)
-encryption_default=$(ynh_app_setting_get --key=encryption_default)
-encryption_require=$(ynh_app_setting_get --key=encryption_require)
+bottoken=$(ynh_app_setting_get --key=bottoken)
+api_id=$(ynh_app_setting_get --key=api_id)
+api_hash=$(ynh_app_setting_get --key=api_hash)
+bottoken=$(ynh_app_setting_get --key=bottoken)
 
+personal_filtering_spaces=$(ynh_app_setting_get --key=personal_filtering_spaces)
+enable_relaybot=$(ynh_app_setting_get --key=enable_relaybot)
+admin_only=$(ynh_app_setting_get --key=admin_only)
+displayname=$(ynh_app_setting_get --key=displayname)
 listrelay=$(ynh_app_setting_get --key=listrelay)
 listuser=$(ynh_app_setting_get --key=listuser)
-# listpuppeting=$(ynh_app_setting_get --key=listpuppeting)
-# listfull=$(ynh_app_setting_get --key=listfull)
 listadmin=$(ynh_app_setting_get --key=listadmin)
+
+async_media=$(ynh_app_setting_get --key=async_media)
+
+avatar=$(ynh_app_setting_get --key=avatar)
+ephemeral_events=$(ynh_app_setting_get --key=ephemeral_events)
+username_template=$(ynh_app_setting_get --key=username_template)
+
+delivery_receipts=$(ynh_app_setting_get --key=delivery_receipts)
+
+encryption=$(ynh_app_setting_get --key=encryption)
+encryption_default=$(ynh_app_setting_get --key=encryption_default)
+encryption_require=$(ynh_app_setting_get --key=encryption_require)
+pickle_key=$(ynh_app_setting_get --key=pickle_key)
+
+print_level=$(ynh_app_setting_get --key=print_level)
+
+ynh_script_progression "Checking version..."
 
 #=================================================
 # STOP SYSTEMD SERVICE
 #=================================================
 ynh_script_progression "Stopping $app's systemd service..."
 
-ynh_systemctl --service=$app --action="stop"
+ynh_systemctl --service="$app" --action="stop"
 
 #=================================================
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
 ynh_script_progression "Ensuring downward compatibility..."
 
-# If appserviceid doesn't exist, create it
-ynh_app_setting_set_default --key=appserviceid --value="$app"
-
-#=================================================
-# SET STANDARD SETTINGS FROM DEFAULT CONFIG
-#=================================================
+# We may have leftover files from the Python bridge version. This step tries to clean them up.
+# The version check is here to only run this cleanup step once. The version it checks for is the version
+# this cleanup was introduced in.
+if ynh_app_upgrading_from_version_before 0.2512.0~ynh1
+then # We may have leftover python files to clean, as this step was introduced in 0.2512.0~ynh1
+	ynh_print_info --message="Cleaning up possible leftovers from python bridge version"
+	for target in bin include lib lib64 pyvenv.cfg share src .python_history example-config.yaml
+	do
+		ynh_safe_rm --file="${install_dir:?}/$target"
+	done
+fi
 
 ynh_app_setting_delete --key=appserviceid
-if [ -z "$async_media" ]
-then
-  async_media="false"
-  ynh_app_setting_set --key=async_media --value=$async_media
-fi
+ynh_app_setting_delete --key=telegram_link_preview
 if [ -z "$botname" ]
 then
   botname="$bot_username"
   ynh_app_setting_set --key=botname --value=$botname
   ynh_app_setting_delete --key=bot_username
 fi
-if [ -z "$displayname" ]
+ynh_app_setting_delete --key=enable_metrics
+if [ -z "$port" ]
 then
-  displayname=bot_displayname
-  ynh_app_setting_set --key=displayname --value=$displayname
-  ynh_app_setting_delete --key=bot_displayname
+  port=$(ynh_app_setting_get --key=listen_port)
+  ynh_app_setting_set --key=port --value=$port
+  ynh_app_setting_delete --key=listen_port
 fi
-if [ -z "$avatar" ]
+ynh_app_setting_delete --key=alias_template
+ynh_app_setting_delete --key=displayname_template
+username_template="telegram_{{.}}"
+ynh_app_setting_set --key=username_template --value=$username_template
+
+ynh_app_setting_delete --key=is_encryption_enabled
+ynh_app_setting_delete --key=listpuppeting
+ynh_app_setting_delete --key=listfull
+
+if [ -z "$api_id" ]
 then
-  avatar=bot_avatar
-  ynh_app_setting_set --key=avatar --value=$avatar
-  ynh_app_setting_delete --key=bot_avatar
+  api_id=""
+  api_id=$(ynh_app_setting_get --key=apiid)
+  ynh_app_setting_set --key=api_id --value=$api_id
+  ynh_app_setting_delete --key=apiid
 fi
+if [ -z "$api_hash" ]
+then
+  api_hash=""
+  api_hash=$(ynh_app_setting_get --key=apihash)
+  ynh_app_setting_set --key=api_hash --value=$api_hash
+  ynh_app_setting_delete --key=apihash
+fi
+if [ -z "$bottoken" ]
+then
+  bottoken="disabled"
+  ynh_app_setting_set --key=bottoken --value=$bottoken
+fi
+
+# SET STANDARD SETTINGS FROM DEFAULT CONFIG
+
 if [ -z "$device_model" ]
 then
   device_model="mautrix-telegram"
   ynh_app_setting_set --key=device_model --value=$device_model
 fi
+
+if [ -z "$personal_filtering_spaces" ]
+then
+  personal_filtering_spaces="false"
+  ynh_app_setting_set --key=personal_filtering_spaces --value=$personal_filtering_spaces
+fi
+if [ -z "$enable_relaybot" ]
+then
+  enable_relaybot="true"
+  ynh_app_setting_set --key=enable_relaybot --value=$enable_relaybot
+fi
+if [ -z "$admin_only" ]
+then
+  admin_only="true"
+  ynh_app_setting_set --key=admin_only --value=$admin_only
+fi
+if [ -z "$displayname" ]
+then
+  displayname=$(ynh_app_setting_get --key=bot_displayname)
+  ynh_app_setting_set --key=displayname --value=$displayname
+  ynh_app_setting_delete --key=bot_displayname
+fi
+if [ -z "$listrelay" ]
+then
+    listrelay=$(ynh_app_setting_get --key=listrelaybot)
+    ynh_app_setting_set --key=listrelay --value=$listrelay
+    ynh_app_setting_delete --key=listrelaybot
+fi
+if [ -z "$listuser" ]
+then
+    listuser=""
+    listuser=$(ynh_app_setting_get --key=botusers)
+    ynh_app_setting_set --key=listuser --value=$listuser
+    ynh_app_setting_delete --key=botusers
+    ynh_app_setting_delete --key=if_botusers
+fi
+if [ -z "$listadmin" ]
+then
+    listadmin=$(ynh_app_setting_get --key=botadmin)
+    ynh_app_setting_set --key=listadmin --value=$listadmin
+    ynh_app_setting_delete --key=botadmin
+fi
+
+
+if [ -z "$async_media" ]
+then
+  async_media="false"
+  ynh_app_setting_set --key=async_media --value=$async_media
+fi
+
+
+if [ -z "$avatar" ]
+then
+  avatar=$bot_avatar
+  ynh_app_setting_set --key=avatar --value=$avatar
+  ynh_app_setting_delete --key=bot_avatar
+fi
 if [ -z "$ephemeral_events" ]
 then
-  ephemeral_events="false"
+  ephemeral_events="true"
   ynh_app_setting_set --key=ephemeral_events --value=$ephemeral_events
 fi
-if [ -z "$enable_metrics" ]
-then
-  enable_metrics="false"
-  ynh_app_setting_set --key=enable_metrics --value=$enable_metrics
-fi
-if [ -z "$listen_port" ]
-then
-  listen_port="8000"
-  ynh_app_setting_set --key=listen_port --value=$listen_port
-fi
-if [ -z "$alias_template" ]
-then
-  alias_template="telegram_{userid}"
-  ynh_app_setting_set --key=alias_template --value=$alias_template
-fi
-ynh_app_setting_delete --key=displayname_template
-if [ -z "$username_template" ]
-then
-  username_template="telegram_{userid}"
-  ynh_app_setting_set --key=username_template --value=$username_template
-fi
+
+
+
 if [ -z "$delivery_receipts" ]
 then
   delivery_receipts="false"
   ynh_app_setting_set --key=delivery_receipts --value=$delivery_receipts
 fi
-if [ -z "$telegram_link_preview" ]
-then
-  telegram_link_preview="false"
-  ynh_app_setting_set --key=telegram_link_preview --value=$telegram_link_preview
-fi
+
+
 if [ -z "$encryption_default" ]
 then
   encryption_default="false"
@@ -130,42 +202,30 @@ then
   encryption_require="false"
   ynh_app_setting_set --key=encryption_require --value=$encryption_require
 fi
-if [ -z "$listrelay" ]
+# Upgrade from <v0.11
+if [ -z "$pickle_key" ]
 then
-    listrelay=$listrelaybot
-    ynh_app_setting_set --key=listrelay --value=$listrelay
-    ynh_app_setting_delete=listrelaybot
+    pickle_key="mautrix.bridge.e2ee"
+    ynh_app_setting_set --key=pickle_key --value=$pickle_key
 fi
-if [ -z "$listuser" ]
+
+
+if [ -z "$print_level" ]
 then
-    listuser=""
-    ynh_app_setting_set --key=listuser --value=$listuser
+  print_level="info"
+  ynh_app_setting_set --key=print_level --value=$print_level
 fi
-ynh_app_setting_delete --key=listpuppeting
-# if [ -z "$listpuppeting" ]
-# then
-#     listpuppeting=$(ynh_app_setting_get --key=botusers)
-#     ynh_app_setting_set --key=listpuppeting --value=$listpuppeting
-#     ynh_app_setting_delete --key=botusers
-# fi
-ynh_app_setting_delete --key=listfull
-# if [ -z "$listfull" ]
-# then
-#     listfull=""
-#     ynh_app_setting_set --key=listfull --value=$listfull
-# fi
-if [ -z "$listadmin" ]
-then
-    listadmin=$(ynh_app_setting_get --key=botadmin)
-    ynh_app_setting_set --key=listadmin --value=$listadmin
-    ynh_app_setting_delete --key=botadmin
-fi
+
+
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
+
 ynh_script_progression "Upgrading source files..."
 
-ynh_setup_source --dest_dir="$install_dir/src"
+# Download, check integrity, uncompress and patch the source from app.src
+ynh_setup_source --dest_dir="$install_dir"
+#chmod u+x "$install_dir"/mautrix-signal # Execute permissions for app user
 
 #=================================================
 # UPDATE A CONFIG FILE
@@ -173,41 +233,22 @@ ynh_setup_source --dest_dir="$install_dir/src"
 ynh_script_progression "Updating configuration..."
 
 # reset permissions to be able to apply_permissions with app_setting values after upgrade
-listrelaybot_=$listrelaybot
+listrelay_=$listrelay
 listuser_=$listuser
-listpuppeting_=$listpuppeting
-listfull_=$listfull
 listadmin_=$listadmin
-listrelaybot="*"
+listrelay="*"
 listuser="@user:domain.tld"
-listpuppeting="@puppet:domain.tld"
-listfull="@full:domain.tld"
 listadmin="@admin:domain.tld"
-
-# main configuration
-ynh_backup_if_checksum_is_different "$install_dir/config.yaml"
-# as_token hs_token are autogenerated, save them before regenerating the config
-as_token=$(grep "as_token:" "$install_dir/config.yaml" | sed -r "s/ *as_token: *//")
-hs_token=$(grep "hs_token:" "$install_dir/config.yaml" | sed -r "s/ *hs_token: *//")
-is_encryption_enabled="$encryption"
-
-if [ $encryption -eq 1 ]; then
-  is_encryption_enabled="true"
-fi
 
 ynh_config_add --template="config.yaml" --destination="$install_dir/config.yaml"
 
-listrelaybot=$listrelaybot_
+listrelay=$listrelay_
 listuser=$listuser_
-listpuppeting=$listpuppeting_
-listfull=$listfull_
 listadmin=$listadmin_
 
 # apply_permissions to have correct syntax in config file
-set__listrelaybot
 set__listuser
-set__listpuppeting
-set__listfull
+set__listrelay
 set__listadmin
 
 #=================================================
@@ -215,7 +256,7 @@ set__listadmin
 #=================================================
 ynh_script_progression "Registering Synapse app-service"
 
-chmod u+x "$install_dir"/mautrix-telegram # Execute permissions for app user
+chmod u+x "$install_dir/mautrix-telegram" # Execute permissions for app user
 $install_dir/mautrix-telegram -g -c $install_dir/config.yaml -r /etc/matrix-$synapse_instance/app-service/$app.yaml
 # We need to run mautrix-telegram -g (registration) as root to be able to write in /etc/matrix-...
 # Then config.yaml somehow gets chown root:root , so we need to chown $app:$app
@@ -226,23 +267,35 @@ $synapse_install_dir/update_synapse_for_appservice.sh || ynh_die "Synapse can't 
 ynh_store_file_checksum "/etc/matrix-$synapse_instance/app-service/$app.yaml"
 
 #=================================================
-# REAPPLY SYSTEM CONFIGURATIONS
+# SETUP SYSTEMD
 #=================================================
-ynh_script_progression "Upgrading system configurations related to $app..."
+ynh_script_progression "Upgrading systemd configuration..."
 
 # Create a dedicated systemd config
 ynh_config_add_systemd
 
-ynh_config_add_logrotate "/var/log/$app/$app.log"
+#=================================================
+# SETUP LOGROTATE
+#=================================================
+ynh_script_progression "Upgrading logrotate configuration..."
 
-yunohost service add $app --description="$app daemon for bridging Telegram and Matrix messages" --log="/var/log/$app/$app.log"
+# Use logrotate to manage application logfile(s)
+ynh_config_add_logrotate "/var/log/$app/$app.log" $app/$app
+
+#=================================================
+# INTEGRATE SERVICE IN YUNOHOST
+#=================================================
+ynh_script_progression "Integrating service in YunoHost..."
+
+yunohost service add $app --description="$app daemon for bridging Signal and Matrix messages" --log="/var/log/$app/$app.log"
 
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
 ynh_script_progression "Starting $app's systemd service..."
 
-ynh_systemctl --service=$app --action="start"
+# Start a systemd service
+ynh_systemctl --service="$app" --action="start"
 
 #=================================================
 # END OF SCRIPT

@@ -162,13 +162,13 @@ services = ["__APP__"]
     [advanced.network]
     name = "Telegram specific config options"
 
-        [main.bridge.api_id]
+        [advanced.network.api_id]
         ask = "Telegram API keys: ID"
         type = "string"
         help = "Get your own API keys at https://my.telegram.org/apps"
         bind = ":__INSTALL_DIR__/config.yaml"
 
-        [main.bridge.api_hash]
+        [advanced.network.api_hash]
         ask = "Telegram API keys: Hash"
         type = "string"
         help = "Get your own API keys at https://my.telegram.org/apps"

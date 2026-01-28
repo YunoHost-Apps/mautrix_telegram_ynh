@@ -43,9 +43,7 @@ ynh_app_setting_set --key=domain --value=$domain
 
 # Network-specific config options
 device_model="mautrix-telegram"
-telegram_link_preview="false"
 ynh_app_setting_set --key=device_model --value=$device_model
-ynh_app_setting_set --key=telegram_link_preview --value=$telegram_link_preview
 
 
 # Config options that affect the central bridge module.
