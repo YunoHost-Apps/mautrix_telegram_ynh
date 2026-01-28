@@ -17,7 +17,6 @@ bot_synapse_db_user="@$botname:$server_name"
 
 api_id=$(ynh_app_setting_get --key=api_id)
 api_hash=$(ynh_app_setting_get --key=api_hash)
-bottoken=$(ynh_app_setting_get --key=bottoken)
 
 personal_filtering_spaces=$(ynh_app_setting_get --key=personal_filtering_spaces)
 enable_relaybot=$(ynh_app_setting_get --key=enable_relaybot)
@@ -106,11 +105,7 @@ then
   ynh_app_setting_set --key=api_hash --value=$api_hash
   ynh_app_setting_delete --key=apihash
 fi
-if [ -z "$bottoken" ]
-then
-  bottoken="disabled"
-  ynh_app_setting_set --key=bottoken --value=$bottoken
-fi
+ynh_app_setting_delete --key=bottoken
 
 # SET STANDARD SETTINGS FROM DEFAULT CONFIG
 

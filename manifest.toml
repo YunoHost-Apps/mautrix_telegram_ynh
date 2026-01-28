@@ -99,15 +99,6 @@ example = "tjyd5yge35lbodk1xwzw2jstp90k55qz"
 help.en = "Get your own API keys at https://my.telegram.org/apps"
 help.fr = "Obtenez vos propres clés API sur https://my.telegram.org/apps"
 
-[install.bottoken]
-ask.en = "Telegram bot token, optional if you don't use relay mode"
-ask.fr = "Jeton de bot de Telegram, facultatif si vous n'utilisez pas le mode relai"
-type = "string"
-example = "tjyd5yge35lbodk1xwzw2jstp90k55qz"
-help.en = "Create your own Telegram bot at https://t.me/BotFather"
-help.fr = "Créez votre propre robot Telegram via https://t.me/BotFather"
-default = "disabled"
-
 [resources]
 	[resources.sources]
 	[resources.sources.main]

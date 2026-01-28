@@ -55,13 +55,6 @@ services = ["__APP__"]
         bind = ":__INSTALL_DIR__/config.yaml"
         visible = "enable_relaybot"
 
-        [main.bridge.bottoken]
-        ask = "Telegram bot token, optional if you don't use relay mode"
-        type = "string"
-        help = "Create your own Telegram bot at https://t.me/BotFather"
-        bind = ":__INSTALL_DIR__/config.yaml"
-        visible = "enable_relaybot"
-
     [main.bot]
     name = "Robot Settings"
 
