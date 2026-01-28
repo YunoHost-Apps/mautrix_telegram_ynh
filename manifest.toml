@@ -112,7 +112,7 @@ default = "disabled"
 	[resources.sources]
 	[resources.sources.main]
 	in_subdir = false
-	extract = true
+	format = "zip"
 	rename = "mautrix-telegram"
 	#amd64.url = "https://github.com/mautrix/telegram/releases/download/v0.2512.0/mautrix-telegram-amd64"
 	amd64.url = "https://mau.dev/mautrix/telegramgo/-/jobs/86299/artifacts/download?file_type=archive"
