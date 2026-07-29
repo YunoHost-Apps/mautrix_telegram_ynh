@@ -19,7 +19,7 @@ admindoc = "https://docs.mau.fi/bridges/go/telegram/index.html"
 fund = "https://github.com/sponsors/tulir"
 
 [integration]
-yunohost = ">= 13"
+yunohost = ">= 12.1.17"
 helpers_version = "2.1"
 architectures = ["amd64", "arm64", "armhf"]
 multi_instance = true
@@ -104,7 +104,7 @@ help.fr = "Obtenez vos propres clés API sur https://my.telegram.org/apps"
 	[resources.sources.main]
 	in_subdir = false
 	extract = false
-	rename = "mautrix-signal"
+	rename = "mautrix-telegram"
 	amd64.url = "https://github.com/mautrix/telegram/releases/download/v0.2607.0/mautrix-telegram-amd64"
 	amd64.sha256 = "28bd1fa3cfd7f20db54e42d78c67a26b6b7b5cbd74a216ccace9b9cc5ff01733"
 	arm64.url = "https://github.com/mautrix/telegram/releases/download/v0.2607.0/mautrix-telegram-arm64"
