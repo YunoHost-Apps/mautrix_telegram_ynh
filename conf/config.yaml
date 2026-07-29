@@ -32,13 +32,6 @@ network:
             height: 256
             fps: 25 # only for webm, webp and gif (2, 5, 10, 20 or 25 recommended)
 
-    # Maximum number of pixels in an image before sending to Telegram as a
-    # document. Defaults to 4096x4096 = 16777216.
-    image_as_file_pixels: 16777216
-
-    # Should view-once messages be disabled entirely?
-    disable_view_once: false
-
     # Settings for syncing the member list for portals.
     member_list:
         # Maximum number of members to sync per portal when starting up. Other
@@ -55,12 +48,6 @@ network:
         sync_broadcast_channels: false
         # Whether or not to skip deleted members when syncing members.
         skip_deleted: true
-    # Maximum number of participants in chats to bridge. Only applies when the
-    # portal is being created. If there are more members when trying to create a
-    # room, the room creation will be cancelled.
-    #
-    # -1 means no limit (which means all chats can be bridged)
-    max_member_count: -1
 
     # Settings for pings to the Telegram server.
     ping:
@@ -68,6 +55,16 @@ network:
         interval_seconds: 30
         # The timeout (in seconds) for a single ping.
         timeout_seconds: 10
+
+    # Proxy settings
+    proxy:
+        # Allowed types: disabled, socks5, mtproxy
+        type: disabled
+        # Proxy IP address/domain name and port.
+        address: "127.0.0.1:1080"
+        # Proxy authentication (optional). Put MTProxy secret in password field.
+        username:
+        password:
 
     sync:
         # Number of most recently active dialogs to check when syncing chats.
@@ -80,16 +77,54 @@ network:
         # Whether or not to sync and create portals for direct chats at startup.
         direct_chats: false
 
+    takeout:
+        # Should the bridge use the data export mode for syncing the full chat list?
+        # If true, login_sync_limit of chats is synced immediately on login,
+        # then the rest are synced after the takeout is accepted.
+        dialog_sync: false
+        # Should the bridge use the data export mode for forward backfilling messages?
+        # This should be set to true if the forward backfill limits are set to high values,
+        # but is probably not necessary otherwise.
+        forward_backfill: false
+        # Should the bridge use the data export mode for backward backfilling messages?
+        # This only affects the backfill queue, which is only available on Beeper.
+        backward_backfill: false
+    
+    # Maximum number of participants in chats to bridge. Only applies when the
+    # portal is being created. If there are more members when trying to create a
+    # room, the room creation will be cancelled.
+    #
+    # -1 means no limit (which means all chats can be bridged)
+    max_member_count: -1
+    # Should personal avatars (that are only visible to specific users) be allowed?
+    contact_avatars: false
+    # Should contact names be updated from any source even if a name is already set?
+    # Note that contact names will still be used if there's no other name available.
+    contact_names: false
     # Should the bridge send all unicode reactions as custom emoji reactions to
     # Telegram? By default, the bridge only uses custom emojis for unicode emojis
     # that aren't allowed in reactions.
     always_custom_emoji_reaction: false
-
     # The avatar to use for the Telegram Saved Messages chat
     saved_message_avatar: mxc://maunium.net/XhhfHoPejeneOngMyBbtyWDk
-
     # Create a new room and tombstone the old one when upgrading rooms
     always_tombstone_on_supergroup_migration: false
+    # Maximum number of pixels in an image before sending to Telegram as a
+    # document. Defaults to 4096x4096 = 16777216.
+    image_as_file_pixels: 16777216
+    # Should view-once messages be disabled entirely?
+    disable_view_once: false
+    # Should video URL previews be bridged as m.video messages to Matrix?
+    # By default, video URL previews will not be bridged.
+    video_url_preview_as_file: false
+    # Displayname template for Telegram users.
+    # {{ .FullName }} - the full name of the Telegram user
+    # {{ .FirstName }} - the first name of the Telegram user
+    # {{ .LastName }} - the last name of the Telegram user
+    # {{ .Username }} - the primary username of the Telegram user, if the user has one
+    # {{ .UserID }} - the internal user ID of the Telegram user
+    # {{ .Deleted }} - true if the user has been deleted, false otherwise
+    displayname_template: "{{ if .Deleted }}Deleted account {{ .UserID }}{{ else }}{{ .FullName }}{{ end }}"
 
 # Config options that affect the central bridge module.
 bridge:
