@@ -1,9 +1,9 @@
 ### Configuration de la passerelle
 
 La passerelle est [configurée avec les paramètres standards adaptés pour votre YunoHost et l'instance Matrix-Synapse sélectionnée](https://github.com/YunoHost-Apps/mautrix_telegram_ynh/blob/master/conf/config.yaml). Vous pouvez par exemple ajouter des administrateur.ice.s et utilisateur.ice.s du Robot autorisés en modifiant le fichier de configuration par liaison SSH:
-``` sudo nano /opt/yunohost/mautrix_whatsapp/config.yaml```
+``` sudo nano /opt/yunohost/mautrix_telegram/config.yaml```
 puis en redémarrant le service:
-``` sudo yunohost service restart mautrix_whatsapp```
+``` sudo yunohost service restart mautrix_telegram```
 
 #### Cryptage End-to-bridge
 
