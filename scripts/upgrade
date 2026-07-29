@@ -219,7 +219,7 @@ ynh_script_progression "Upgrading source files..."
 
 # Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source --dest_dir="$install_dir"
-#chmod u+x "$install_dir"/mautrix-signal # Execute permissions for app user
+#chmod u+x "$install_dir"/mautrix-telegram # Execute permissions for app user
 
 #=================================================
 # UPDATE A CONFIG FILE
@@ -281,7 +281,7 @@ ynh_config_add_logrotate "/var/log/$app/$app.log" $app/$app
 #=================================================
 ynh_script_progression "Integrating service in YunoHost..."
 
-yunohost service add $app --description="$app daemon for bridging Signal and Matrix messages" --log="/var/log/$app/$app.log"
+yunohost service add $app --description="$app daemon for bridging Telegram and Matrix messages" --log="/var/log/$app/$app.log"
 
 #=================================================
 # START SYSTEMD SERVICE
