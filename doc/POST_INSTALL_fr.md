@@ -4,7 +4,7 @@
 
 ## Usages de la passerelle
 
-** Notez que plusieurs comptes Telegram et Matrix peuvent être pontés, chaque compte Telegram connecté a son propre Salon d'Administration. Si plusieurs utilisateur.ice.s du Robot sont dans un même groupe Signal, seul un Salon Matrix sera créé par la passerelle. **
+** Notez que plusieurs comptes Telegram et Matrix peuvent être pontés, chaque compte Telegram connecté a son propre Salon d'Administration. Si plusieurs utilisateur.ice.s du Robot sont dans un même groupe Telegram, seul un Salon Matrix sera créé par la passerelle. **
 
 ### Passerelle entre un utilisateur Telegram et un utilisateur Matrix
 

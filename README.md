@@ -4,14 +4,14 @@ It shall NOT be edited by hand.
 -->
 
 <h1>
-  <img src="https://raw.githubusercontent.com/YunoHost/apps/main/logos/mautrix_telegram.png" width="32px" alt="Logo of Matrix-Telegram bridge">
-  Matrix-Telegram bridge, packaged for YunoHost
+  <img src="https://raw.githubusercontent.com/YunoHost/apps/main/logos/mautrix_telegram.png" width="32px" alt="Logo of Matrix Telegram bridge">
+  Matrix Telegram bridge, packaged for YunoHost
 </h1>
 
-Telegram puppeting bridge for Matrix/Synapse
+Matrix / Synapse puppeting bridge for Telegram
 
-[![🌐 Official app website](https://img.shields.io/badge/Official_app_website-darkgreen?style=for-the-badge)](https://docs.mau.fi/bridges/python/telegram/index.html)
-[![Version: 0.15.3~ynh1](https://img.shields.io/badge/Version-0.15.3~ynh1-rgb(18,138,11)?style=for-the-badge)](https://ci-apps.yunohost.org/ci/apps/mautrix_telegram/)
+[![🌐 Official app website](https://img.shields.io/badge/Official_app_website-darkgreen?style=for-the-badge)](https://maunium.net/go/mautrix-telegram)
+[![Version: 0.2608.0~ynh1](https://img.shields.io/badge/Version-0.2608.0~ynh1-rgb(18,138,11)?style=for-the-badge)](https://ci-apps.yunohost.org/ci/apps/mautrix_telegram/)
 
 <div align="center">
 <a href="https://apps.yunohost.org/app/mautrix_telegram"><img height="100px" src="https://github.com/YunoHost/yunohost-artwork/raw/refs/heads/main/badges/neopossum-badges/badge_more_info_on_the_appstore.svg"/></a>
@@ -22,7 +22,7 @@ Telegram puppeting bridge for Matrix/Synapse
 
 [![Automatic tests level](https://apps.yunohost.org/badge/cilevel/mautrix_telegram)](https://ci-apps.yunohost.org/ci/apps/mautrix_telegram/)
 
-🛠️ Upstream Matrix-Telegram bridge repository: <https://github.com/mautrix/telegram>
+🛠️ Upstream Matrix Telegram bridge repository: <https://github.com/mautrix/telegram>
 
 Pull request are welcome and should target the [`testing` branch](https://github.com/YunoHost-Apps/mautrix_telegram_ynh/tree/testing).
 

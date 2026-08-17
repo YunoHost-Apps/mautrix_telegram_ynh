@@ -17,12 +17,12 @@ get__botname() {
     echo "${botname}"
 }
 
-get__listrelaybot() {
-  role="relaybot"
-  existingRelaybotUsers=$(get_config_permission)
+get__listrelay() {
+  role="relay"
+  existingRelayUsers=$(get_config_permission)
 
   cat <<EOF
-"$existingRelaybotUsers"
+"$existingRelayUsers"
 EOF
 }
 
@@ -35,23 +35,23 @@ get__listuser() {
 EOF
 }
 
-get__listpuppeting() {
-  role="puppeting"
-  existingPuppeting=$(get_config_permission)
+# get__listpuppeting() {
+#   role="puppeting"
+#   existingPuppeting=$(get_config_permission)
 
-  cat <<EOF
-"$existingPuppeting"
-EOF
-}
+#   cat <<EOF
+# "$existingPuppeting"
+# EOF
+# }
 
-get__listfull() {
-  role="full"
-  existingFull=$(get_config_permission)
+# get__listfull() {
+#   role="full"
+#   existingFull=$(get_config_permission)
 
-  cat <<EOF
-"$existingFull"
-EOF
-}
+#   cat <<EOF
+# "$existingFull"
+# EOF
+# }
 
 get__listadmin() {
   role="admin"
@@ -80,10 +80,9 @@ set__botname() {
     ynh_app_setting_set --key=botname --value="$botname"
     synapse_instance=$(ynh_app_setting_get --key synapse_instance)
 
-    sed -i "s/bot_username:.*/bot_username: $botname/" "$install_dir/config.yaml"
-    "$install_dir/mautrix-whatsapp" -g -c "$install_dir/config.yaml" -r "/etc/matrix-$synapse_instance/app-service/$app.yaml"
+    sed -i "s/username:.*/username: $botname/" "$install_dir/config.yaml"
+    "$install_dir/mautrix-telegram" -g -c "$install_dir/config.yaml" -r "/etc/matrix-$synapse_instance/app-service/$app.yaml"
     "/opt/yunohost/matrix-$synapse_instance/update_synapse_for_appservice.sh" || ynh_die "Synapse can't restart with the appservice configuration"
-    #REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown -R "$app:$app" "$install_dir"
     ynh_store_file_checksum "/etc/matrix-$synapse_instance/app-service/$app.yaml"
     ynh_store_file_checksum "$install_dir/config.yaml"
 }
