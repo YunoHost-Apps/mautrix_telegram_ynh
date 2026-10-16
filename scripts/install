@@ -34,8 +34,8 @@ ynh_app_setting_set --key=synapse_instance --value="$synapse_instance"
 synapse_install_dir=$(ynh_app_setting_get --app $synapse_instance --key install_dir)
 server_name=$(ynh_app_setting_get --app $synapse_instance --key server_name)
 domain=$(ynh_app_setting_get --app $synapse_instance --key domain)
-ynh_app_setting_set --key=server_name --value=$server_name
-ynh_app_setting_set --key=domain --value=$domain
+ynh_app_setting_set --key=server_name --value="$server_name"
+ynh_app_setting_set --key=domain --value="$domain"
 
 #=================================================
 # SET STANDARD SETTINGS FROM DEFAULT CONFIG
@@ -43,9 +43,9 @@ ynh_app_setting_set --key=domain --value=$domain
 
 # Network-specific config options
 device_model="mautrix-telegram"
-ynh_app_setting_set --key=device_model --value=$device_model
-ynh_app_setting_set --key=api_id --value=$api_id
-ynh_app_setting_set --key=api_hash --value=$api_hash
+ynh_app_setting_set --key=device_model --value="$device_model"
+ynh_app_setting_set --key=api_id --value="$api_id"
+ynh_app_setting_set --key=api_hash --value="$api_hash"
 
 # Config options that affect the central bridge module.
 personal_filtering_spaces="false"
@@ -76,28 +76,28 @@ pickle_key=$(ynh_string_random)
 # Logging config. See https://github.com/tulir/zeroconfig for details.
 print_level="info"
 
-ynh_app_setting_set --key=personal_filtering_spaces --value=$personal_filtering_spaces
-ynh_app_setting_set --key=enable_relaybot --value=$enable_relaybot
-ynh_app_setting_set --key=admin_only --value=$admin_only
-ynh_app_setting_set --key=displayname --value=$displayname
-ynh_app_setting_set --key=listrelay --value=$listrelay
-ynh_app_setting_set --key=listuser --value=$listuser
-ynh_app_setting_set --key=listadmin --value=$listadmin
+ynh_app_setting_set --key=personal_filtering_spaces --value="$personal_filtering_spaces"
+ynh_app_setting_set --key=enable_relaybot --value="$enable_relaybot"
+ynh_app_setting_set --key=admin_only --value="$admin_only"
+ynh_app_setting_set --key=displayname --value="$displayname"
+ynh_app_setting_set --key=listrelay --value="$listrelay"
+ynh_app_setting_set --key=listuser --value="$listuser"
+ynh_app_setting_set --key=listadmin --value="$listadmin"
 
-ynh_app_setting_set --key=async_media --value=$async_media
+ynh_app_setting_set --key=async_media --value="$async_media"
 
-ynh_app_setting_set --key=avatar --value=$avatar
-ynh_app_setting_set --key=ephemeral_events --value=$ephemeral_events
-ynh_app_setting_set --key=username_template --value=$username_template
+ynh_app_setting_set --key=avatar --value="$avatar"
+ynh_app_setting_set --key=ephemeral_events --value="$ephemeral_events"
+ynh_app_setting_set --key=username_template --value="$username_template"
 
-ynh_app_setting_set --key=delivery_receipts --value=$delivery_receipts
+ynh_app_setting_set --key=delivery_receipts --value="$delivery_receipts"
 
-ynh_app_setting_set --key=encryption --value=$encryption
-ynh_app_setting_set --key=encryption_default --value=$encryption_default
-ynh_app_setting_set --key=encryption_require --value=$encryption_require
-ynh_app_setting_set --key=pickle_key --value=$pickle_key
+ynh_app_setting_set --key=encryption --value="$encryption"
+ynh_app_setting_set --key=encryption_default --value="$encryption_default"
+ynh_app_setting_set --key=encryption_require --value="$encryption_require"
+ynh_app_setting_set --key=pickle_key --value="$pickle_key"
 
-ynh_app_setting_set --key=print_level --value=$print_level
+ynh_app_setting_set --key=print_level --value="$print_level"
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
