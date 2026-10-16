@@ -67,6 +67,32 @@ then # We may have leftover python files to clean, as this step was introduced i
 	done
 fi
 
+# Boolean settings stored by older versions (Python bridge, or the manifest boolean question) can be 1/0,
+# which the Go bridge does not read as booleans in config.yaml (e.g. "encryption: 1" breaks encrypted rooms).
+normalize_bool_setting() {
+  local value="${!1}"
+  case "${value,,}" in
+    1|yes|true) value="true" ;;
+    0|no|false) value="false" ;;
+    *) return 0 ;;
+  esac
+  if [ "${!1}" != "$value" ]; then
+    printf -v "$1" '%s' "$value"
+    ynh_app_setting_set --key="$1" --value="$value"
+  fi
+}
+for setting in encryption encryption_default encryption_require ephemeral_events delivery_receipts \
+               async_media personal_filtering_spaces enable_relaybot admin_only
+do
+  normalize_bool_setting "$setting"
+done
+
+if ynh_app_upgrading_from_version_before 0.2512.0~ynh1
+then # The Python bridge did not use ephemeral events; the Go bridge needs them for read receipts and typing notifications
+  ephemeral_events="true"
+  ynh_app_setting_set --key=ephemeral_events --value="$ephemeral_events"
+fi
+
 ynh_app_setting_delete --key=appserviceid
 ynh_app_setting_delete --key=telegram_link_preview
 if [ -z "$botname" ]
