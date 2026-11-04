@@ -72,20 +72,20 @@ ynh_app_setting_delete --key=telegram_link_preview
 if [ -z "$botname" ]
 then
   botname="$bot_username"
-  ynh_app_setting_set --key=botname --value=$botname
+  ynh_app_setting_set --key=botname --value="$botname"
   ynh_app_setting_delete --key=bot_username
 fi
 ynh_app_setting_delete --key=enable_metrics
 if [ -z "$port" ]
 then
   port=$(ynh_app_setting_get --key=listen_port)
-  ynh_app_setting_set --key=port --value=$port
+  ynh_app_setting_set --key=port --value="$port"
   ynh_app_setting_delete --key=listen_port
 fi
 ynh_app_setting_delete --key=alias_template
 ynh_app_setting_delete --key=displayname_template
 username_template="telegram_{{.}}"
-ynh_app_setting_set --key=username_template --value=$username_template
+ynh_app_setting_set --key=username_template --value="$username_template"
 
 ynh_app_setting_delete --key=is_encryption_enabled
 ynh_app_setting_delete --key=listpuppeting
@@ -95,14 +95,14 @@ if [ -z "$api_id" ]
 then
   api_id=""
   api_id=$(ynh_app_setting_get --key=apiid)
-  ynh_app_setting_set --key=api_id --value=$api_id
+  ynh_app_setting_set --key=api_id --value="$api_id"
   ynh_app_setting_delete --key=apiid
 fi
 if [ -z "$api_hash" ]
 then
   api_hash=""
   api_hash=$(ynh_app_setting_get --key=apihash)
-  ynh_app_setting_set --key=api_hash --value=$api_hash
+  ynh_app_setting_set --key=api_hash --value="$api_hash"
   ynh_app_setting_delete --key=apihash
 fi
 ynh_app_setting_delete --key=bottoken
@@ -112,48 +112,48 @@ ynh_app_setting_delete --key=bottoken
 if [ -z "$device_model" ]
 then
   device_model="mautrix-telegram"
-  ynh_app_setting_set --key=device_model --value=$device_model
+  ynh_app_setting_set --key=device_model --value="$device_model"
 fi
 
 if [ -z "$personal_filtering_spaces" ]
 then
   personal_filtering_spaces="false"
-  ynh_app_setting_set --key=personal_filtering_spaces --value=$personal_filtering_spaces
+  ynh_app_setting_set --key=personal_filtering_spaces --value="$personal_filtering_spaces"
 fi
 if [ -z "$enable_relaybot" ]
 then
   enable_relaybot="true"
-  ynh_app_setting_set --key=enable_relaybot --value=$enable_relaybot
+  ynh_app_setting_set --key=enable_relaybot --value="$enable_relaybot"
 fi
 if [ -z "$admin_only" ]
 then
   admin_only="true"
-  ynh_app_setting_set --key=admin_only --value=$admin_only
+  ynh_app_setting_set --key=admin_only --value="$admin_only"
 fi
 if [ -z "$displayname" ]
 then
   displayname=$(ynh_app_setting_get --key=bot_displayname)
-  ynh_app_setting_set --key=displayname --value=$displayname
+  ynh_app_setting_set --key=displayname --value="$displayname"
   ynh_app_setting_delete --key=bot_displayname
 fi
 if [ -z "$listrelay" ]
 then
     listrelay=$(ynh_app_setting_get --key=listrelaybot)
-    ynh_app_setting_set --key=listrelay --value=$listrelay
+    ynh_app_setting_set --key=listrelay --value="$listrelay"
     ynh_app_setting_delete --key=listrelaybot
 fi
 if [ -z "$listuser" ]
 then
     listuser=""
     listuser=$(ynh_app_setting_get --key=botusers)
-    ynh_app_setting_set --key=listuser --value=$listuser
+    ynh_app_setting_set --key=listuser --value="$listuser"
     ynh_app_setting_delete --key=botusers
     ynh_app_setting_delete --key=if_botusers
 fi
 if [ -z "$listadmin" ]
 then
     listadmin=$(ynh_app_setting_get --key=botadmin)
-    ynh_app_setting_set --key=listadmin --value=$listadmin
+    ynh_app_setting_set --key=listadmin --value="$listadmin"
     ynh_app_setting_delete --key=botadmin
 fi
 
@@ -161,20 +161,20 @@ fi
 if [ -z "$async_media" ]
 then
   async_media="false"
-  ynh_app_setting_set --key=async_media --value=$async_media
+  ynh_app_setting_set --key=async_media --value="$async_media"
 fi
 
 
 if [ -z "$avatar" ]
 then
   avatar=$bot_avatar
-  ynh_app_setting_set --key=avatar --value=$avatar
+  ynh_app_setting_set --key=avatar --value="$avatar"
   ynh_app_setting_delete --key=bot_avatar
 fi
 if [ -z "$ephemeral_events" ]
 then
   ephemeral_events="true"
-  ynh_app_setting_set --key=ephemeral_events --value=$ephemeral_events
+  ynh_app_setting_set --key=ephemeral_events --value="$ephemeral_events"
 fi
 
 
@@ -182,32 +182,32 @@ fi
 if [ -z "$delivery_receipts" ]
 then
   delivery_receipts="false"
-  ynh_app_setting_set --key=delivery_receipts --value=$delivery_receipts
+  ynh_app_setting_set --key=delivery_receipts --value="$delivery_receipts"
 fi
 
 
 if [ -z "$encryption_default" ]
 then
   encryption_default="false"
-  ynh_app_setting_set --key=encryption_default --value=$encryption_default
+  ynh_app_setting_set --key=encryption_default --value="$encryption_default"
 fi
 if [ -z "$encryption_require" ]
 then
   encryption_require="false"
-  ynh_app_setting_set --key=encryption_require --value=$encryption_require
+  ynh_app_setting_set --key=encryption_require --value="$encryption_require"
 fi
 # Upgrade from <v0.11
 if [ -z "$pickle_key" ]
 then
     pickle_key="mautrix.bridge.e2ee"
-    ynh_app_setting_set --key=pickle_key --value=$pickle_key
+    ynh_app_setting_set --key=pickle_key --value="$pickle_key"
 fi
 
 
 if [ -z "$print_level" ]
 then
   print_level="info"
-  ynh_app_setting_set --key=print_level --value=$print_level
+  ynh_app_setting_set --key=print_level --value="$print_level"
 fi
 
 
