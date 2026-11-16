@@ -7,7 +7,7 @@ name = "Matrix Telegram bridge"
 
 description.en = "Matrix / Synapse puppeting bridge for Telegram"
 description.fr = "Passerelle Matrix / Synapse pour Telegram"
-version = "0.2610.0~ynh1"
+version = "0.2611.0~ynh1"
 
 maintainers = ["thardev"]
 
@@ -105,12 +105,12 @@ help.fr = "Obtenez vos propres clés API sur https://my.telegram.org/apps"
 	in_subdir = false
 	extract = false
 	rename = "mautrix-telegram"
-	amd64.url = "https://github.com/mautrix/telegram/releases/download/v0.2610.0/mautrix-telegram-amd64"
-	amd64.sha256 = "a021ac51e648fbaabac7933a881c182723d32faff95aab42023f290d15d5d4c5"
-	arm64.url = "https://github.com/mautrix/telegram/releases/download/v0.2610.0/mautrix-telegram-arm64"
-	arm64.sha256 = "25f057c2b7ac1f89225f52eda75615ff030c33cbfe45226c598a6362ef6516f5"
-    armhf.url = "https://github.com/mautrix/telegram/releases/download/v0.2610.0/mautrix-telegram-arm"
-	armhf.sha256 = "c43a09494e44ec6b244642301f925bed4e078867e870e5a5d4cc973e67c30f35"
+	amd64.url = "https://github.com/mautrix/telegram/releases/download/v0.2611.0/mautrix-telegram-amd64"
+	amd64.sha256 = "58e0c43186cf17c633e3cad2e17ad046a4605980d2950bd13786ff68c87c2d2b"
+	arm64.url = "https://github.com/mautrix/telegram/releases/download/v0.2611.0/mautrix-telegram-arm64"
+	arm64.sha256 = "4f6f502fee76c4b97a4b0f51d74e4710735d0fe4d5ed2459374ab451f6a1b157"
+    armhf.url = "https://github.com/mautrix/telegram/releases/download/v0.2611.0/mautrix-telegram-arm"
+	armhf.sha256 = "ee050fc8dcaa1637d73c9009ec9c19cc7c95bda6d29489db1ee005dcf703865d"
 	autoupdate.strategy = "latest_github_release"
 	autoupdate.asset.amd64 = "^mautrix-telegram-amd64$"
 	autoupdate.asset.arm64 = "^mautrix-telegram-arm64$"
